@@ -246,189 +246,64 @@
     }
 
     
-/* Navigation */
-.navbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  z-index: 1000;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-}
-
-.nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  height: 70px;
-}
-
-.nav-logo h2 {
-  color: #6366f1;
-  font-weight: 700;
-  font-size: 1.8rem;
-}
-
-.nav-menu {
-  display: flex;
-  flex-wrap: wrap;
-  list-style: none;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-left: auto;
-  transition: all 0.3s ease;
-}
-
-.nav-link {
-  text-decoration: none;
-  color: #374151;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  white-space: nowrap;
-}
-
-.nav-link:hover {
-  color: #6366f1;
-  background: rgba(99, 102, 241, 0.1);
-}
-
-.nav-link.btn-primary {
-  background: #6366f1;
-  color: white;
-  padding: 0.6rem 1.2rem;
-}
-
-.nav-link.btn-primary:hover {
-  background: #5855eb;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-
-/* Hamburger Menu */
-.hamburger {
-  display: none;
-  flex-direction: column;
-  cursor: pointer;
-}
-
-.bar {
-  height: 3px;
-  width: 25px;
-  background-color: #374151;
-  margin: 3px 0;
-  transition: all 0.3s ease;
-}
-
-/* Scrollbar for nav on overflow */
-.nav-menu::-webkit-scrollbar {
-  height: 6px;
-}
-
-.nav-menu::-webkit-scrollbar-thumb {
-  background-color: #d1d5db;
-  border-radius: 3px;
-}
-
-/* Responsive Styling */
-@media (max-width: 1024px) {
-  .nav-container {
-    flex-wrap: nowrap;
-  }
-
-  .nav-menu {
-    overflow-x: auto;
-    max-width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .hamburger {
-    display: flex;
-  }
-
-  .nav-menu {
-    position: fixed;
-    left: -100%;
-    top: 70px;
-    flex-direction: column;
-    background-color: white;
-    width: 100%;
-    text-align: center;
-    transition: 0.3s;
-    box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
-    padding: 2rem 0;
-    z-index: 999;
-  }
-
-  .nav-menu.active {
-    left: 0;
-  }
-
-  .nav-link {
-    padding: 1rem;
-    font-size: 1.1rem;
-  }
-}
 
   </style>
 </head>
 <body class="container py-4">
-   <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <h2>EventHub</h2>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="#home" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a href="events.html" class="nav-link">Events</a>
-                </li>
-                <li class="nav-item">
-                    <a href="certificates.html" class="nav-link">Certificates</a>
-                </li>
-                <li class="nav-item">
-                    <a href="results.html" class="nav-link">Results</a>
-                </li>
-                 <li class="nav-item">
-                    <a href="Intern.html" class="nav-link">InternShips</a>
-                </li>
-                <li class="nav-item">
-  <a href="refer.html" class="nav-link">
-     Referral Program
-  </a>
-</li>
+ 
 
-                
-                <li class="nav-item" >
-                    <a href="1.html" class="nav-link ">Edit Profile</a>
-                </li>
-                
-                <li class="nav-item" onclick="logout()">
-                    <a href="#" class="nav-link">Logout</a>
-                </li>
-                <li class="nav-item">
-                    <a href="Login.html" class="nav-link btn-primary">Login</a>
-                </li>
-            </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </div>
-    </nav>
+<nav class="navbar navbar-expand-lg bg-body-tertiary bg-light shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">EventHub</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Offcanvas menu -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+
+      <div class="offcanvas-body">
+        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+          <li class="nav-item">
+            <a class="nav-link" href="#home">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="events.html">Events</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="certificates.html">Certificates</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="results.html">Results</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="Intern.html">Internships</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="refer.html">Referral Program</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="1.html">Edit Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="logout()">Logout</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-primary nav-link text-white px-3" href="Login.html">Login</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Bootstrap JS Bundle (required for offcanvas) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <!-- Toast Notifications -->
   <div class="toast-container" style="margin-top:10vh">
     <div id="successToast" class="toast align-items-center text-white bg-success" role="alert" aria-live="assertive" aria-atomic="true">
