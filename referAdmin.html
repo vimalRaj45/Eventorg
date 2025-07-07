@@ -865,13 +865,16 @@ async function setStudentTarget() {
             }
         }
 
-    async function createMentor() {
+   async function createMentor() {
     const form = document.getElementById('create-mentor-form');
     const formData = new FormData(form);
     const mentorData = Object.fromEntries(formData.entries());
 
     // Force attained to be 0
     mentorData.attained = 0;
+
+    // Log all the data being sent
+    console.log('Creating mentor with data:', JSON.stringify(mentorData));
 
     try {
         const response = await fetch(`${BASE_URL}/admin/create-mentor`, {
