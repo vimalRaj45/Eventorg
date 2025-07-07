@@ -235,6 +235,7 @@
             <th style="width: 12%">Event</th>
             <th style="width: 8%">Fee</th>
             <th style="width: 10%">Transaction ID</th>
+            <th style="width: 10%">Referral Code</th>
             <th style="width: 8%">Status</th>
             <th style="width: 10%">Verified At</th>
             <th style="width: 10%">Registered</th>
@@ -510,6 +511,11 @@
             ? `<span class="badge bg-light text-dark font-monospace">${p.transaction_id}</span>` 
             : '-'}
         </td>
+         <td>
+          ${p.referral_code
+            ? `<span class="badge bg-light text-dark font-monospace">${p.referral_code}</span>` 
+            : '-'}
+        </td>
         <td>
           ${p.payment_verified 
             ? '<span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i> Verified</span>'
@@ -616,42 +622,69 @@
     elements.confirmationModal.show();
   }
 
-  // Confirm toggle payment
-  async function confirmTogglePayment() {
-    elements.confirmationModal.hide();
-    try {
-      showLoading();
-      
-      const res = await fetch(`${API_BASE_URL}/participants/${currentParticipantId}/payment`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${adminToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ payment_verified: currentNewStatus })
-      });
+  
+ // Confirm toggle payment
+async function confirmTogglePayment() {
+  elements.confirmationModal.hide();
+  try {
+    showLoading();
+    
+    // Find the payment in our local data to check for referral code
+    const payment = allPayments.find(p => p.participant_id === currentParticipantId);
+    
+    const res = await fetch(`${API_BASE_URL}/participants/${currentParticipantId}/payment`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ payment_verified: currentNewStatus })
+    });
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Update failed');
-      }
-
-      // Update local data instead of reloading everything
-      const paymentIndex = allPayments.findIndex(p => p.participant_id === currentParticipantId);
-      if (paymentIndex !== -1) {
-        allPayments[paymentIndex].payment_verified = currentNewStatus;
-        allPayments[paymentIndex].verified_at = currentNewStatus ? new Date().toISOString() : null;
-      }
-      
-      renderPaymentTable();
-      showSuccess(`Payment ${currentNewStatus ? 'verified' : 'unverified'} successfully!`);
-    } catch (err) {
-      console.error('Update failed:', err.message);
-      showError('Failed to update payment status. Please try again.');
-    } finally {
-      hideLoading();
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'Update failed');
     }
+
+    // Update local data instead of reloading everything
+    const paymentIndex = allPayments.findIndex(p => p.participant_id === currentParticipantId);
+    if (paymentIndex !== -1) {
+      allPayments[paymentIndex].payment_verified = currentNewStatus;
+      allPayments[paymentIndex].verified_at = currentNewStatus ? new Date().toISOString() : null;
+    }
+    
+    // If we're verifying (not unverifying) and there's a referral code
+    if (currentNewStatus && payment && payment.referral_code) {
+      try {
+        const incrementRes = await fetch(`${API_BASE_URL}/students/increment-attained`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ referral_code: payment.referral_code })
+        });
+        
+        if (!incrementRes.ok) {
+          console.error('Failed to increment attained count, but payment was verified');
+        } else {
+          console.log('Successfully incremented attained count for referral code:', payment.referral_code);
+        }
+      } catch (err) {
+        console.error('Error incrementing attained count:', err);
+        // Don't fail the whole operation if this fails
+      }
+    }
+    
+    renderPaymentTable();
+    showSuccess(`Payment ${currentNewStatus ? 'verified' : 'unverified'} successfully!`);
+  } catch (err) {
+    console.error('Update failed:', err.message);
+    showError('Failed to update payment status. Please try again.');
+  } finally {
+    hideLoading();
   }
+}
 
   // Format date time
   function formatDateTime(dateString) {
