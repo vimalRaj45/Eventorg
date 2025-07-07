@@ -345,7 +345,8 @@
           <span id="loginSpinner" class="loading-spinner" style="color: white;display: none;"></span>
         </button>
       </div>
-      
+       <p id="autoLoginMessage" class="text-muted">Logging you in...</p>
+
       <div class="text-center mt-3">
         <a href="referRegister.html" class="text-decoration-none">Dont Have Account ?</a>
       </div>
@@ -627,74 +628,118 @@
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <script>
-    const baseUrl = "https://eventdb.onrender.com";
-    const loginForm = document.getElementById("loginForm");
-    const loginSection = document.getElementById("loginSection");
-    const studentDashboard = document.getElementById("studentDashboard");
-    const mentorDashboard = document.getElementById("mentorDashboard");
-    const contactInput = document.getElementById("contact");
-    const emailInput = document.getElementById("email");
-    const loginBtn = document.getElementById("loginBtn");
-    const loginText = document.getElementById("loginText");
-    const loginSpinner = document.getElementById("loginSpinner");
-    const helpBtn = document.getElementById("helpBtn");
-    
-    // Toast elements
-    const successToast = new bootstrap.Toast(document.getElementById('successToast'));
-    const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
-    
-    let currentUser = null;
+   const baseUrl = "https://eventdb.onrender.com";
+  const loginForm = document.getElementById("loginForm");
+  const loginSection = document.getElementById("loginSection");
+  const studentDashboard = document.getElementById("studentDashboard");
+  const mentorDashboard = document.getElementById("mentorDashboard");
+  const contactInput = document.getElementById("contact");
+  const emailInput = document.getElementById("email");
+  const loginBtn = document.getElementById("loginBtn");
+  const loginText = document.getElementById("loginText");
+  const loginSpinner = document.getElementById("loginSpinner");
+  const helpBtn = document.getElementById("helpBtn");
+  
+  // Toast elements
+  const successToast = new bootstrap.Toast(document.getElementById('successToast'));
+  const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+  
+  let currentUser = null;
 
-    // Show toast notification
-    function showToast(type, message) {
-      const toast = type === 'success' ? successToast : errorToast;
-      document.querySelector(`#${type}Toast .toast-body`).textContent = message;
-      toast.show();
+  // Auto-login if stored credentials exist
+const savedCredentials = localStorage.getItem('referralCredentials');
+if (savedCredentials) {
+  const credentials = JSON.parse(savedCredentials);
+
+  // Auto-fill fields
+  contactInput.value = credentials.contact || '';
+  emailInput.value = credentials.email || '';
+
+  // Auto-login only if both fields are filled
+  if (credentials.contact && credentials.email) {
+    // Optional: show a message
+    const autoLoginMessage = document.getElementById("autoLoginMessage");
+    if (autoLoginMessage) {
+      autoLoginMessage.style.display = 'block';
     }
 
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const contact_number = contactInput.value;
-      const email = emailInput.value;
-
-      // Show loading state
-      loginText.classList.add("hidden");
-      loginSpinner.classList.remove("hidden");
-      loginBtn.disabled = true;
-
-      try {
-        const res = await fetch(`${baseUrl}/stdlogin`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contact_number, email })
-        });
-        const user = await res.json();
-        
-        if (!res.ok) throw new Error(user.error || "Login failed. Please check your credentials.");
-        
-        currentUser = user;
-        loginSection.classList.add("hidden");
-        helpBtn.classList.remove("hidden");
-
-       if (user.role === 'mentor') {
-  loadMentorDashboard(user);    // 👨‍🏫 Mentor goes to mentor dashboard
-} else {
-  loadStudentDashboard(user);   // 🎓 Student goes to student dashboard
+    // Slight delay to ensure inputs are updated before submission
+    setTimeout(() => {
+      loginForm.dispatchEvent(new Event("submit"));
+    }, 300); // Delay can be 100–500ms
+  }
 }
 
 
-        
-        showToast('success', `Welcome back, ${user.first_name}!`);
-      } catch (err) {
-        showToast('error', err.message);
-        console.error("Login error:", err);
-      } finally {
-        // Reset loading state
-        loginText.classList.remove("hidden");
-        loginSpinner.classList.add("hidden");
-        loginBtn.disabled = false;
-      }
+  // Show toast notification
+  function showToast(type, message) {
+    const toast = type === 'success' ? successToast : errorToast;
+    document.querySelector(`#${type}Toast .toast-body`).textContent = message;
+    toast.show();
+  }
+
+ function logout() {
+  // Clear the stored credentials
+  localStorage.removeItem('referralCredentials');
+  // Clear the form fields
+  contactInput.value = '';
+  emailInput.value = '';
+  // Hide the auto-login message if it's visible
+  const autoLoginMessage = document.getElementById("autoLoginMessage");
+  if (autoLoginMessage) {
+    autoLoginMessage.style.display = 'none';
+  }
+  showToast('success', "Logged out successfully. See you soon!");
+  setTimeout(() => location.reload(), 1000);
+}
+  loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const contact_number = contactInput.value;
+  const email = emailInput.value;
+
+  // Show loading state
+  loginText.classList.add("hidden");
+  loginSpinner.classList.remove("hidden");
+  loginBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${baseUrl}/stdlogin`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contact_number, email })
     });
+    const user = await res.json();
+    
+    if (!res.ok) throw new Error(user.error || "Login failed. Please check your credentials.");
+    
+    currentUser = user;
+    loginSection.classList.add("hidden");
+    helpBtn.classList.remove("hidden");
+
+    // Store credentials only after successful login
+    localStorage.setItem('referralCredentials', JSON.stringify({
+      contact: contact_number,
+      email: email
+    }));
+
+    if (user.role === 'mentor') {
+      loadMentorDashboard(user);
+    } else {
+      loadStudentDashboard(user);
+    }
+    
+    showToast('success', `Welcome back, ${user.first_name}!`);
+  } catch (err) {
+    showToast('error', err.message);
+    console.error("Login error:", err);
+  } finally {
+    // Reset loading state
+    loginText.classList.remove("hidden");
+    loginSpinner.classList.add("hidden");
+    loginBtn.disabled = false;
+  }
+});
+
 
     function loadStudentDashboard(user) {
       studentDashboard.classList.remove("hidden");
@@ -754,101 +799,143 @@
       }
     });
 
-    async function loadMentorDashboard(user) {
-      mentorDashboard.classList.remove("hidden");
-      
-      // Update profile info
-      document.getElementById("mentorName").textContent = user.first_name;
-      document.getElementById("mentorFullName").textContent = `${user.first_name} ${user.last_name}`;
-      document.getElementById("mentorEmail").textContent = user.email;
-      document.getElementById("mentorPhoto").src = user.photo_url || 'https://via.placeholder.com/150?text=No+Photo';
-      document.getElementById("mentorRefCode").textContent = user.referral_code || 'Not Available';
-      
-      try {
-        const res = await fetch(`${baseUrl}/students/referral-tree/${user.referral_code}`);
-        const downlines = await res.json();
+   async function loadMentorDashboard(user) {
+  mentorDashboard.classList.remove("hidden");
+  
+  // Update profile info
+  document.getElementById("mentorName").textContent = user.first_name;
+  document.getElementById("mentorFullName").textContent = `${user.first_name} ${user.last_name}`;
+  document.getElementById("mentorEmail").textContent = user.email;
+  document.getElementById("mentorPhoto").src = user.photo_url || 'https://via.placeholder.com/150?text=No+Photo';
+  document.getElementById("mentorRefCode").textContent = user.referral_code || 'Not Available';
+  
+  try {
+    const res = await fetch(`${baseUrl}/students/referral-tree/${user.referral_code}`);
+    const downlines = await res.json();
+    
+    if (!res.ok) throw new Error("Failed to load student data");
+    
+    // Calculate totals
+    let totalTarget = user.target || 0; // Include mentor's own target
+    let totalAttained = user.attained || 0; // Include mentor's own attainment
+    let activeStudents = 0;
+    let studentsTotalTarget = 0;
+    let studentsTotalAttained = 0;
+    
+    const studentSelect = document.getElementById("studentSelect");
+    studentSelect.innerHTML = `<option value="">-- Select Student --</option>`;
+    downlineTable.innerHTML = "";
+    
+    downlines.forEach(d => {
+      if (d.level > 0 && d.role === 'student') {
+        // Add to student totals
+        studentsTotalTarget += d.target || 0;
+        studentsTotalAttained += d.attained || 0;
+        if (d.status === 'active') activeStudents++;
         
-        if (!res.ok) throw new Error("Failed to load student data");
+        // Add to student dropdown
+        studentSelect.innerHTML += `<option value="${d.id}">${d.first_name} ${d.last_name} (${d.email})</option>`;
         
-        // Calculate totals
-        let totalTarget = 0;
-        let totalAttained = 0;
-        let activeStudents = 0;
+        // Calculate progress
+        const progress = d.target ? Math.min(100, Math.round((d.attained / d.target) * 100)) : 0;
         
-        const studentSelect = document.getElementById("studentSelect");
-        studentSelect.innerHTML = `<option value="">-- Select Student --</option>`;
-        downlineTable.innerHTML = "";
-        
-        downlines.forEach(d => {
-          if (d.level > 0 && d.role === 'student') {
-            // Add to totals
-            totalTarget += d.target || 0;
-            totalAttained += d.attained || 0;
-            if (d.status === 'active') activeStudents++;
-            
-            // Add to student dropdown
-            studentSelect.innerHTML += `<option value="${d.id}">${d.first_name} ${d.last_name} (${d.email})</option>`;
-            
-            // Calculate progress
-            const progress = d.target ? Math.min(100, Math.round((d.attained / d.target) * 100)) : 0;
-            
-            // Add to table
-            downlineTable.innerHTML += `
-              <tr onclick="viewStudent(${d.id})" style="cursor: pointer;">
-                <td>${d.first_name} ${d.last_name}</td>
-                <td>${d.email}</td>
-                <td>${d.target || 0}</td>
-                <td>${d.attained || 0}</td>
-                <td>
-                  <div class="progress" style="height: 6px;">
-                    <div class="progress-bar bg-success" role="progressbar" 
-                      style="width: ${progress}%" 
-                      aria-valuenow="${progress}" 
-                      aria-valuemin="0" 
-                      aria-valuemax="100"></div>
-                  </div>
-                  <small>${progress}%</small>
-                </td>
-                <td><span class="status-badge status-${d.status || 'inactive'}">${d.status || 'inactive'}</span></td>
-              </tr>`;
-          }
-        });
-        
-        // Update mentor stats
-        document.getElementById("mentorTarget").textContent = totalTarget;
-        document.getElementById("mentorAttained").textContent = totalAttained;
-        document.getElementById("mentorStudents").textContent = activeStudents;
-        
-        const completionRate = totalTarget ? Math.min(100, Math.round((totalAttained / totalTarget) * 100)) : 0;
-        document.getElementById("mentorCompletion").textContent = `${completionRate}%`;
-        
-        // Update progress bar
-        document.getElementById("mentorProgressBar").style.width = `${completionRate}%`;
-        document.getElementById("mentorProgressBar").setAttribute('aria-valuenow', completionRate);
-        document.getElementById("mentorProgressPercent").textContent = `${completionRate}%`;
-        
-        // Enhance dropdown
-        setTimeout(() => $('#studentSelect').select2({
-          placeholder: "Search student...",
-          width: '100%'
-        }), 300);
-        
-        // Add search functionality
-        document.getElementById('studentSearch').addEventListener('input', (e) => {
-          const searchTerm = e.target.value.toLowerCase();
-          const rows = downlineTable.querySelectorAll('tr');
-          
-          rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchTerm) ? '' : 'none';
-          });
-        });
-        
-      } catch (err) {
-        showToast('error', "Failed to load student data: " + err.message);
-        console.error("Error loading mentor dashboard:", err);
+        // Add to table
+        downlineTable.innerHTML += `
+          <tr onclick="viewStudent(${d.id})" style="cursor: pointer;">
+            <td>${d.first_name} ${d.last_name}</td>
+            <td>${d.email}</td>
+            <td>${d.target || 0}</td>
+            <td>${d.attained || 0}</td>
+            <td>
+              <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-success" role="progressbar" 
+                  style="width: ${progress}%" 
+                  aria-valuenow="${progress}" 
+                  aria-valuemin="0" 
+                  aria-valuemax="100"></div>
+              </div>
+              <small>${progress}%</small>
+            </td>
+            <td><span class="status-badge status-${d.status || 'inactive'}">${d.status || 'inactive'}</span></td>
+          </tr>`;
       }
+    });
+    
+    // Update mentor stats - show both mentor's target and team totals
+    document.getElementById("mentorTarget").textContent = totalTarget;
+    document.getElementById("mentorAttained").textContent = totalAttained;
+    document.getElementById("mentorStudents").textContent = activeStudents;
+    
+    // Calculate completion rate including mentor's own target and attainment
+    const completionRate = totalTarget ? Math.min(100, Math.round((totalAttained / totalTarget) * 100)) : 0;
+    document.getElementById("mentorCompletion").textContent = `${completionRate}%`;
+    
+    // Update progress bar
+    document.getElementById("mentorProgressBar").style.width = `${completionRate}%`;
+    document.getElementById("mentorProgressBar").setAttribute('aria-valuenow', completionRate);
+    document.getElementById("mentorProgressPercent").textContent = `${completionRate}%`;
+    
+    // Add a summary section showing team totals
+    const teamSummaryHTML = `
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3">Team Performance Summary</h5>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card stat-card">
+                <div class="stat-value text-primary">${studentsTotalTarget}</div>
+                <div class="stat-label">Students Total Target</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card stat-card">
+                <div class="stat-value text-success">${studentsTotalAttained}</div>
+                <div class="stat-label">Students Total Attained</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card stat-card">
+                <div class="stat-value text-info">${activeStudents}</div>
+                <div class="stat-label">Active Students</div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <p><strong>Your Personal Target:</strong> ${user.target || 0}</p>
+            <p><strong>Your Personal Attained:</strong> ${user.attained || 0}</p>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Insert the summary before the student table
+    const mentorCard = document.querySelector("#mentorDashboard .card.mb-4");
+    if (mentorCard) {
+      mentorCard.insertAdjacentHTML('afterend', teamSummaryHTML);
     }
+    
+    // Enhance dropdown
+    setTimeout(() => $('#studentSelect').select2({
+      placeholder: "Search student...",
+      width: '100%'
+    }), 300);
+    
+    // Add search functionality
+    document.getElementById('studentSearch').addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const rows = downlineTable.querySelectorAll('tr');
+      
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+      });
+    });
+    
+  } catch (err) {
+    showToast('error', "Failed to load student data: " + err.message);
+    console.error("Error loading mentor dashboard:", err);
+  }
+}
 
     // Assign target form
     const assignForm = document.getElementById("assignForm");
@@ -964,11 +1051,32 @@
     }
 
     // Logout functionality
-    document.getElementById("logoutBtn1").onclick =
-    document.getElementById("logoutBtn2").onclick = () => {
-      showToast('success', "Logged out successfully. See you soon!");
-      setTimeout(() => location.reload(), 1000);
-    };
+document.getElementById("logoutBtn1").onclick =
+document.getElementById("logoutBtn2").onclick = () => {
+  // Clear the stored credentials from localStorage
+  localStorage.removeItem('referralCredentials');
+  
+  // Clear the login form fields
+  document.getElementById("contact").value = '';
+  document.getElementById("email").value = '';
+  
+  // Hide the auto-login message if visible
+  const autoLoginMessage = document.getElementById("autoLoginMessage");
+  if (autoLoginMessage) {
+    autoLoginMessage.style.display = 'none';
+  }
+  
+  // Show logout success message
+  showToast('success', "Logged out successfully. See you soon!");
+  
+  // Reload the page after a short delay to reset everything
+  setTimeout(() => {
+    // Clear any cached user data
+    currentUser = null;
+    // Force reload without cache
+    window.location.reload(true);
+  }, 1000);
+};
 
     // Help button functionality
     helpBtn.addEventListener('click', () => {
