@@ -656,7 +656,7 @@ async function confirmTogglePayment() {
     // If we're verifying (not unverifying) and there's a referral code
     if (currentNewStatus && payment && payment.referral_code) {
       try {
-        const incrementRes = await fetch(`${BASE_URL}/students/increment-attained`, {
+        const incrementRes = await fetch(`${BASE}/students/increment-attained`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${adminToken}`,
