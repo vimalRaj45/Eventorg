@@ -864,32 +864,36 @@ async function setStudentTarget() {
             }
         }
 
-        async function createMentor() {
-            const form = document.getElementById('create-mentor-form');
-            const formData = new FormData(form);
-            const mentorData = Object.fromEntries(formData.entries());
-            
-            try {
-                const response = await fetch(`${BASE_URL}/admin/create-mentor`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(mentorData)
-                });
-                
-                if (response.ok) {
-                    alert('Mentor created successfully!');
-                    form.reset();
-                    loadAllMentors();
-                } else {
-                    throw new Error('Mentor creation failed');
-                }
-            } catch (error) {
-                console.error('Error creating mentor:', error);
-                alert('Failed to create mentor');
-            }
+    async function createMentor() {
+    const form = document.getElementById('create-mentor-form');
+    const formData = new FormData(form);
+    const mentorData = Object.fromEntries(formData.entries());
+
+    // Force attained to be 0
+    mentorData.attained = 0;
+
+    try {
+        const response = await fetch(`${BASE_URL}/admin/create-mentor`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mentorData)
+        });
+
+        if (response.ok) {
+            alert('Mentor created successfully!');
+            form.reset();
+            loadAllMentors();
+        } else {
+            throw new Error('Mentor creation failed');
         }
+    } catch (error) {
+        console.error('Error creating mentor:', error);
+        alert('Failed to create mentor');
+    }
+}
+
 
         // Approval functions
         async function loadPendingApprovals() {
