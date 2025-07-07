@@ -480,6 +480,14 @@
           <i class="fas fa-check-circle mt-2" style="color: var(--success-color); font-size: 1.5rem;"></i>
         </div>
       </div>
+
+      <div class="col-md-3">
+  <div class="card stat-card">
+    <div class="stat-value text-info" id="mentorTeamAttained">0</div>
+    <div class="stat-label">Team Attained (You + Students)</div>
+    <i class="fas fa-users mt-2" style="color: var(--info-color); font-size: 1.5rem;"></i>
+  </div>
+</div>
       
       <div class="col-md-3">
         <div class="card stat-card">
@@ -802,7 +810,7 @@ if (savedCredentials) {
       }
     });
 
-   async function loadMentorDashboard(user) {
+async function loadMentorDashboard(user) {
   mentorDashboard.classList.remove("hidden");
   
   // Update profile info
@@ -821,6 +829,7 @@ if (savedCredentials) {
     // Calculate totals
     let totalTarget = user.target || 0; // Include mentor's own target
     let totalAttained = user.attained || 0; // Include mentor's own attainment
+    let teamAttained = user.attained || 0; // Start with mentor's attainment
     let activeStudents = 0;
     let studentsTotalTarget = 0;
     let studentsTotalAttained = 0;
@@ -834,6 +843,7 @@ if (savedCredentials) {
         // Add to student totals
         studentsTotalTarget += d.target || 0;
         studentsTotalAttained += d.attained || 0;
+        teamAttained += d.attained || 0; // Add to team total
         if (d.status === 'active') activeStudents++;
         
         // Add to student dropdown
@@ -864,9 +874,10 @@ if (savedCredentials) {
       }
     });
     
-    // Update mentor stats - show both mentor's target and team totals
+    // Update mentor stats
     document.getElementById("mentorTarget").textContent = totalTarget;
     document.getElementById("mentorAttained").textContent = totalAttained;
+    document.getElementById("mentorTeamAttained").textContent = teamAttained; // New metric
     document.getElementById("mentorStudents").textContent = activeStudents;
     
     // Calculate completion rate including mentor's own target and attainment
@@ -878,25 +889,31 @@ if (savedCredentials) {
     document.getElementById("mentorProgressBar").setAttribute('aria-valuenow', completionRate);
     document.getElementById("mentorProgressPercent").textContent = `${completionRate}%`;
     
-    // Add a summary section showing team totals
+    // Update the team summary section to include the new metric
     const teamSummaryHTML = `
       <div class="card mb-4">
         <div class="card-body">
           <h5 class="fw-bold mb-3">Team Performance Summary</h5>
           <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="card stat-card">
                 <div class="stat-value text-primary">${studentsTotalTarget}</div>
                 <div class="stat-label">Students Total Target</div>
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="card stat-card">
                 <div class="stat-value text-success">${studentsTotalAttained}</div>
                 <div class="stat-label">Students Total Attained</div>
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+              <div class="card stat-card">
+                <div class="stat-value text-info">${teamAttained}</div>
+                <div class="stat-label">Team Attained (You + Students)</div>
+              </div>
+            </div>
+            <div class="col-md-3">
               <div class="card stat-card">
                 <div class="stat-value text-info">${activeStudents}</div>
                 <div class="stat-label">Active Students</div>
@@ -917,6 +934,7 @@ if (savedCredentials) {
       mentorCard.insertAdjacentHTML('afterend', teamSummaryHTML);
     }
     
+    // Rest of the function remains the same...
     // Enhance dropdown
     setTimeout(() => $('#studentSelect').select2({
       placeholder: "Search student...",
@@ -939,7 +957,6 @@ if (savedCredentials) {
     console.error("Error loading mentor dashboard:", err);
   }
 }
-
     // Assign target form
     const assignForm = document.getElementById("assignForm");
     assignForm.addEventListener("submit", async (e) => {
