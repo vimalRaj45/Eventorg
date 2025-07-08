@@ -628,7 +628,13 @@ function filterEvents() {
     displayEvents(allEventsData);
     return;
   }
-  
+
+  function logout() {
+  localStorage.clear(); // Clears all localStorage keys
+  window.location.href = "Login.html"; // Redirect to login/home page
+}
+
+    
   const filteredEvents = allEventsData.filter(event => 
     event.status.toLowerCase() === status.toLowerCase()
   );
