@@ -225,12 +225,12 @@
      Referral Program
   </a>
 </li>
-                <li class="nav-item" onclick="logout()">
-                    <a href="#" class="nav-link">Logout</a>
-                </li>
-         <li class="eh-nav-item">
-        <a href="Login.html" class="nav-link btn-primary">Login</a>
-      </li> 
+                 <li class="nav-item" id="logoutItem" style="display: none;" onclick="logout()">
+    <a href="#" class="nav-link">Logout</a>
+  </li>
+  <li class="nav-item" id="loginItem" style="display: none;">
+    <a href="Login.html" class="nav-link btn-primary">Login</a>
+  </li>
             </ul>
             <div class="hamburger">
                 <span class="bar"></span>
@@ -471,6 +471,23 @@ document.addEventListener('keydown', function(e) {
     
   }
 });
+
+        const user = localStorage.getItem("user");
+
+    if (user) {
+      document.getElementById("logoutItem").style.display = "block";
+      document.getElementById("loginItem").style.display = "none";
+    } else {
+      document.getElementById("logoutItem").style.display = "none";
+      document.getElementById("loginItem").style.display = "block";
+    }
+
+          function logout() {
+  localStorage.clear(); // Clears all localStorage keys
+  window.location.href = "Login.html"; // Redirect to login/home page
+}
+
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Mobile menu toggle
             const hamburger = document.querySelector('.hamburger');
