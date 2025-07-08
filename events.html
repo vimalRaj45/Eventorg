@@ -606,6 +606,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
+
+      function logout() {
+  localStorage.clear(); // Clears all localStorage keys
+  window.location.href = "Login.html"; // Redirect to login/home page
+}
  const user = localStorage.getItem("user");
 
     if (user) {
@@ -629,10 +634,7 @@ function filterEvents() {
     return;
   }
 
-  function logout() {
-  localStorage.clear(); // Clears all localStorage keys
-  window.location.href = "Login.html"; // Redirect to login/home page
-}
+
 
     
   const filteredEvents = allEventsData.filter(event => 
