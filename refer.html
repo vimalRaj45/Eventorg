@@ -833,6 +833,9 @@ async function loadMentorDashboard(user) {
     let activeStudents = 0;
     let studentsTotalTarget = 0;
     let studentsTotalAttained = 0;
+    const internTarget = user.admin_intern_target || 0;
+    const internAttained = user.admin_intern_attained || 0;
+
     
     const studentSelect = document.getElementById("studentSelect");
     studentSelect.innerHTML = `<option value="">-- Select Student --</option>`;
@@ -891,42 +894,49 @@ async function loadMentorDashboard(user) {
     
     // Update the team summary section to include the new metric
     const teamSummaryHTML = `
-      <div class="card mb-4">
-        <div class="card-body">
-          <h5 class="fw-bold mb-3">Team Performance Summary</h5>
-          <div class="row">
-            <div class="col-md-3">
-              <div class="card stat-card">
-                <div class="stat-value text-primary">${studentsTotalTarget}</div>
-                <div class="stat-label">Students Total Target</div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card stat-card">
-                <div class="stat-value text-success">${studentsTotalAttained}</div>
-                <div class="stat-label">Students Total Attained</div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card stat-card">
-                <div class="stat-value text-info">${teamAttained}</div>
-                <div class="stat-label">Team Attained (You + Students)</div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card stat-card">
-                <div class="stat-value text-info">${activeStudents}</div>
-                <div class="stat-label">Active Students</div>
-              </div>
-            </div>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="fw-bold mb-3">Team Performance Summary</h5>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="stat-value text-primary">${studentsTotalTarget}</div>
+            <div class="stat-label">Students Total Target</div>
           </div>
-          <div class="mt-3">
-            <p><strong>Your Personal Target:</strong> ${user.target || 0}</p>
-            <p><strong>Your Personal Attained:</strong> ${user.attained || 0}</p>
+        </div>
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="stat-value text-success">${studentsTotalAttained}</div>
+            <div class="stat-label">Students Total Attained</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="stat-value text-info">${teamAttained}</div>
+            <div class="stat-label">Team Attained (You + Students)</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="stat-value text-info">${activeStudents}</div>
+            <div class="stat-label">Active Students</div>
           </div>
         </div>
       </div>
-    `;
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <p><strong>Your Personal Target:</strong> ${user.target || 0}</p>
+          <p><strong>Your Personal Attained:</strong> ${user.attained || 0}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Internship Target:</strong> ${internTarget}</p>
+          <p><strong>Internship Attained:</strong> ${internAttained}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
     
     // Insert the summary before the student table
     const mentorCard = document.querySelector("#mentorDashboard .card.mb-4");
