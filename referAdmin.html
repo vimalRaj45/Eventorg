@@ -349,16 +349,18 @@
     <h2>Target Management</h2>
     
     <div class="target-controls">
-        <div class="target-form">
-            <h3>Set Mentor Target</h3>
-            <form id="set-mentor-target-form" onsubmit="event.preventDefault(); setMentorTarget();">
-                <select id="mentor-target-select" required>
-                    <option value="">Select Mentor</option>
-                </select>
-                <input type="number" id="mentor-target-value" placeholder="Target value" required>
-                <button type="submit">Set Target</button>
-            </form>
-        </div>
+       <div class="target-form">
+  <h3>Set Mentor Target</h3>
+  <form id="set-mentor-target-form" onsubmit="event.preventDefault(); setMentorTarget();">
+    <select id="mentor-target-select" required>
+      <option value="">Select Mentor</option>
+    </select>
+    <input type="number" id="mentor-target-value" placeholder="Attained Target">
+    <input type="number" id="mentor-intern-target-value" placeholder="Internship Target">
+    <button type="submit">Set Target</button>
+  </form>
+</div>
+
         
         <div class="target-form">
             <h3>Set Student Target</h3>
@@ -444,11 +446,11 @@
         let currentMentorId = null;
 
 
-     const user = JSON.parse(localStorage.getItem('user')) || {}; // Get user from localStorage
+       const user = JSON.parse(localStorage.getItem('user')) || {}; // Get user from localStorage
 
-function isAdmin() {
-  return user.role === 'admin';
-}
+      function isAdmin() {
+               return user.role === 'admin';
+      }
 
 // If not admin, redirect to index.html
 if (!isAdmin()) {
@@ -484,92 +486,117 @@ if (!isAdmin()) {
         }
 
 
-        async function loadTargetsSection() {
-    try {
-        // Load mentors and students for dropdowns
-        const [mentorsRes, studentsRes, targetsRes] = await Promise.all([
-            fetch(`${BASE_URL}/admin/mentors`),
-            fetch(`${BASE_URL}/admin/students`),
-            fetch(`${BASE_URL}/admin/targets`)
-        ]);
-        
-        const [mentors, students, targets] = await Promise.all([
-            mentorsRes.json(),
-            studentsRes.json(),
-            targetsRes.json()
-        ]);
+       async function loadTargetsSection() {
+  try {
+    const [mentorsRes, studentsRes, targetsRes] = await Promise.all([
+      fetch(`${BASE_URL}/admin/mentors`),
+      fetch(`${BASE_URL}/admin/students`),
+      fetch(`${BASE_URL}/admin/targets`)
+    ]);
 
-        // Populate mentor dropdown
-        document.getElementById('mentor-target-select').innerHTML = 
-            '<option value="">Select Mentor</option>' +
-            mentors.map(m => `<option value="${m.mentor_id}">${m.mentor_name} (ID: ${m.mentor_id})</option>`).join('');
+    const [mentors, students, targets] = await Promise.all([
+      mentorsRes.json(),
+      studentsRes.json(),
+      targetsRes.json()
+    ]);
 
-        // Populate student dropdown
-        document.getElementById('student-target-select').innerHTML = 
-            '<option value="">Select Student</option>' +
-            students.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name} (ID: ${s.id})</option>`).join('');
+    // Populate mentor dropdown
+    document.getElementById('mentor-target-select').innerHTML =
+      '<option value="">Select Mentor</option>' +
+      mentors.map(m => `<option value="${m.mentor_id}">${m.mentor_name} (ID: ${m.mentor_id})</option>`).join('');
 
-        // Display targets table
-        document.getElementById('targets-data').innerHTML = `
-            <table border="1">
-                <tr>
-                    <th>ID</th><th>Name</th><th>Role</th>
-                    <th>Target</th><th>Attained</th><th>Progress</th>
-                </tr>
-                ${targets.map(target => {
-                    const progress = target.target > 0 ? 
-                        Math.min(100, Math.round((target.attained / target.target) * 100)) : 0;
-                    const color = progress >= 100 ? '#2ecc71' : progress >= 50 ? '#f39c12' : '#e74c3c';
-                    return `
-                    <tr class="role-${target.role.toLowerCase()}">
-                        <td>${target.id}</td>
-                        <td>${target.name}</td>
-                        <td>${getRoleBadge(target.role)}</td>
-                        <td>${target.target}</td>
-                        <td>${target.attained}</td>
-                        <td>
-                            <div style="background:#ecf0f1;border-radius:4px;height:20px;">
-                                <div style="background:${color};width:${progress}%;height:100%;border-radius:4px;text-align:center;color:white;font-size:12px;line-height:20px;">
-                                    ${progress}%
-                                </div>
-                            </div>
-                        </td>
-                    </tr>`;
-                }).join('')}
-            </table>`;
-    } catch (error) {
-        console.error('Error loading targets:', error);
-        document.getElementById('targets-data').innerHTML = 'Error loading targets';
-    }
+    // Populate student dropdown
+    document.getElementById('student-target-select').innerHTML =
+      '<option value="">Select Student</option>' +
+      students.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name} (ID: ${s.id})</option>`).join('');
+
+    // Display targets table with intern targets
+    document.getElementById('targets-data').innerHTML = `
+      <table border="1">
+        <tr>
+          <th>ID</th><th>Name</th><th>Role</th>
+          <th>Target</th><th>Attained</th><th>Progress</th>
+          <th>Intern Target</th><th>Intern Attained</th><th>Intern Progress</th>
+        </tr>
+        ${targets.map(target => {
+          const progress = target.target > 0 ?
+            Math.min(100, Math.round((target.attained / target.target) * 100)) : 0;
+          const internProgress = target.admin_intern_target > 0 ?
+            Math.min(100, Math.round((target.admin_intern_attained / target.admin_intern_target) * 100)) : 0;
+
+          const progressColor = progress >= 100 ? '#2ecc71' : progress >= 50 ? '#f39c12' : '#e74c3c';
+          const internColor = internProgress >= 100 ? '#3498db' : internProgress >= 50 ? '#9b59b6' : '#95a5a6';
+
+          return `
+            <tr class="role-${target.role.toLowerCase()}">
+              <td>${target.id}</td>
+              <td>${target.name}</td>
+              <td>${getRoleBadge(target.role)}</td>
+              <td>${target.target}</td>
+              <td>${target.attained}</td>
+              <td>
+                <div style="background:#ecf0f1;border-radius:4px;height:20px;">
+                  <div style="background:${progressColor};width:${progress}%;height:100%;border-radius:4px;text-align:center;color:white;font-size:12px;line-height:20px;">
+                    ${progress}%
+                  </div>
+                </div>
+              </td>
+              <td>${target.admin_intern_target || 0}</td>
+              <td>${target.admin_intern_attained || 0}</td>
+              <td>
+                <div style="background:#ecf0f1;border-radius:4px;height:20px;">
+                  <div style="background:${internColor};width:${internProgress}%;height:100%;border-radius:4px;text-align:center;color:white;font-size:12px;line-height:20px;">
+                    ${internProgress}%
+                  </div>
+                </div>
+              </td>
+            </tr>`;
+        }).join('')}
+      </table>
+    `;
+
+  } catch (error) {
+    console.error('Error loading targets:', error);
+    document.getElementById('targets-data').innerHTML = 'Error loading targets';
+  }
 }
+
 
 async function setMentorTarget() {
-    const mentorId = document.getElementById('mentor-target-select').value;
-    const targetValue = document.getElementById('mentor-target-value').value;
-    
-    if (!mentorId || !targetValue) {
-        alert('Please select a mentor and enter target value');
-        return;
+  const mentorId = document.getElementById('mentor-target-select').value;
+  const targetValue = document.getElementById('mentor-target-value').value;
+  const internTargetValue = document.getElementById('mentor-intern-target-value').value;
+
+  if (!mentorId || !targetValue || !internTargetValue) {
+    alert('Please fill all fields');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${BASE_URL}/admin/set-target`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: mentorId,
+        target: Number(targetValue),
+        admin_intern_target: Number(internTargetValue),
+        is_mentor: true
+      })
+    });
+
+    if (response.ok) {
+      alert('Target set successfully!');
+      loadTargetsSection(); // Reload updated target list
+    } else {
+      throw new Error(await response.text());
     }
-    
-    try {
-        const response = await fetch(`${BASE_URL}/admin/set-target`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: mentorId, target: targetValue, is_mentor: true })
-        });
-        
-        if (response.ok) {
-            alert('Target set successfully!');
-            loadTargetsSection();
-        } else {
-            throw new Error(await response.text());
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to set target');
-    }
+
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Failed to set target');
+  }
 }
+
 
 async function setStudentTarget() {
     const studentId = document.getElementById('student-target-select').value;
