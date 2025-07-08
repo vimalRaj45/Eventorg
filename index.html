@@ -279,12 +279,14 @@
                     <a href="1.html" class="nav-link ">Edit Profile</a>
                 </li>
                 
-                <li class="nav-item" onclick="logout()">
-                    <a href="#" class="nav-link">Logout</a>
-                </li>
-                <li class="nav-item">
-                    <a href="Login.html" class="nav-link btn-primary">Login</a>
-                </li>
+            
+  <li class="nav-item" id="logoutItem" style="display: none;" onclick="logout()">
+    <a href="#" class="nav-link">Logout</a>
+  </li>
+  <li class="nav-item" id="loginItem" style="display: none;">
+    <a href="Login.html" class="nav-link btn-primary">Login</a>
+  </li>
+
             </ul>
             <div class="hamburger">
                 <span class="bar"></span>
@@ -588,6 +590,17 @@ document.addEventListener('keydown', function(e) {
 function showDevPopup() {
  console.warn('Developer tools are disabled for this page.');
 }
+
+
+    const user = localStorage.getItem("user");
+
+    if (user) {
+      document.getElementById("logoutItem").style.display = "block";
+      document.getElementById("loginItem").style.display = "none";
+    } else {
+      document.getElementById("logoutItem").style.display = "none";
+      document.getElementById("loginItem").style.display = "block";
+    }
 
 
   const BASE_URL = "https://eventdb.onrender.com";
