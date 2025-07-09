@@ -176,7 +176,7 @@
 
   <script>
     const BASE = "https://eventdb.onrender.com";
-    const token = localStorage.getItem("jwtToken") || "";
+    const token = localStorage.getItem('jwtToken');
     let applicationsModal = null;
     let applicationModal = null;
     let currentInternshipId = null;
@@ -250,6 +250,9 @@
             <div class="card-body">
               <h5 class="card-title">${internship.company_name}</h5>
               <h6 class="card-subtitle mb-2 text-muted">${internship.position}</h6>
+              <p class="card-text">
+                ${internship.description || 'No description available'}
+              </p>
               <p class="card-text">
                 <small class="text-muted">Duration: ${internship.duration}</small><br>
                 <small class="text-muted">
