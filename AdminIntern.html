@@ -234,9 +234,9 @@
   </div>
 
 <script>
-const BASE = "https://eventdb.onrender.com";
+const BASE = "https://eventdb.onrender.com"
 const IMGBB_API_KEY = "76954d664f0beaf57b8c5a5b0eca84e6";
-const token = localStorage.getItem('jwtToken') || "";
+const token = localStorage.getItem('jwtToken');
 let applicantModal = null;
 let editModal = null;
 let currentApplicationId = null;
@@ -322,7 +322,7 @@ function renderInternships(internships) {
         <div class="card-body">
           <h5 class="card-title">${i.company_name}</h5>
           <h6 class="card-subtitle mb-2 text-muted">${i.position}</h6>
-          ${i.desc ? `<p class="card-text">${i.desc}</p>` : ''}
+          ${i.description ? `<p class="card-text">${i.description}</p>` : ''}
           <p class="card-text">
             <small class="text-muted">Duration: ${i.duration}</small><br>
             <small class="text-muted">Dates: ${new Date(i.start_date).toLocaleDateString()} to ${new Date(i.end_date).toLocaleDateString()}</small><br>
@@ -387,7 +387,7 @@ async function openEditModal(id) {
     document.getElementById('editId').value = internship.id;
     document.getElementById('editCompany').value = internship.company_name || '';
     document.getElementById('editPosition').value = internship.position || '';
-    document.getElementById('editDescription').value = internship.desc || '';
+    document.getElementById('editDescription').value = internship.description || '';
     document.getElementById('editDuration').value = internship.duration || '';
     document.getElementById('editStart').value = formatDateForInput(internship.start_date);
     document.getElementById('editEnd').value = formatDateForInput(internship.end_date);
@@ -451,7 +451,7 @@ async function saveInternshipChanges() {
     const body = {
       company_name: document.getElementById('editCompany').value,
       position: document.getElementById('editPosition').value,
-      desc: document.getElementById('editDescription').value,
+      description: document.getElementById('editDescription').value,
       duration: document.getElementById('editDuration').value,
       start_date: document.getElementById('editStart').value,
       end_date: document.getElementById('editEnd').value,
@@ -563,7 +563,7 @@ document.getElementById('createInternship').addEventListener('submit', async (e)
     const body = {
       company_name: document.getElementById('company').value,
       position: document.getElementById('position').value,
-      desc: document.getElementById('description').value,
+      description: document.getElementById('description').value,
       duration: document.getElementById('duration').value,
       start_date: document.getElementById('start').value,
       end_date: document.getElementById('end').value,
