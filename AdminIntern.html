@@ -234,8 +234,8 @@
                   <th>Student</th>
                   <th>Internship</th>
                   <th>Transaction No</th>
+                  <th>Referral Code</th>
                   <th>Payment Status</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="paymentsTable">
@@ -290,7 +290,7 @@
 <script>
 const BASE = "https://eventdb.onrender.com";
 const IMGBB_API_KEY = "76954d664f0beaf57b8c5a5b0eca84e6";
-const token = localStorage.getItem("jwtToken") || "";
+const token = localStorage.getItem('jwtToken') || "";
 let applicantModal = null;
 let editModal = null;
 let verifyPaymentModal = null;
@@ -357,6 +357,7 @@ async function loadInternships() {
     if (!res.ok) throw new Error('Failed to load internships');
     
     const data = await res.json();
+  
     renderInternships(data);
   } catch (err) {
     console.error('Error loading internships:', err);
@@ -768,6 +769,7 @@ async function loadPaymentApplications() {
     if (!res.ok) throw new Error('Failed to load payment applications');
     
     const data = await res.json();
+    console.log('Payment applications data:', data);
     renderPaymentApplications(data);
   } catch (err) {
     console.error('Error loading payment applications:', err);
@@ -809,13 +811,14 @@ function renderPaymentApplications(applications) {
         ${a.position} at ${a.company_name}
       </td>
       <td>${a.transaction_no || 'N/A'}</td>
+      <td>${a.referral_code || 'N/A'}</td>
       <td>
         <span class="badge rounded-pill bg-warning">
           ${a.payment_status}
         </span>
       </td>
       <td>
-        <button class="btn btn-sm btn-success" onclick="openVerifyPaymentModal(${a.id})">
+        <button class="btn btn-sm btn-success" style="display: none;" onclick="openVerifyPaymentModal(${a.id})">
           <i class="fas fa-check-circle"></i> Verify
         </button>
       </td>
@@ -878,33 +881,75 @@ async function openVerifyPaymentModal(applicationId) {
 }
 
 // Confirm payment verification
+// ✅ Confirm payment verification and optionally increment mentor intern count
 async function confirmVerifyPayment() {
   try {
-    const res = await fetch(`${BASE}/api/admin/applications/${currentApplicationId}/verify-payment`, {
+    // Step 1: Verify the payment
+    const verifyRes = await fetch(`${BASE}/api/admin/applications/${currentApplicationId}/verify-payment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       }
     });
-    
-    if (!res.ok) {
-      const error = await res.json();
+
+    if (!verifyRes.ok) {
+      const error = await verifyRes.json();
       throw new Error(error.message || 'Failed to verify payment');
     }
-    
-    const result = await res.json();
+
+    const result = await verifyRes.json();
+
+    // Step 2: Fetch application details to get the referral code
+    const appRes = await fetch(`${BASE}/api/admin/applications`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!appRes.ok) throw new Error('Failed to load application details');
+
+    const applications = await appRes.json();
+    const application = applications.find(app => app.id == currentApplicationId);
+
+    if (!application) throw new Error('Application not found');
+
+    // ✅ Console log the referral code
+    console.log("Referral Code from Application:", application.referral_code);
+
+    // Step 3: If there's a referral code, increment the mentor's intern count
+    if (application.referral_code) {
+      try {
+        const incrementRes = await fetch(`${BASE}/referrals/increment-intern-chain`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            used_referral_code: application.referral_code
+          })
+        });
+
+        if (!incrementRes.ok) {
+          console.error('Failed to increment mentor intern count:', await incrementRes.json());
+        }
+      } catch (incErr) {
+        console.error('Error incrementing mentor intern count:', incErr);
+      }
+    }
+
+    // Step 4: Show success and refresh data
     verifyPaymentModal.hide();
-    
+
     Swal.fire({
       title: 'Success!',
       text: result.message,
       icon: 'success',
       confirmButtonText: 'OK'
     });
-    
+
     loadApplications();
     loadPaymentApplications();
+
   } catch (err) {
     Swal.fire('Error', err.message, 'error');
   }
@@ -985,9 +1030,10 @@ async function updateApplicationStatus(id, status) {
       confirmButtonText: `Yes, ${status}`,
       cancelButtonText: 'Cancel'
     });
-    
+
     if (!confirm.isConfirmed) return;
-    
+
+    // Step 1: Update application status
     const res = await fetch(`${BASE}/api/admin/applications/${id}/status`, {
       method: 'PUT',
       headers: {
@@ -996,16 +1042,53 @@ async function updateApplicationStatus(id, status) {
       },
       body: JSON.stringify({ status })
     });
-    
+
     if (!res.ok) throw new Error('Failed to update application status');
-    
+
     const result = await res.json();
+
+    // Step 2: Fetch application to get referral code
+    const appRes = await fetch(`${BASE}/api/admin/applications`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!appRes.ok) throw new Error('Failed to fetch applications');
+
+    const applications = await appRes.json();
+    const application = applications.find(app => app.id == id);
+
+    if (!application) throw new Error('Application not found');
+
+    console.log("Referral Code (if any):", application.referral_code);
+
+    // Step 3: If approved and referral_code exists, increment referral chain
+    if (status === 'approved' && application.referral_code) {
+      const incRes = await fetch(`${BASE}/referrals/increment-intern-chain`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          used_referral_code: application.referral_code
+        })
+      });
+
+      if (!incRes.ok) {
+        const errJson = await incRes.json();
+        console.error("Failed to increment referral chain:", errJson);
+      }
+    }
+
+    // Step 4: Show success and refresh
     Swal.fire('Success', result.message, 'success');
     loadApplications();
+
   } catch (err) {
     Swal.fire('Error', err.message, 'error');
   }
 }
+
 
 // Helper functions for status badges
 function getStatusClass(status) {
