@@ -230,50 +230,55 @@
     }
 
     function renderInternships(internships) {
-      const container = document.getElementById('internshipsList');
-      
-      if (internships.length === 0) {
-        container.innerHTML = `
-          <div class="col-12 text-center text-muted">
-            No internships available at this time
-          </div>
-        `;
-        return;
-      }
-      
-      container.innerHTML = internships.map(internship => `
-        <div class="col-md-6 mb-4">
-          <div class="card h-100 internship-card">
-            ${internship.imgurl ? `
-              <img src="${internship.imgurl}" class="card-img-top internship-img" alt="${internship.company_name}">
-            ` : ''}
-            <div class="card-body">
-              <h5 class="card-title">${internship.company_name}</h5>
-              <h6 class="card-subtitle mb-2 text-muted">${internship.position}</h6>
-              <p class="card-text">
-                ${internship.description || 'No description available'}
-              </p>
-              <p class="card-text">
-                <small class="text-muted">Duration: ${internship.duration}</small><br>
-                <small class="text-muted">
-                  ${new Date(internship.start_date).toLocaleDateString()} - 
-                  ${new Date(internship.end_date).toLocaleDateString()}
-                </small>
-              </p>
-              <span class="badge rounded-pill ${getStatusClass(internship.status)}">
-                ${internship.status}
-              </span>
-            </div>
-            <div class="card-footer bg-transparent">
-              <button class="btn btn-primary w-100" onclick="startApplication(${internship.id})">
-                <i class="fas fa-paper-plane"></i> Apply Now
-              </button>
-            </div>
-          </div>
+  const container = document.getElementById('internshipsList');
+  
+  if (internships.length === 0) {
+    container.innerHTML = `
+      <div class="col-12 text-center text-muted">
+        No internships available at this time
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = internships.map(internship => `
+    <div class="col-md-6 mb-4">
+      <div class="card h-100 internship-card">
+        ${internship.imgurl ? `
+          <img src="${internship.imgurl}" class="card-img-top internship-img" alt="${internship.company_name}">
+        ` : ''}
+        <div class="card-body">
+          <h5 class="card-title">${internship.company_name}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">${internship.position}</h6>
+          <p class="card-text">
+            ${internship.description || 'No description available'}
+          </p>
+          <p class="card-text">
+            <small class="text-muted">Duration: ${internship.duration}</small><br>
+            <small class="text-muted">
+              ${new Date(internship.start_date).toLocaleDateString()} - 
+              ${new Date(internship.end_date).toLocaleDateString()}
+            </small>
+          </p>
+          <span class="badge rounded-pill ${getStatusClass(internship.status)}">
+            ${internship.status}
+          </span>
         </div>
-      `).join('');
-    }
-
+        <div class="card-footer bg-transparent">
+          ${internship.status === 'active' ? `
+            <button class="btn btn-primary w-100" onclick="startApplication(${internship.id})">
+              <i class="fas fa-paper-plane"></i> Apply Now
+            </button>
+          ` : `
+            <button class="btn btn-secondary w-100" disabled>
+              <i class="fas fa-ban"></i> Applications ${internship.status === 'completed' ? 'Closed' : 'Not Available'}
+            </button>
+          `}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
     function getStatusClass(status) {
       switch (status) {
         case 'active': return 'badge-active';
