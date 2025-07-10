@@ -975,35 +975,45 @@ async function deleteTarget(targetId) {
             return `<span class="badge badge-${roleLower}">${roleLower}</span>`;
         }
 
-        async function viewStudentDetail(studentId) {
-            try {
-                currentStudentId = studentId;
-                const response = await fetch(`${BASE_URL}/admin/student/${studentId}`);
-                const student = await response.json();
-                
-                let detailHTML = `
-                    <h3>Student Details</h3>
-                    <p><strong>ID:</strong> ${student.id}</p>
-                    <p><strong>Name:</strong> ${student.first_name} ${student.last_name}</p>
-                    <p><strong>Gender:</strong> ${student.gender}</p>
-                    <p><strong>Contact:</strong> ${student.contact_number}</p>
-                    <p><strong>Email:</strong> ${student.email}</p>
-                    <p><strong>College:</strong> ${student.college_name}</p>
-                    <p><strong>Status:</strong> <span class="badge badge-${student.status.toLowerCase()}">${student.status}</span></p>
-                    <p><strong>Role:</strong> ${getRoleBadge(student.role)}</p>
-                    <p><strong>Referral Code:</strong> ${student.referral_code || 'N/A'}</p>
-                    <p><strong>Referrer:</strong> ${student.referrer?.first_name || 'N/A'} ${student.referrer?.last_name || ''}</p>
-                    <p><strong>Target/Attained:</strong> ${student.attained}/${student.target}</p>
-                    <button onclick="showSection('students-section')">Back to List</button>
-                `;
-                
-                document.getElementById('student-detail').innerHTML = detailHTML;
-                showSection('student-detail-section');
-            } catch (error) {
-                console.error('Error loading student details:', error);
-                alert('Failed to load student details');
-            }
-        }
+       async function viewStudentDetail(studentId) {
+    try {
+        currentStudentId = studentId;
+        const response = await fetch(`${BASE_URL}/admin/student/${studentId}`);
+        const student = await response.json();
+
+        let detailHTML = `
+            <h3>Student Details</h3>
+            <p><strong>ID:</strong> ${student.id}</p>
+            <p><strong>Name:</strong> ${student.first_name} ${student.last_name}</p>
+            <p><strong>Gender:</strong> ${student.gender}</p>
+            <p><strong>Contact:</strong> ${student.contact_number}</p>
+            <p><strong>Email:</strong> ${student.email}</p>
+            <p><strong>College:</strong> ${student.college_name}</p>
+            <p><strong>Status:</strong> <span class="badge badge-${student.status.toLowerCase()}">${student.status}</span></p>
+            <p><strong>Role:</strong> ${getRoleBadge(student.role)}</p>
+            <p><strong>Referral Code:</strong> ${student.referral_code || 'N/A'}</p>
+            <p><strong>Referrer:</strong> ${student.referrer?.first_name || 'N/A'} ${student.referrer?.last_name || ''}</p>
+            <p><strong>Target/Attained:</strong> ${student.attained}/${student.target}</p>
+            
+            <h4>Uploaded Images</h4>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                ${student.clg_id_photo_url ? `<div><p><strong>College ID:</strong></p><img src="${student.clg_id_photo_url}" alt="College ID" style="max-width: 150px; border: 1px solid #ccc;"></div>` : ''}
+                ${student.photo_url ? `<div><p><strong>Photo:</strong></p><img src="${student.photo_url}" alt="Photo" style="max-width: 150px; border: 1px solid #ccc;"></div>` : ''}
+                ${student.signature_photo_url ? `<div><p><strong>Signature:</strong></p><img src="${student.signature_photo_url}" alt="Signature" style="max-width: 150px; border: 1px solid #ccc;"></div>` : ''}
+            </div>
+
+            <br>
+            <button onclick="showSection('students-section')">Back to List</button>
+        `;
+
+        document.getElementById('student-detail').innerHTML = detailHTML;
+        showSection('student-detail-section');
+    } catch (error) {
+        console.error('Error loading student details:', error);
+        alert('Failed to load student details');
+    }
+}
+
 
         async function approveStudent(studentId) {
             if (!confirm('Are you sure you want to approve this student?')) return;
