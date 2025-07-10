@@ -975,43 +975,90 @@ async function deleteTarget(targetId) {
             return `<span class="badge badge-${roleLower}">${roleLower}</span>`;
         }
 
-       async function viewStudentDetail(studentId) {
-    try {
-        currentStudentId = studentId;
-        const response = await fetch(`${BASE_URL}/admin/student/${studentId}`);
-        const student = await response.json();
+      async function viewStudentDetail(studentId) {
+  try {
+    currentStudentId = studentId;
 
-        let detailHTML = `
-            <h3>Student Details</h3>
-            <p><strong>ID:</strong> ${student.id}</p>
-            <p><strong>Name:</strong> ${student.first_name} ${student.last_name}</p>
-            <p><strong>Gender:</strong> ${student.gender}</p>
-            <p><strong>Contact:</strong> ${student.contact_number}</p>
-            <p><strong>Email:</strong> ${student.email}</p>
-            <p><strong>College:</strong> ${student.college_name}</p>
-            <p><strong>Status:</strong> <span class="badge badge-${student.status.toLowerCase()}">${student.status}</span></p>
-            <p><strong>Role:</strong> ${getRoleBadge(student.role)}</p>
-            <p><strong>Referral Code:</strong> ${student.referral_code || 'N/A'}</p>
-            <p><strong>Referrer:</strong> ${student.referrer?.first_name || 'N/A'} ${student.referrer?.last_name || ''}</p>
-            <p><strong>Target/Attained:</strong> ${student.attained}/${student.target}</p>
-            
-            <h4>Uploaded Images</h4>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                ${student.clg_id_photo_url ? `<div><p><strong>College ID:</strong></p><img src="${student.clg_id_photo_url}" alt="College ID" style="max-width: 150px; border: 1px solid #ccc;"></div>` : ''}
-                ${student.photo_url ? `<div><p><strong>Photo:</strong></p><img src="${student.photo_url}" alt="Photo" style="max-width: 150px; border: 1px solid #ccc;"></div>` : ''}
-                ${student.signature_photo_url ? `<div><p><strong>Signature:</strong></p><img src="${student.signature_photo_url}" alt="Signature" style="max-width: 150px; border: 1px solid #ccc;"></div>` : ''}
-            </div>
+    // 1. Fetch student details
+    const response = await fetch(`${BASE_URL}/admin/student/${studentId}`);
+    const student = await response.json();
 
-            <br>
-            <button onclick="showSection('students-section')">Back to List</button>
-        `;
+    // 2. Fetch student's event-wise targets
+    const eventResponse = await fetch(`${BASE_URL}/api/targets/student/view-mine?student_id=${studentId}`);
+    const eventData = await eventResponse.json();
+    const events = eventData.success ? eventData.data : [];
 
-        document.getElementById('student-detail').innerHTML = detailHTML;
-        showSection('student-detail-section');
-    } catch (error) {
-        console.error('Error loading student details:', error);
-        alert('Failed to load student details');
+    // 3. Create base student detail HTML
+    let detailHTML = `
+      <h3>Student Details</h3>
+      <p><strong>ID:</strong> ${student.id}</p>
+      <p><strong>Name:</strong> ${student.first_name} ${student.last_name}</p>
+      <p><strong>Gender:</strong> ${student.gender}</p>
+      <p><strong>Contact:</strong> ${student.contact_number}</p>
+      <p><strong>Email:</strong> ${student.email}</p>
+      <p><strong>College:</strong> ${student.college_name}</p>
+      <p><strong>Status:</strong> <span class="badge badge-${student.status.toLowerCase()}">${student.status}</span></p>
+      <p><strong>Role:</strong> ${getRoleBadge(student.role)}</p>
+      <p><strong>Referral Code:</strong> ${student.referral_code || 'N/A'}</p>
+      <p><strong>Referrer:</strong> ${student.referrer?.first_name || 'N/A'} ${student.referrer?.last_name || ''}</p>
+
+      <h4>Uploaded Images</h4>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        ${student.clg_id_photo_url ? `<div><p><strong>College ID:</strong></p><img src="${student.clg_id_photo_url}" style="max-width: 150px;"></div>` : ''}
+        ${student.photo_url ? `<div><p><strong>Photo:</strong></p><img src="${student.photo_url}" style="max-width: 150px;"></div>` : ''}
+        ${student.signature_photo_url ? `<div><p><strong>Signature:</strong></p><img src="${student.signature_photo_url}" style="max-width: 150px;"></div>` : ''}
+      </div>
+    `;
+
+    // 4. Add event-wise progress
+    if (events.length > 0) {
+      detailHTML += `
+        <h4 class="mt-4">🎯 Event Targets</h4>
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>Event</th>
+                <th>Target</th>
+                <th>Attained</th>
+                <th>Progress</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${events.map(ev => {
+                const percent = ev.target ? Math.round((ev.attained / ev.target) * 100) : 0;
+                return `
+                  <tr>
+                    <td>${ev.event_title}</td>
+                    <td>${ev.target}</td>
+                    <td>${ev.attained}</td>
+                    <td>
+                      <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" role="progressbar"
+                          style="width: ${percent}%"
+                          aria-valuenow="${percent}"
+                          aria-valuemin="0" aria-valuemax="100"></div>
+                      </div>
+                      <small>${percent}%</small>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
     }
+
+    // 5. Finalize
+    detailHTML += `<br><button onclick="showSection('students-section')">Back to List</button>`;
+    document.getElementById('student-detail').innerHTML = detailHTML;
+    showSection('student-detail-section');
+
+  } catch (error) {
+    console.error('Error loading student details:', error);
+    alert('Failed to load student details');
+  }
 }
 
 
