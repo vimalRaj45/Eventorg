@@ -392,6 +392,7 @@
       const data = await response.json();
       allPayments = data.payments || [];
       
+      console.log('Payments loaded:', allPayments);
       // Fetch user details for each payment to get contact numbers
       const paymentsWithContacts = await Promise.all(allPayments.map(async payment => {
         try {
@@ -654,27 +655,31 @@ async function confirmTogglePayment() {
     }
     
     // If we're verifying (not unverifying) and there's a referral code
-    if (currentNewStatus && payment && payment.referral_code) {
-      try {
-        const incrementRes = await fetch(`${BASE}/students/increment-attained`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${adminToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ referral_code: payment.referral_code })
-        });
-        
-        if (!incrementRes.ok) {
-          console.error('Failed to increment attained count, but payment was verified');
-        } else {
-          console.log('Successfully incremented attained count for referral code:', payment.referral_code);
-        }
-      } catch (err) {
-        console.error('Error incrementing attained count:', err);
-        // Don't fail the whole operation if this fails
-      }
+   if (currentNewStatus && payment?.referral_code && payment?.event_id) {
+  try {
+    const incrementRes = await fetch(`${BASE}/api/targets/increment-by-referral`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        used_referral_code: payment.referral_code,
+        event_id: payment.event_id
+      })
+    });
+
+    const result = await incrementRes.json();
+
+    if (!incrementRes.ok) {
+      console.warn('Referral progress increment failed:', result.error || 'Unknown error');
+    } else {
+      console.log('Referral progress incremented:', result.data);
     }
+  } catch (err) {
+    console.error('Error incrementing referral progress:', err.message);
+    // Don't block the rest of the operation
+  }
+}
     
     renderPaymentTable();
     showSuccess(`Payment ${currentNewStatus ? 'verified' : 'unverified'} successfully!`);
