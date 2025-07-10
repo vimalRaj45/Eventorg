@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,28 +59,28 @@
 
       <div class="mb-3">
         <label class="form-label">Upload College ID Photo</label>
-        <input type="file" class="form-control" name="clg_id_photo" accept="image/*" required />
+        <input type="file" class="form-control" name="clg_id_photo" accept="image/*" />
       </div>
 
       <div class="mb-3">
         <label class="form-label">Upload Profile Photo</label>
-        <input type="file" class="form-control" name="photo" accept="image/*" required />
+        <input type="file" class="form-control" name="photo" accept="image/*" />
       </div>
 
       <div class="mb-3">
         <label class="form-label">Upload Signature</label>
-        <input type="file" class="form-control" name="signature_photo" accept="image/*" required />
+        <input type="file" class="form-control" name="signature_photo" accept="image/*"/>
       </div>
 
       <button type="submit" class="btn btn-primary w-100">Register</button>
     </form>
 
     <div id="result" class="mt-4"></div>
-    <div class="mt-3 text-center"><a href="refer.html">Already registered? Login here</a></div>
+    <div class="mt-3 text-center"><a href='/refer'>Already registered? Login here</a></div>
   </div>
 
   <script>
-    const baseUrl = "https://eventdb.onrender.com";
+    const baseUrl = "https://eventdb.onrender.com"; // Change this to your server URL
     const form = document.getElementById("registerForm");
     const result = document.getElementById("result");
 
