@@ -32,10 +32,17 @@
       background-color: #fff;
       border-radius: 12px;
       box-shadow: var(--card-shadow);
-      padding: 24px;
-      margin-bottom: 30px;
+      padding: 20px;
+      margin-bottom: 20px;
       transition: all 0.3s ease;
       border: none;
+    }
+    
+    @media (min-width: 768px) {
+      .dashboard-card {
+        padding: 24px;
+        margin-bottom: 30px;
+      }
     }
     
     .dashboard-card:hover {
@@ -46,15 +53,25 @@
     .dashboard-card h5 {
       font-weight: 600;
       color: var(--primary);
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       border-bottom: 2px solid #f0f0f0;
-      padding-bottom: 10px;
+      padding-bottom: 8px;
+      font-size: 1.1rem;
+    }
+    
+    @media (min-width: 768px) {
+      .dashboard-card h5 {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        font-size: 1.25rem;
+      }
     }
     
     .btn-primary {
       background-color: var(--primary);
       border-color: var(--primary);
       font-weight: 500;
+      padding: 8px 16px;
     }
     
     .btn-primary:hover {
@@ -64,29 +81,45 @@
     
     .btn-outline-danger {
       font-weight: 500;
+      padding: 8px 16px;
     }
     
     .table {
       margin-bottom: 0;
+      font-size: 0.9rem;
+    }
+    
+    @media (min-width: 768px) {
+      .table {
+        font-size: 1rem;
+      }
     }
     
     .table thead th {
       font-weight: 600;
       background-color: #f8f9fa;
       border-bottom-width: 1px;
+      padding: 10px;
     }
     
     .dashboard-header {
       background-color: white;
       border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 30px;
+      padding: 15px;
+      margin-bottom: 20px;
       box-shadow: var(--card-shadow);
     }
     
+    @media (min-width: 768px) {
+      .dashboard-header {
+        padding: 20px;
+        margin-bottom: 30px;
+      }
+    }
+    
     .progress {
-      height: 8px;
-      border-radius: 4px;
+      height: 6px;
+      border-radius: 3px;
     }
     
     .progress-bar {
@@ -95,14 +128,31 @@
     
     .badge {
       font-weight: 500;
-      padding: 5px 10px;
-      border-radius: 8px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+    
+    @media (min-width: 768px) {
+      .badge {
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+      }
     }
     
     .form-control, .form-select {
       border-radius: 8px;
-      padding: 10px 15px;
+      padding: 8px 12px;
       border: 1px solid #e0e0e0;
+      font-size: 0.9rem;
+    }
+    
+    @media (min-width: 768px) {
+      .form-control, .form-select {
+        padding: 10px 15px;
+        font-size: 1rem;
+      }
     }
     
     @keyframes fadeIn {
@@ -114,23 +164,25 @@
       animation: fadeIn 0.4s ease-out forwards;
     }
     
-    @media (max-width: 768px) {
-      .dashboard-card {
-        padding: 16px;
-      }
-    }
-    
     .referral-code {
       font-family: 'Courier New', monospace;
       background: #f0f4f8;
-      padding: 8px 12px;
-      border-radius: 8px;
+      padding: 6px 10px;
+      border-radius: 6px;
       font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    @media (min-width: 768px) {
+      .referral-code {
+        padding: 8px 12px;
+        font-size: 1rem;
+      }
     }
     
     .user-avatar {
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background-color: var(--primary);
       color: white;
@@ -138,15 +190,23 @@
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 18px;
+      font-size: 16px;
+    }
+    
+    @media (min-width: 768px) {
+      .user-avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+      }
     }
     
     .loading-spinner {
       display: inline-block;
-      width: 1.5rem;
-      height: 1.5rem;
+      width: 1.25rem;
+      height: 1.25rem;
       vertical-align: text-bottom;
-      border: 0.25em solid currentColor;
+      border: 0.2em solid currentColor;
       border-right-color: transparent;
       border-radius: 50%;
       animation: spinner-border .75s linear infinite;
@@ -155,23 +215,63 @@
     @keyframes spinner-border {
       to { transform: rotate(360deg); }
     }
+    
+    .no-account {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.9rem;
+    }
+    
+    .no-account a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .no-account a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Mobile-specific adjustments */
+    @media (max-width: 767px) {
+      .table-responsive {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+      }
+      
+      .dashboard-header {
+        padding: 12px;
+      }
+      
+      .dashboard-header h3 {
+        font-size: 1.25rem;
+      }
+      
+      .form-row {
+        margin-bottom: -10px;
+      }
+      
+      .form-row > div {
+        margin-bottom: 10px;
+      }
+    }
   </style>
 </head>
 <body>
 
-<div class="container py-4">
+<div class="container py-3 py-md-4">
 
   <!-- 🔐 Login Section -->
   <div id="loginSection">
     <div class="row justify-content-center">
-      <div class="col-lg-6">
-        <div class="text-center mb-5">
-          <h1 class="fw-bold mb-3" style="color: var(--primary);">EventHub</h1>
-          <p class="lead">Login to access your dashboard</p>
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="text-center mb-4 mb-md-5">
+          <h1 class="fw-bold mb-2 mb-md-3" style="color: var(--primary);">EventHub</h1>
+          <p class="lead mb-0">Login to access your dashboard</p>
         </div>
         
-        <div class="card p-4 mx-auto" style="max-width: 500px; border-radius: 12px;">
-          
+        <div class="card p-3 p-md-4 mx-auto" style="border-radius: 12px;">
+         
           
           <div class="tab-content" id="loginTabContent">
             <!-- Student Login -->
@@ -188,6 +288,9 @@
                 <span id="loginBtnText">Login</span>
                 <span id="loginSpinner" class="loading-spinner hidden"></span>
               </button>
+              <div class="no-account">
+                Don't have an account? <a href="#" onclick="showSignup()">Sign up</a>
+              </div>
             </div>
           </div>
         </div>
@@ -198,25 +301,29 @@
   <!-- 🎓 Student Dashboard -->
   <div id="studentDashboard" class="hidden fade-in">
     <div class="dashboard-header">
-      <div class="d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
+      <div class="d-flex justify-content-between align-items-start align-items-md-center flex-column flex-md-row">
+        <div class="d-flex align-items-center mb-2 mb-md-0">
           <div class="user-avatar me-3" id="studentAvatar"></div>
           <div>
-            <h3 class="mb-1">Welcome, <span id="studentName">Student</span></h3>
-            <div class="d-flex align-items-center">
-              <strong class="me-2">Your Referral Code:</strong>
-              <span class="referral-code me-2" id="referralCode"></span>
-              <button class="btn btn-sm btn-outline-secondary copy-btn me-2" onclick="copyReferralCode()">
-                <i class="bi bi-clipboard"></i> Copy
-              </button>
-              <a id="whatsappShare" href="#" target="_blank" class="btn btn-success btn-sm">
-                <i class="bi bi-whatsapp"></i> Share
-              </a>
+            <h3 class="mb-1" style="font-size: 1.25rem;">Welcome, <span id="studentName">Student</span></h3>
+            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center">
+              <div class="d-flex align-items-center mb-1 mb-md-0 me-md-2">
+                <strong class="me-2" style="font-size: 0.9rem;">Referral Code:</strong>
+                <span class="referral-code me-2" id="referralCode"></span>
+              </div>
+              <div>
+                <button class="btn btn-sm btn-outline-secondary copy-btn me-1 me-md-2 mb-1 mb-md-0" onclick="copyReferralCode()">
+                  <i class="bi bi-clipboard"></i> <span class="d-none d-md-inline">Copy</span>
+                </button>
+                <a id="whatsappShare" href="#" target="_blank" class="btn btn-success btn-sm">
+                  <i class="bi bi-whatsapp"></i> <span class="d-none d-md-inline">Share</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
-        <button class="btn btn-outline-danger btn-sm" onclick="logout()">
-          <i class="bi bi-box-arrow-right"></i> Logout
+        <button class="btn btn-outline-danger btn-sm align-self-start align-self-md-center">
+          <i class="bi bi-box-arrow-right"></i> <span class="d-none d-md-inline">Logout</span>
         </button>
       </div>
     </div>
@@ -224,16 +331,16 @@
     <!-- 🎯 Target Progress -->
     <div class="dashboard-card">
       <h5><i class="bi bi-bullseye me-2"></i>Your Event Targets</h5>
-      <div class="table-responsive mt-3">
+      <div class="table-responsive">
         <table class="table table-bordered">
           <thead class="table-light">
             <tr>
               <th>#</th>
               <th>Event</th>
               <th>Target</th>
-              <th>Attained</th>
-              <th>Progress</th>
-              <th>Assigned At</th>
+              <th class="d-none d-md-table-cell">Attained</th>
+              <th class="d-none d-md-table-cell">Progress</th>
+              <th class="d-none d-md-table-cell">Assigned At</th>
             </tr>
           </thead>
           <tbody id="targetTableBody"></tbody>
@@ -245,14 +352,14 @@
     <div class="dashboard-card" id="mentorSection" style="display:none;">
       <h5><i class="bi bi-person-badge me-2"></i>Your Mentor</h5>
       <div class="row">
-        <div class="col-md-4">
-          <p><strong>Name:</strong> <span id="mentorName">-</span></p>
+        <div class="col-md-4 mb-2 mb-md-0">
+          <p class="mb-1"><strong>Name:</strong> <span id="mentorName">-</span></p>
+        </div>
+        <div class="col-md-4 mb-2 mb-md-0">
+          <p class="mb-1"><strong>Email:</strong> <span id="mentorEmail">-</span></p>
         </div>
         <div class="col-md-4">
-          <p><strong>Email:</strong> <span id="mentorEmail">-</span></p>
-        </div>
-        <div class="col-md-4">
-          <p><strong>Contact:</strong> <span id="mentorContact">-</span></p>
+          <p class="mb-1"><strong>Contact:</strong> <span id="mentorContact">-</span></p>
         </div>
       </div>
     </div>
@@ -261,35 +368,35 @@
   <!-- 👨‍🏫 Mentor Dashboard -->
   <div id="mentorDashboard" class="hidden fade-in">
     <div class="dashboard-header">
-      <div class="d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
+      <div class="d-flex justify-content-between align-items-start align-items-md-center flex-column flex-md-row">
+        <div class="d-flex align-items-center mb-2 mb-md-0">
           <div class="user-avatar me-3" id="mentorAvatar"></div>
           <div>
-            <h3 class="mb-1">Welcome, <span id="mentorNameDisplay">Mentor</span></h3>
-            <div class="d-flex align-items-center flex-wrap">
-              <div class="me-3">
-                <strong class="me-2">Referral Code:</strong>
+            <h3 class="mb-1" style="font-size: 1.25rem;">Welcome, <span id="mentorNameDisplay">Mentor</span></h3>
+            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center flex-wrap">
+              <div class="d-flex align-items-center mb-1 mb-md-0 me-md-2">
+                <strong class="me-2" style="font-size: 0.9rem;">Referral Code:</strong>
                 <span class="referral-code me-2" id="mentorReferralCode">N/A</span>
-                <button class="btn btn-sm btn-outline-secondary copy-btn me-2" onclick="copyMentorReferralCode()">
-                  <i class="bi bi-clipboard"></i> Copy
-                </button>
-                <a href="#" id="mentorShareLink" target="_blank" class="btn btn-success btn-sm">
-                  <i class="bi bi-share"></i> Share
-                </a>
               </div>
-              <div class="mt-2 mt-md-0">
-                <span class="badge bg-primary me-2">
-                  Internship Target: <span id="internTarget">0</span>
+              <div class="d-flex align-items-center flex-wrap">
+                <button class="btn btn-sm btn-outline-secondary copy-btn me-1 me-md-2 mb-1 mb-md-0" onclick="copyMentorReferralCode()">
+                  <i class="bi bi-clipboard"></i> <span class="d-none d-md-inline">Copy</span>
+                </button>
+                <a href="#" id="mentorShareLink" target="_blank" class="btn btn-success btn-sm me-2 mb-1 mb-md-0">
+                  <i class="bi bi-share"></i> <span class="d-none d-md-inline">Share</span>
+                </a>
+                <span class="badge bg-primary me-1 me-md-2 mb-1 mb-md-0">
+                  Target: <span id="internTarget">0</span>
                 </span>
-                <span class="badge bg-success">
+                <span class="badge bg-success mb-1 mb-md-0">
                   Attained: <span id="internAttained">0</span>
                 </span>
               </div>
             </div>
           </div>
         </div>
-        <button class="btn btn-outline-danger btn-sm" onclick="logout()">
-          <i class="bi bi-box-arrow-right"></i> Logout
+        <button class="btn btn-outline-danger btn-sm align-self-start align-self-md-center">
+          <i class="bi bi-box-arrow-right"></i> <span class="d-none d-md-inline">Logout</span>
         </button>
       </div>
     </div>
@@ -297,13 +404,13 @@
     <!-- ✅ Mentor's Own Progress -->
     <div class="dashboard-card">
       <h5><i class="bi bi-graph-up me-2"></i>Your Event Progress</h5>
-      <div class="table-responsive mt-3">
+      <div class="table-responsive">
         <table class="table table-bordered">
           <thead class="table-light">
             <tr>
               <th>Event</th>
               <th>Target</th>
-              <th>Attained</th>
+              <th class="d-none d-md-table-cell">Attained</th>
               <th>Progress</th>
             </tr>
           </thead>
@@ -315,16 +422,16 @@
     <!-- ✅ Downline Progress -->
     <div class="dashboard-card">
       <h5><i class="bi bi-people me-2"></i>Your Downlines' Progress</h5>
-      <div class="table-responsive mt-3">
+      <div class="table-responsive">
         <table class="table table-bordered">
           <thead class="table-light">
             <tr>
               <th>#</th>
               <th>Name</th>
-              <th>Email</th>
+              <th class="d-none d-md-table-cell">Email</th>
               <th>Event</th>
               <th>Target</th>
-              <th>Attained</th>
+              <th class="d-none d-md-table-cell">Attained</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -337,16 +444,16 @@
     <div class="dashboard-card">
       <h5><i class="bi bi-plus-circle me-2"></i>Assign Target to Downline</h5>
       <form id="assignForm" onsubmit="assignTarget(event)">
-        <div class="row g-3">
-          <div class="col-md-4">
+        <div class="row g-2 g-md-3">
+          <div class="col-12 col-md-4">
             <label for="studentSelect" class="form-label">Downline</label>
             <select id="studentSelect" class="form-select" required></select>
           </div>
-          <div class="col-md-4">
+          <div class="col-12 col-md-4">
             <label for="eventSelect" class="form-label">Event</label>
             <select id="eventSelect" class="form-select" required></select>
           </div>
-          <div class="col-md-4">
+          <div class="col-12 col-md-4">
             <label for="targetInput" class="form-label">Target</label>
             <input type="number" id="targetInput" class="form-control" required min="1">
           </div>
@@ -371,6 +478,12 @@
       routeUserToDashboard(storedUser);
     }
   });
+
+  // Show signup form (placeholder function)
+  function showSignup() {
+    alert("Sign up functionality will be implemented here. For now, please contact your administrator to create an account.");
+    // In a real implementation, you would show a signup form or redirect to a signup page
+  }
 
   // Main login function
   async function userLogin() {
@@ -456,15 +569,15 @@
               <td>${index + 1}</td>
               <td>${item.event_title}</td>
               <td>${item.target}</td>
-              <td>${item.attained}</td>
-              <td>
+              <td class="d-none d-md-table-cell">${item.attained}</td>
+              <td class="d-none d-md-table-cell">
                 <div class="progress">
                   <div class="progress-bar" role="progressbar" style="width: ${progressPercent}%" 
                     aria-valuenow="${progressPercent}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <small class="text-muted">${progressPercent}%</small>
               </td>
-              <td>${date}</td>
+              <td class="d-none d-md-table-cell">${date}</td>
             </tr>`;
           tbody.innerHTML += row;
         });
@@ -531,7 +644,7 @@
             <tr>
               <td>${item.event_title}</td>
               <td>${item.target}</td>
-              <td>${item.attained}</td>
+              <td class="d-none d-md-table-cell">${item.attained}</td>
               <td>
                 <div class="progress">
                   <div class="progress-bar" role="progressbar" style="width: ${progressPercent}%" 
@@ -581,16 +694,16 @@
               <tr>
                 <td>${index + 1}</td>
                 <td>${item.first_name} ${item.last_name}</td>
-                <td>${item.email}</td>
+                <td class="d-none d-md-table-cell">${item.email}</td>
                 <td>${item.event_title}</td>
                 <td>
                   <input type="number" value="${item.target}" min="1" 
                     class="form-control form-control-sm" id="targetInput-${item.target_id}">
                 </td>
-                <td>${item.attained}</td>
+                <td class="d-none d-md-table-cell">${item.attained}</td>
                 <td>
                   <button class="btn btn-sm btn-outline-primary" onclick="updateTarget(${item.target_id})">
-                    <i class="bi bi-arrow-repeat"></i> Update
+                    <i class="bi bi-arrow-repeat"></i> <span class="d-none d-md-inline">Update</span>
                   </button>
                 </td>
               </tr>`;
