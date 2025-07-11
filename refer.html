@@ -338,7 +338,7 @@
               <th>#</th>
               <th>Event</th>
               <th>Target</th>
-              <th class="d-none d-md-table-cell">Attained</th>
+              <th>Attained</th> <!-- Changed: Now always visible -->
               <th class="d-none d-md-table-cell">Progress</th>
               <th class="d-none d-md-table-cell">Assigned At</th>
             </tr>
@@ -410,7 +410,7 @@
             <tr>
               <th>Event</th>
               <th>Target</th>
-              <th class="d-none d-md-table-cell">Attained</th>
+              <th>Attained</th> <!-- Changed: Now always visible -->
               <th>Progress</th>
             </tr>
           </thead>
@@ -431,7 +431,7 @@
               <th class="d-none d-md-table-cell">Email</th>
               <th>Event</th>
               <th>Target</th>
-              <th class="d-none d-md-table-cell">Attained</th>
+              <th>Attained</th> <!-- Changed: Now always visible -->
               <th>Actions</th>
             </tr>
           </thead>
@@ -514,7 +514,7 @@
       const user = await response.json();
       
       if (user.status !== 'approved') {
-        throw new Error('Your account is not yet approved.');
+        throw new Error('Your account is not yet approved. pls wait for admin approval.');
       }
 
       // Store user data
@@ -556,7 +556,7 @@
     try {
       const res = await fetch(`${BASE_URL}/api/targets/student/view-mine?student_id=${user.id}`);
       const data = await res.json();
-
+      
       const tbody = document.getElementById('targetTableBody');
       tbody.innerHTML = '';
 
@@ -569,7 +569,7 @@
               <td>${index + 1}</td>
               <td>${item.event_title}</td>
               <td>${item.target}</td>
-              <td class="d-none d-md-table-cell">${item.attained}</td>
+              <td>${item.attained}</td> <!-- Changed: Now always visible -->
               <td class="d-none d-md-table-cell">
                 <div class="progress">
                   <div class="progress-bar" role="progressbar" style="width: ${progressPercent}%" 
@@ -644,7 +644,7 @@
             <tr>
               <td>${item.event_title}</td>
               <td>${item.target}</td>
-              <td class="d-none d-md-table-cell">${item.attained}</td>
+              <td>${item.attained}</td> <!-- Changed: Now always visible -->
               <td>
                 <div class="progress">
                   <div class="progress-bar" role="progressbar" style="width: ${progressPercent}%" 
@@ -700,7 +700,7 @@
                   <input type="number" value="${item.target}" min="1" 
                     class="form-control form-control-sm" id="targetInput-${item.target_id}">
                 </td>
-                <td class="d-none d-md-table-cell">${item.attained}</td>
+                <td>${item.attained}</td> <!-- Changed: Now always visible -->
                 <td>
                   <button class="btn btn-sm btn-outline-primary" onclick="updateTarget(${item.target_id})">
                     <i class="bi bi-arrow-repeat"></i> <span class="d-none d-md-inline">Update</span>
