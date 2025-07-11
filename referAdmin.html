@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -735,8 +736,9 @@ async function setMentorTarget() {
 }
 
 async function setInternAdminTarget() {
-    const mentorId = document.getElementById('mentor-target-select').value;
+    const mentorId = document.getElementById('mentor-intern-select').value;
     const internTargetValue = parseInt(document.getElementById('mentor-intern-target-value').value);
+    console.log('Setting intern target for mentor ID:', mentorId, 'with value:', internTargetValue);
     const user = JSON.parse(localStorage.getItem('user'));
 
     if (!mentorId || isNaN(internTargetValue)) {
