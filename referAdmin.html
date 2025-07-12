@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1264,50 +1265,72 @@ async function viewMentorDownline(mentorId) {
 
 
         // Approval functions
-        async function loadPendingApprovals() {
-            try {
-                const response = await fetch(`${BASE_URL}/students`);
-                const students = await response.json();
-                const pendingStudents = students.filter(s => s.status === 'pending');
-                
-                let tableHTML = `
-                    <table border="1">
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Contact</th>
-                            <th>Email</th>
-                            <th>College</th>
-                            <th>Role</th>
-                            <th>Actions</th>
-                        </tr>
-                `;
-                
-                pendingStudents.forEach(student => {
-                    const roleBadge = getRoleBadge(student.role);
-                    tableHTML += `
-                        <tr class="role-${student.role.toLowerCase()}">
-                            <td>${student.id}</td>
-                            <td>${student.first_name} ${student.last_name}</td>
-                            <td>${student.contact_number}</td>
-                            <td>${student.email}</td>
-                            <td>${student.college_name}</td>
-                            <td>${roleBadge}</td>
-                            <td>
-                                <button class="btn-success" onclick="approveStudent(${student.id})">Approve</button>
-                                <button onclick="viewStudentDetail(${student.id})">View</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                tableHTML += '</table>';
-                document.getElementById('approvals-data').innerHTML = tableHTML;
-            } catch (error) {
-                console.error('Error loading pending approvals:', error);
-                alert('Failed to load pending approvals');
-            }
-        }
+async function loadPendingApprovals() {
+  try {
+    const response = await fetch(`${BASE_URL}/students`);
+    const students = await response.json();
+    const pendingStudents = students.filter(s => s.status === 'pending');
+
+    let tableHTML = `
+      <table border="1" class="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>College</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    pendingStudents.forEach(student => {
+      const roleBadge = getRoleBadge(student.role);
+      const fullName = `${student.first_name} ${student.last_name}`;
+      const contact = student.contact_number;
+
+      const message = `Hi ${fullName}, congratulations! 🎉 Your registration has been approved by Edwyna. You can now log in and start your journey.`;
+
+      const whatsappLink = `https://wa.me/${contact}?text=${encodeURIComponent(message)}`;
+      const smsLink = `sms:${contact}?body=${encodeURIComponent(message)}`;
+
+      tableHTML += `
+        <tr class="role-${student.role.toLowerCase()}">
+          <td>${student.id}</td>
+          <td>${fullName}</td>
+          <td>${contact}</td>
+          <td>${student.email}</td>
+          <td>${student.college_name}</td>
+          <td>${roleBadge}</td>
+          <td>
+            <button class="btn btn-success btn-sm mb-1" onclick="approveStudent(${student.id})">Approve</button>
+            <button class="btn btn-secondary btn-sm mb-1" onclick="viewStudentDetail(${student.id})">View</button>
+            <div class="dropdown mt-1">
+              <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Notify
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="${whatsappLink}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                <li><a class="dropdown-item" href="${smsLink}"><i class="fas fa-sms"></i> SMS</a></li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+
+    tableHTML += `</tbody></table>`;
+    document.getElementById('approvals-data').innerHTML = tableHTML;
+
+  } catch (error) {
+    console.error('Error loading pending approvals:', error);
+    alert('Failed to load pending approvals');
+  }
+}
+
 
    <!-- Referral functions -->
 async function loadReferralData() {
@@ -1601,5 +1624,11 @@ async function viewReferralTree(referralCode) {
             }
         }
     </script>
+    <!-- Bootstrap 5 JS Bundle for dropdowns -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Font Awesome for icons (optional) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
 </body>
 </html>
