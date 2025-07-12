@@ -558,7 +558,7 @@
         <div class="row g-2 g-md-3">
           <div class="col-12 col-md-4">
             <label for="studentSelect" class="form-label">Downline</label>
-            <select id="studentSelect" class="form-select" required></select>
+            <select id="downlineSelect" class="form-select" required></select>
           </div>
           <div class="col-12 col-md-4">
             <label for="eventSelect" class="form-label">Event</label>
@@ -802,11 +802,11 @@
   }
 
   // Load mentor's downlines
-  async function loadDownlines(mentorId) {
+  async function loadDownlinesfor(mentorId) {
     try {
       const res = await fetch(`${BASE_URL}/api/targets/admin/downlines-with-progress/${mentorId}`);
       const data = await res.json();
-     
+      console.log(data);
       const tbody = document.getElementById('progressTableBody');
       tbody.innerHTML = '';
 
@@ -820,9 +820,6 @@
           }])
       ).values()];
 
-      document.getElementById('studentSelect').innerHTML = uniqueDownlines.map(d =>
-        `<option value="${d.id}">${d.name}</option>`
-      ).join('');
 
       // Populate table
       if (data.data && data.data.length > 0) {
@@ -873,7 +870,7 @@
   // Assign target to student
   async function assignTarget(e) {
     e.preventDefault();
-    const student_id = document.getElementById('studentSelect').value;
+    const student_id = document.getElementById('downlineSelect').value;
     const event_id = document.getElementById('eventSelect').value;
     const target = document.getElementById('targetInput').value;
 
@@ -899,6 +896,9 @@
       }
     } catch (err) {
       alert(err.message);
+    }
+    finally {
+      window.location.reload();
     }
   }
 
@@ -950,6 +950,27 @@
     localStorage.removeItem('eventHubUser');
     location.reload();
   }
+  
+
+  // Load downline students for dropdown using currentUser.referral_code
+async function loadDownlines() {
+  try {
+    const referralCode = currentUser.referral_code;
+    const res = await fetch(`${BASE_URL}/studentsormentor/downlines/${referralCode}`);
+    const downlines = await res.json();
+
+    document.getElementById('downlineSelect').innerHTML = downlines.map(d =>
+      `<option value="${d.id}">${d.name}</option>`
+    ).join('');
+  } catch (err) {
+    console.error('Error loading downlines:', err);
+    alert('Failed to load downlines');
+  }
+}
+
+
+
+
 
   // Show referral tree modal
   async function showReferralTree() {
@@ -1111,12 +1132,32 @@ function toggleNavMenu() {
       document.getElementById("loginItem").style.display = "none";
     } else {
       document.getElementById("logoutItem").style.display = "none";
-      document.getElementById("loginItem").style.display = "block";
+      document.getElementById("loginItem").style.display = "none";
     }
     handleResize();
   });
 
   window.addEventListener('resize', handleResize);
+  document.addEventListener('DOMContentLoaded', () => {
+  const userData = localStorage.getItem('eventHubUser');
+  if (!userData) {
+    console.error('No user data found in localStorage');
+    return;
+  }
+
+  const eventHubUser = JSON.parse(userData);
+  console.log('Loaded user:', eventHubUser);
+  if (!eventHubUser.id) {
+    console.error('Invalid user object in localStorage');
+    return;
+  }
+  console.log('Loading downlines for user ID:', eventHubUser.id);
+
+ loadDownlinesfor(eventHubUser.id);
+
+});
+
+
 </script>
 
 </body>
