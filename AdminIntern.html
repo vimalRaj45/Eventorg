@@ -244,7 +244,7 @@
   </div>
 
 <script>
-const BASE = "https://eventdb.onrender.com"
+const BASE = "https://eventdb.onrender.com"; // Update with your actual backend URL
 const IMGBB_API_KEY = "76954d664f0beaf57b8c5a5b0eca84e6";
 const token = localStorage.getItem('jwtToken');
 let applicantModal = null;
@@ -459,20 +459,29 @@ async function saveInternshipChanges() {
     if (fileInput.files.length > 0) {
       imgurl = await uploadToImgBB(fileInput.files[0]);
     }
+// In saveInternshipChanges function:
+const startDate = document.getElementById('editStart').value;
+const endDate = document.getElementById('editEnd').value;
 
-    // First update the internship details (without QR code)
+// Validate dates
+if (startDate && isNaN(new Date(startDate).getTime())) {
+  throw new Error('Invalid start date');
+}
+if (endDate && isNaN(new Date(endDate).getTime())) {
+  throw new Error('Invalid end date');
+}
+
 const body = {
-  company_name: document.getElementById('company').value,
-  position: document.getElementById('position').value,
-  description: document.getElementById('description').value,
-  duration: document.getElementById('duration').value,
-  start_date: document.getElementById('start').value,
-  end_date: document.getElementById('end').value,
-  status: document.getElementById('status').value,
-  application_fee: document.getElementById('applicationFee').value,
-  imgurl: null
+  company_name: document.getElementById('editCompany').value,
+  position: document.getElementById('editPosition').value,
+  description: document.getElementById('editDescription').value,
+  duration: document.getElementById('editDuration').value,
+  start_date: startDate || null,  // Send null if empty
+  end_date: endDate || null,      // Send null if empty
+  status: document.getElementById('editStatus').value,
+  application_fee: document.getElementById('editApplicationFee').value || 0,
+  imgurl: imgurl || null
 };
-
     const res = await fetch(`${BASE}/api/internships/${id}`, {
       method: 'PUT',
       headers: {
@@ -573,18 +582,29 @@ document.getElementById('createInternship').addEventListener('submit', async (e)
     let imgurl = null;
     let paymentQrUrl = null;
 
-    // First create the internship without QR code
-const body = {
-  company_name: document.getElementById('editCompany').value,
-  position: document.getElementById('editPosition').value,
-  description: document.getElementById('editDescription').value,
-  duration: document.getElementById('editDuration').value,
-  start_date: document.getElementById('editStart').value,
-  end_date: document.getElementById('editEnd').value,
-  status: document.getElementById('editStatus').value,
-  application_fee: document.getElementById('editApplicationFee').value,
-  imgurl: imgurl || null
-};
+    // Get date values
+    const startDate = document.getElementById('start').value;
+    const endDate = document.getElementById('end').value;
+
+    // Validate dates
+    if (startDate && isNaN(new Date(startDate).getTime())) {
+      throw new Error('Invalid start date');
+    }
+    if (endDate && isNaN(new Date(endDate).getTime())) {
+      throw new Error('Invalid end date');
+    }
+
+    const body = {
+      company_name: document.getElementById('company').value,
+      position: document.getElementById('position').value,
+      description: document.getElementById('description').value,
+      duration: document.getElementById('duration').value,
+      start_date: startDate || null,  // Send null if empty
+      end_date: endDate || null,      // Send null if empty
+      status: document.getElementById('status').value,
+      application_fee: document.getElementById('applicationFee').value || 0,
+      imgurl: null
+    };
 
     // Upload internship image if selected
     if (fileInput.files.length > 0) {
