@@ -495,6 +495,10 @@
     }
 
     async function uploadImageToImgBB(file, progressBarId) {
+      if (!file) {
+        throw new Error('No file selected');
+      }
+      
       const formData = new FormData();
       formData.append('image', file);
       
@@ -556,6 +560,11 @@
         const profileFile = document.getElementById('profilePhoto').files[0];
         const signatureFile = document.getElementById('signaturePhoto').files[0];
         
+        // Verify all files are selected
+        if (!clgIdFile || !profileFile || !signatureFile) {
+          throw new Error('Please upload all required documents');
+        }
+        
         const [clgIdUrl, profileUrl, signatureUrl] = await Promise.all([
           uploadImageToImgBB(clgIdFile, 'clgIdProgress'),
           uploadImageToImgBB(profileFile, 'profileProgress'),
@@ -570,6 +579,8 @@
           signature_photo: signatureUrl
         };
         
+        console.log('Submitting data:', studentData); // Debug log
+        
         // Send to backend
         const res = await fetch(`${baseUrl}/students`, {
           method: "POST",
@@ -580,8 +591,12 @@
         });
 
         const data = await res.json();
+        
+        console.log('Backend response:', data); // Debug log
 
-        if (!res.ok) throw new Error(data.error || "Registration failed");
+        if (!res.ok) {
+          throw new Error(data.error || data.message || "Registration failed");
+        }
 
         result.innerHTML = `
           <div class="alert alert-success">
@@ -609,7 +624,6 @@
             <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Registration Failed</h5>
             <p>${err.message}</p>
             <p>Please check your information and try again.</p>
-            ${err.details ? `<div class="mt-2"><small>Details: ${err.details}</small></div>` : ''}
           </div>`;
       } finally {
         // Re-enable submit button and hide spinner
