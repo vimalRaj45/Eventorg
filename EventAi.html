@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -243,35 +244,98 @@
       border: 1px solid rgba(239,35,60,0.2);
     }
 
-    /* Simple paragraph styling */
-    .info-paragraph {
-      margin-bottom: 1rem;
+    /* Event line formatting */
+    .event-line {
+      margin: 0.25rem 0;
       line-height: 1.6;
     }
 
-    .info-title {
+    .event-title-line {
       font-weight: 600;
       color: var(--primary-color);
-      margin-bottom: 0.5rem;
+      margin: 0.5rem 0;
     }
 
-    .info-meta {
-      font-size: 0.85rem;
+    .event-detail-line {
+      display: flex;
+      margin: 0.25rem 0;
+    }
+
+    .detail-label {
+      min-width: 120px;
       color: var(--text-light);
-      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
     }
 
-    .info-divider {
+    .detail-value {
+      flex: 1;
+    }
+
+    .event-divider {
       height: 1px;
       background: rgba(0,0,0,0.1);
       margin: 1rem 0;
     }
 
+    /* Announcement styling */
+    .announcement-item {
+      background: rgba(67,97,238,0.05);
+      border-radius: var(--border-radius-sm);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-left: 3px solid var(--primary-color);
+    }
+
+    .announcement-title {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .announcement-meta {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-top: 0.5rem;
+    }
+
+    /* Internship styling */
+    .internship-item {
+      background: white;
+      border-radius: var(--border-radius-sm);
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .internship-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .internship-company {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .internship-position {
+      font-weight: 500;
+    }
+
+    .internship-status {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 50px;
+    }
+
     .status-active {
+      background: rgba(76,201,240,0.1);
       color: var(--success-color);
     }
 
     .status-inactive {
+      background: rgba(239,35,60,0.1);
       color: var(--danger-color);
     }
 
@@ -294,6 +358,10 @@
       
       .message {
         max-width: 90%;
+      }
+      
+      .detail-label {
+        min-width: 100px;
       }
     }
 
@@ -343,8 +411,7 @@
       <i class="fas fa-paper-plane"></i>
     </button>
   </div>
-
-  <script>
+<script>
     // Disable right-click context menu
     document.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -363,6 +430,17 @@
     let eventsText = "";
     let generalData = null;
     let isTyping = false;
+
+    // Hardcoded responses for common questions
+    const hardcodedResponses = {
+      "how to register": "To register for events, please visit our website at <a href='https://eventdb.onrender.com' target='_blank'>EventDB Website</a> and follow the registration process.",
+      "registration": "You can register for events by visiting our website: <a href='https://eventdb.onrender.com' target='_blank'>EventDB Website</a>",
+      "how do i sign up": "Sign up by visiting our registration page at <a href='https://eventdb.onrender.com/register' target='_blank'>EventDB Registration</a>",
+      "where to register": "All registrations are handled through our website: <a href='https://eventdb.onrender.com' target='_blank'>EventDB Website</a>",
+      "website": "Our official website is <a href='https://eventdb.onrender.com' target='_blank'>EventDB Website</a> where you can find all events and registration options.",
+      "visit website": "You can visit our website at <a href='https://eventdb.onrender.com' target='_blank'>EventDB Website</a> for more information.",
+      "help": "For assistance, please visit our website at <a href='https://eventdb.onrender.com/help' target='_blank'>EventDB Help Center</a> or contact support."
+    };
 
     function getCurrentTime() {
       const now = new Date();
@@ -442,7 +520,7 @@
       }
     }
 
-    async function loadEvents() {
+     async function loadEvents() {
       const jwtToken = localStorage.getItem("jwtToken");
       if (!jwtToken) {
         eventsText = "User is not logged in. Only public events available.";
@@ -462,13 +540,23 @@
         const profileEvents = jwtToken ? await profileRes.json() : [];
 
         function formatEvent(event) {
+          const now = new Date();
+          const startDate = new Date(event.start_date);
+          const endDate = new Date(event.end_date);
+          const regDeadline = new Date(event.registration_deadline);
+          
+          // Format dates to show only if they're in the future
+          const formatDateIfFuture = (date) => {
+            return date > now ? date.toLocaleString() : "Already passed";
+          };
+
           return `
 Title: ${event.title}
 Type: ${event.event_type}
 Status: ${event.status}
-Start: ${new Date(event.start_date).toLocaleString()}
-End: ${new Date(event.end_date).toLocaleString()}
-Registration Deadline: ${new Date(event.registration_deadline).toLocaleString()}
+Start: ${formatDateIfFuture(startDate)}
+End: ${formatDateIfFuture(endDate)}
+Registration Deadline: ${formatDateIfFuture(regDeadline)}
 Description: ${event.detailed_description}
 -----------------------------`;
         }
@@ -566,7 +654,17 @@ Description: ${event.detailed_description}
       return response || '<p>No general information available at this time.</p>';
     }
 
-    async function sendMessage() {
+    function checkForHardcodedResponse(message) {
+      const lowerMessage = message.toLowerCase();
+      for (const [keyword, response] of Object.entries(hardcodedResponses)) {
+        if (lowerMessage.includes(keyword)) {
+          return response;
+        }
+      }
+      return null;
+    }
+
+     async function sendMessage() {
       const input = document.getElementById("userInput");
       const message = input.value.trim();
       if (!message) return;
@@ -574,6 +672,14 @@ Description: ${event.detailed_description}
       addMessage(message, 'user');
       input.value = "";
       showTypingIndicator();
+
+      // First check for hardcoded responses
+      const hardcodedResponse = checkForHardcodedResponse(message);
+      if (hardcodedResponse) {
+        hideTypingIndicator();
+        addMessage(hardcodedResponse, 'bot');
+        return;
+      }
 
       // Check if this is a general information request
       const generalInfoKeywords = ['announcement', 'internship', 'general info', 'upcoming event'];
@@ -588,8 +694,27 @@ Description: ${event.detailed_description}
         return;
       }
 
+      // Get current date and calculate start/end of week
+      const now = new Date();
+      const currentDateStr = now.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      const endOfWeek = new Date(now);
+      endOfWeek.setDate(now.getDate() + (6 - now.getDay()));
+      
+      const weekRange = `${startOfWeek.toLocaleDateString()} to ${endOfWeek.toLocaleDateString()}`;
+
       const prompt = `
 You are an AI assistant for an event management website. Use the following event information to answer user questions clearly and helpfully.
+
+Current date: ${currentDateStr}
+This week's date range: ${weekRange}
 
 When listing events, format the response with each detail on a new line like this:
 Title: [Event Title]
@@ -605,6 +730,8 @@ ${eventsText}
 
 User Question: ${message}
 Provide a clear, line-by-line response based on the event data above.
+Focus on events happening this week (${weekRange}) when asked about "this week's events".
+For date comparisons, use the current date: ${currentDateStr}
 `;
 
       try {
@@ -630,14 +757,6 @@ Provide a clear, line-by-line response based on the event data above.
         addMessage("<div class='error-message'><i class='fas fa-exclamation-circle'></i> Error fetching response. Please check your connection and try again.</div>", 'bot');
       }
     }
-
-    document.getElementById("userInput").addEventListener("keypress", function (e) {
-      if (e.key === "Enter") sendMessage();
-    });
-
-    window.addEventListener('load', () => {
-      document.getElementById('userInput').focus();
-    });
   </script>
 </body>
 </html>
