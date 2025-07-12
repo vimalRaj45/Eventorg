@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -244,37 +243,36 @@
       border: 1px solid rgba(239,35,60,0.2);
     }
 
-    /* Event line formatting */
-    .event-line {
-      margin: 0.25rem 0;
+    /* Simple paragraph styling */
+    .info-paragraph {
+      margin-bottom: 1rem;
       line-height: 1.6;
     }
 
-    .event-title-line {
+    .info-title {
       font-weight: 600;
       color: var(--primary-color);
-      margin: 0.5rem 0;
+      margin-bottom: 0.5rem;
     }
 
-    .event-detail-line {
-      display: flex;
-      margin: 0.25rem 0;
-    }
-
-    .detail-label {
-      min-width: 120px;
+    .info-meta {
+      font-size: 0.85rem;
       color: var(--text-light);
-      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
     }
 
-    .detail-value {
-      flex: 1;
-    }
-
-    .event-divider {
+    .info-divider {
       height: 1px;
       background: rgba(0,0,0,0.1);
       margin: 1rem 0;
+    }
+
+    .status-active {
+      color: var(--success-color);
+    }
+
+    .status-inactive {
+      color: var(--danger-color);
     }
 
     @keyframes typingAnimation {
@@ -296,10 +294,6 @@
       
       .message {
         max-width: 90%;
-      }
-      
-      .detail-label {
-        min-width: 100px;
       }
     }
 
@@ -327,24 +321,24 @@
   <div id="chatbox">
     <div class="welcome-message animate__animated animate__fadeIn">
       <h4>Welcome to EventDB Assistant!</h4>
-      <p>I can help you find information about upcoming events, registration details, and more.</p>
+      <p>I can help you find information about upcoming events, announcements, internships, and more.</p>
       
       <div class="suggestions">
         <div class="suggestion-chip" onclick="insertSuggestion('What events are happening this week?')">
           <i class="far fa-calendar-alt"></i> This Week's Events
         </div>
-        <div class="suggestion-chip" onclick="insertSuggestion('Show me upcoming tech conferences')">
-          <i class="fas fa-laptop-code"></i> Tech Conferences
+        <div class="suggestion-chip" onclick="insertSuggestion('Show me current announcements')">
+          <i class="fas fa-bullhorn"></i> Announcements
         </div>
-        <div class="suggestion-chip" onclick="insertSuggestion('What events have I registered for?')">
-          <i class="fas fa-user-check"></i> My Events
+        <div class="suggestion-chip" onclick="insertSuggestion('What internships are available?')">
+          <i class="fas fa-briefcase"></i> Internships
         </div>
       </div>
     </div>
   </div>
   
   <div class="input-container">
-    <input type="text" id="userInput" class="form-control" placeholder="Ask about an event..." autocomplete="off" />
+    <input type="text" id="userInput" class="form-control" placeholder="Ask about events, announcements, or internships..." autocomplete="off" />
     <button id="sendButton" onclick="sendMessage()">
       <i class="fas fa-paper-plane"></i>
     </button>
@@ -352,21 +346,22 @@
 
   <script>
     // Disable right-click context menu
-document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('contextmenu', e => e.preventDefault());
 
-// Disable specific key shortcuts
-document.addEventListener('keydown', function(e) {
-  if (
-    e.key === 'F12' ||
-    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
-    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
-  ) {
-    e.preventDefault();
-   
-  }
-});
+    // Disable specific key shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+        (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+      ) {
+        e.preventDefault();
+      }
+    });
+
     const API_KEY = "AIzaSyAU8Plhzh1ZPGuMdN96YcMXNpHSBlG1_xM";
     let eventsText = "";
+    let generalData = null;
     let isTyping = false;
 
     function getCurrentTime() {
@@ -434,6 +429,19 @@ document.addEventListener('keydown', function(e) {
       input.focus();
     }
 
+    async function loadGeneralData() {
+      try {
+        const response = await fetch("https://eventdb.onrender.com/api/chatbot/general");
+        if (!response.ok) {
+          throw new Error("Failed to fetch general data");
+        }
+        generalData = await response.json();
+      } catch (err) {
+        console.error("Error loading general data:", err);
+        addMessage("<div class='error-message'><i class='fas fa-exclamation-circle'></i> Failed to load general information. Some functionality may be limited.</div>", 'bot');
+      }
+    }
+
     async function loadEvents() {
       const jwtToken = localStorage.getItem("jwtToken");
       if (!jwtToken) {
@@ -477,7 +485,8 @@ Description: ${event.detailed_description}
       }
     }
 
-    loadEvents();
+    // Load both general data and events when the page loads
+    Promise.all([loadGeneralData(), loadEvents()]);
 
     function formatEventResponse(text) {
       if (text.includes('Title:')) {
@@ -492,26 +501,69 @@ Description: ${event.detailed_description}
           
           lines.forEach(line => {
             if (line.startsWith('Title:')) {
-              eventHtml += `<div class="event-title-line">${line.replace('Title:', '<i class="fas fa-calendar-alt"></i>')}</div>`;
+              eventHtml += `<div class="info-title">${line.replace('Title:', '<i class="fas fa-calendar-alt"></i>')}</div>`;
             } else if (line.includes(':')) {
               const [label, value] = line.split(':').map(part => part.trim());
-              eventHtml += `
-                <div class="event-detail-line">
-                  <span class="detail-label">${label}:</span>
-                  <span class="detail-value">${value}</span>
-                </div>`;
+              eventHtml += `<div class="info-paragraph"><strong>${label}:</strong> ${value}</div>`;
             } else if (line.trim()) {
-              eventHtml += `<div class="event-line">${line}</div>`;
+              eventHtml += `<div class="info-paragraph">${line}</div>`;
             }
           });
           
-          formattedResponse += eventHtml + '<div class="event-divider"></div>';
+          formattedResponse += eventHtml + '<div class="info-divider"></div>';
         });
         
         return formattedResponse;
       }
       
       return text;
+    }
+
+    function formatGeneralDataResponse(data) {
+      let response = '';
+      
+      // Format announcements
+      if (data.announcements && data.announcements.length > 0) {
+        response += '<div class="info-title"><i class="fas fa-bullhorn"></i> Announcements</div>';
+        data.announcements.forEach(announcement => {
+          response += `
+            <div class="info-paragraph">
+              <strong>${announcement.title}</strong><br>
+              ${announcement.content}<br>
+              <span class="info-meta">Posted by ${announcement.author} on ${new Date(announcement.start_date).toLocaleDateString()}</span>
+            </div>
+            <div class="info-divider"></div>`;
+        });
+      }
+      
+      // Format upcoming events
+      if (data.upcoming_events && data.upcoming_events.length > 0) {
+        response += '<div class="info-title"><i class="far fa-calendar-alt"></i> Upcoming Events</div>';
+        data.upcoming_events.forEach(event => {
+          response += `
+            <div class="info-paragraph">
+              <strong>${event.title}</strong><br>
+              <span class="info-meta">Date: ${new Date(event.start_date).toLocaleString()}</span><br>
+              ${event.description}
+            </div>
+            <div class="info-divider"></div>`;
+        });
+      }
+      
+      // Format internships
+      if (data.internships && data.internships.length > 0) {
+        response += '<div class="info-title"><i class="fas fa-briefcase"></i> Internship Opportunities</div>';
+        data.internships.forEach(internship => {
+          response += `
+            <div class="info-paragraph">
+              <strong>${internship.company_name}</strong> - ${internship.position}<br>
+              Status: <span class="${internship.status === 'active' ? 'status-active' : 'status-inactive'}">${internship.status}</span>
+            </div>
+            <div class="info-divider"></div>`;
+        });
+      }
+      
+      return response || '<p>No general information available at this time.</p>';
     }
 
     async function sendMessage() {
@@ -522,6 +574,19 @@ Description: ${event.detailed_description}
       addMessage(message, 'user');
       input.value = "";
       showTypingIndicator();
+
+      // Check if this is a general information request
+      const generalInfoKeywords = ['announcement', 'internship', 'general info', 'upcoming event'];
+      const isGeneralRequest = generalInfoKeywords.some(keyword => 
+        message.toLowerCase().includes(keyword)
+      );
+
+      if (isGeneralRequest && generalData) {
+        hideTypingIndicator();
+        const formattedResponse = formatGeneralDataResponse(generalData.data);
+        addMessage(formattedResponse, 'bot');
+        return;
+      }
 
       const prompt = `
 You are an AI assistant for an event management website. Use the following event information to answer user questions clearly and helpfully.
