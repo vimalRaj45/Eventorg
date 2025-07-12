@@ -1292,8 +1292,7 @@ async function loadPendingApprovals() {
       const fullName = `${student.first_name} ${student.last_name}`;
       const contact = student.contact_number;
 
-      const message = `Hi ${fullName}, congratulations! 🎉 Your registration has been approved by Edwyna. You can now log in and start your journey.`;
-
+      const message = `Hi ${fullName}, congratulations! Your registration has been approved by Edwyna. You can now log in and start your journey.`;
       const whatsappLink = `https://wa.me/${contact}?text=${encodeURIComponent(message)}`;
       const smsLink = `sms:${contact}?body=${encodeURIComponent(message)}`;
 
@@ -1306,17 +1305,14 @@ async function loadPendingApprovals() {
           <td>${student.college_name}</td>
           <td>${roleBadge}</td>
           <td>
-            <button class="btn btn-success btn-sm mb-1" onclick="approveStudent(${student.id})">Approve</button>
-            <button class="btn btn-secondary btn-sm mb-1" onclick="viewStudentDetail(${student.id})">View</button>
-            <div class="dropdown mt-1">
-              <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                Notify
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="${whatsappLink}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
-                <li><a class="dropdown-item" href="${smsLink}"><i class="fas fa-sms"></i> SMS</a></li>
-              </ul>
-            </div>
+            <button onclick="approveStudent(${student.id})">Approve</button>
+            <button onclick="viewStudentDetail(${student.id})">View</button>
+            <a href="${whatsappLink}" target="_blank">
+              <button>WhatsApp</button>
+            </a>
+            <a href="${smsLink}">
+              <button>SMS</button>
+            </a>
           </td>
         </tr>
       `;
@@ -1624,11 +1620,5 @@ async function viewReferralTree(referralCode) {
             }
         }
     </script>
-    <!-- Bootstrap 5 JS Bundle for dropdowns -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Font Awesome for icons (optional) -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-
 </body>
 </html>
