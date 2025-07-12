@@ -1644,7 +1644,7 @@ function toggleNavMenu() {
   }
 
   function logoutUser() {
-    localStorage.removeItem("user");
+    localStorage.clear(); // Clear all localStorage keys
     window.location.href = "Login.html";
   }
 
