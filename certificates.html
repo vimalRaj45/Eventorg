@@ -64,48 +64,76 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-               <img src="https://i.ibb.co/mFHfq6KS/Event-Hub-Logo.jpg" alt="Logo" style="height: 60px; margin-top: 5%;">
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="index.html" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a href="events.html" class="nav-link">Events</a>
-                </li>
-                <li class="nav-item">
-                    <a href="certificates.html" style="text-decoration: none; color: #1f2937; font-weight: 650;">Certificates</a>
-                </li>
-                 <li class="nav-item">
-                    <a href="results.html" class="nav-link">Results</a>
-                </li>
-                 <li class="nav-item">
-                    <a href="Intern.html" class="nav-link">InternShips</a>
-                </li>
-                 <li class="nav-item">
-  <a href="refer.html" class="nav-link">
-     Referral Program
-  </a>
-</li>
-               
+<nav style="
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  padding: 0 20px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Outfit', sans-serif;
+">
 
-          <li class="nav-item" id="logoutItem" style="display: none;" onclick="logout()">
-    <a href="#" class="nav-link">Logout</a>
-  </li>
-  <li class="nav-item" id="loginItem" style="display: none;">
-    <a href="Login.html" class="nav-link btn-primary">Login</a>
-  </li>
-            </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </div>
-    </nav>
+
+  <!-- Logo -->
+  <div style="
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #6366f1;
+  "> <img src="https://i.ibb.co/mFHfq6KS/Event-Hub-Logo.jpg" alt="Logo" style="height: 60px; margin-top: 5%;"></div>
+
+  <!-- Hamburger -->
+  <div id="hamburgerBtn" style="
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+  " onclick="toggleNavMenu()">
+    <div style="width: 25px; height: 3px; background: #1f2937; margin: 3px 0;"></div>
+    <div style="width: 25px; height: 3px; background: #1f2937; margin: 3px 0;"></div>
+    <div style="width: 25px; height: 3px; background: #1f2937; margin: 3px 0;"></div>
+  </div>
+
+  <!-- Nav Menu -->
+  <div id="navMenu" style="
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    align-items: center;
+  ">
+    <a href="index.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Home</a>
+    <a href="events.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Events</a>
+    <a href="certificates.html" style="text-decoration: none; color: #1f2937; font-weight: 650;">Certificates</a>
+    <a href="results.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Results</a>
+    <a href="Intern.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Internships</a>
+    <a href="refer.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Referral</a>
+    <a href="1.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Profile</a>
+    <!-- Login and Logout -->
+    <a id="loginItem" href="Login.html" style="
+      text-decoration: none;
+      background: #6366f1;
+      color: white;
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+    ">Login</a>
+
+    <a id="logoutItem" href="#" onclick="logoutUser()" style="
+      text-decoration: none;
+      background: #f46721;
+      color: white;
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      display: none;
+    ">Logout</a>
+  </div>
+  </div>
+</nav>
 
               
 
@@ -502,6 +530,59 @@ certificates = response.events
                 }
             }
         });
+        function logout() {
+  localStorage.clear(); // Clears all localStorage keys
+  window.location.href = "Login.html"; // Redirect to login/home page
+}
+
+function toggleNavMenu() {
+    const navMenu = document.getElementById('navMenu');
+    navMenu.style.left = navMenu.style.left === '0px' ? '-100%' : '0px';
+  }
+
+  function handleResize() {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const navMenu = document.getElementById('navMenu');
+    if (window.innerWidth <= 768) {
+      hamburger.style.display = 'flex';
+      navMenu.style.position = 'fixed';
+      navMenu.style.left = '-100%';
+      navMenu.style.top = '70px';
+      navMenu.style.width = '100%';
+      navMenu.style.background = 'white';
+      navMenu.style.flexDirection = 'column';
+      navMenu.style.textAlign = 'center';
+      navMenu.style.padding = '2rem 0';
+      navMenu.style.transition = 'left 0.3s ease';
+      navMenu.style.boxShadow = '0 10px 27px rgba(0, 0, 0, 0.05)';
+    } else {
+      hamburger.style.display = 'none';
+      navMenu.removeAttribute('style');
+      navMenu.style.display = 'flex';
+      navMenu.style.gap = '2rem';
+      navMenu.style.listStyle = 'none';
+      navMenu.style.alignItems = 'center';
+    }
+  }
+
+  function logoutUser() {
+    localStorage.removeItem("user");
+    window.location.href = "Login.html";
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      document.getElementById("logoutItem").style.display = "block";
+      document.getElementById("loginItem").style.display = "none";
+    } else {
+      document.getElementById("logoutItem").style.display = "none";
+      document.getElementById("loginItem").style.display = "block";
+    }
+    handleResize();
+  });
+
+  window.addEventListener('resize', handleResize);
     </script>
 </body>
 </html>
