@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,22 +77,22 @@ body{
     list-style: none;
     align-items: center;
   ">
-    <a href="index.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Home</a>
-    <a href="events.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Events</a>
-    <a href="certificates.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Certificates</a>
-    <a href="results.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Results</a>
-    <a href="Intern.html" style="text-decoration: none; color: #1f2937; font-weight: 650;">Internships</a>
-    <a href="refer.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Referral</a>
-    <a href="1.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Profile</a>
+    <a href='/' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Home</a>
+    <a href='/events' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Events</a>
+    <a href='/certificates' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Certificates</a>
+    <a href='/results' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Results</a>
+    <a href='/intern' style='text-decoration: none; color: #1f2937; font-weight: 650;'>Internships</a>
+    <a href='/refer' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Referral</a>
+    <a href='/1' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Profile</a>
     <!-- Login and Logout -->
-    <a id="loginItem" href="Login.html" style="
+    <a href='/login' id='loginItem' style='
       text-decoration: none;
       background: #6366f1;
       color: white;
       padding: 0.5rem 1.2rem;
       border-radius: 8px;
       font-weight: 600;
-    ">Login</a>
+    '>Login</a>
 
     <a id="logoutItem" href="#" onclick="logoutUser()" style="
       text-decoration: none;
@@ -224,35 +225,48 @@ body{
       window.location.href = 'login.html';
     }
 
-    async function loadInternships() {
-      try {
-        document.getElementById('internshipsList').innerHTML = `
-          <div class="col-12 text-center">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-            <p>Loading internships...</p>
-          </div>
-        `;
-        
-        const res = await fetch(`${BASE}/api/internships`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (!res.ok) throw new Error('Failed to load internships');
-        
-        const internships = await res.json();
-        renderInternships(internships);
-      } catch (err) {
-        document.getElementById('internshipsList').innerHTML = `
-          <div class="col-12 text-center text-danger">
-            Error loading internships: ${err.message}
-          </div>
-        `;
-      }
-    }
+   async function loadInternships() {
+  try {
+    document.getElementById('internshipsList').innerHTML = `
+      <div class="col-12 text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Loading internships...</p>
+      </div>
+    `;
+    
+    // Fetch both internships and applications in parallel
+    const [internshipsRes, applicationsRes] = await Promise.all([
+      fetch(`${BASE}/api/internships`, { headers: { Authorization: `Bearer ${token}` } }),
+      fetch(`${BASE}/api/internships/applied`, { headers: { Authorization: `Bearer ${token}` } })
+    ]);
+    
+    if (!internshipsRes.ok) throw new Error('Failed to load internships');
+    
+    const internships = await internshipsRes.json();
+    const applications = applicationsRes.ok ? await applicationsRes.json() : [];
+    
+    renderInternships(internships, applications);
+  } catch (err) {
+    document.getElementById('internshipsList').innerHTML = `
+      <div class="col-12 text-center text-danger">
+        Error loading internships: ${err.message}
+      </div>
+    `;
+  }
+}
 
-    function renderInternships(internships) {
+function getStatusClass(status) {
+  switch (status) {
+    case 'active': return 'badge-active';
+    case 'inactive': return 'badge-inactive';
+    case 'completed': return 'badge-completed';
+    default: return 'badge-secondary';
+  }
+}
+
+   function renderInternships(internships, applications) {
   const container = document.getElementById('internshipsList');
   
   if (internships.length === 0) {
@@ -264,229 +278,251 @@ body{
     return;
   }
   
-  container.innerHTML = internships.map(internship => `
-   <div class="col-md-6 mb-4">
-  <div class="card h-100 internship-card">
-    ${internship.imgurl ? `
-      <img src="${internship.imgurl}" class="card-img-top internship-img" alt="${internship.company_name}">
-    ` : ''}
-    <div class="card-body">
-      <h5 class="card-title">${internship.company_name}</h5>
-      <h6 class="card-subtitle mb-2 text-muted">${internship.position}</h6>
-      <p class="card-text">
-        ${internship.description || 'No description available'}
-      </p>
-      <p class="card-text">
-        <small class="text-muted">Duration: ${internship.duration}</small><br>
-        <small class="text-muted">
-          ${new Date(internship.start_date).toLocaleDateString()} - 
-          ${new Date(internship.end_date).toLocaleDateString()}
-        </small><br>
-        ${internship.application_fee !== null && !isNaN(internship.application_fee) ? `
-          <small class="text-muted">Amount: ₹${internship.application_fee} (Application Fee)</small>
-        ` : ''}
-      </p>
-      <span class="badge rounded-pill ${getStatusClass(internship.status)}">
-        ${internship.status}
-      </span>
-    </div>
-    <div class="card-footer bg-transparent">
-      ${internship.status === 'active' ? `
-        <button class="btn btn-primary w-100" onclick="startApplication(${internship.id})">
-          <i class="fas fa-paper-plane"></i> Apply Now
-        </button>
-      ` : `
-        <button class="btn btn-secondary w-100" disabled>
-          <i class="fas fa-ban"></i> Applications ${internship.status === 'completed' ? 'Closed' : 'Not Available'}
-        </button>
-      `}
-    </div>
-  </div>
-</div>
-
-      
-  `).join('');
+  container.innerHTML = internships.map(internship => {
+    const hasApplied = applications.some(app => app.internship_id === internship.id);
+    const isPaid = applications.some(app => app.internship_id === internship.id && app.transaction_id);
+    
+    return `
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 internship-card">
+          ${internship.imgurl ? `
+            <img src="${internship.imgurl}" class="card-img-top internship-img" alt="${internship.company_name}">
+          ` : ''}
+          <div class="card-body">
+            <h5 class="card-title">${internship.company_name}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">${internship.position}</h6>
+            <p class="card-text">
+              ${internship.description || 'No description available'}
+            </p>
+            <p class="card-text">
+              <small class="text-muted">Duration: ${internship.duration}</small><br>
+              <small class="text-muted">
+                ${new Date(internship.start_date).toLocaleDateString()} - 
+                ${new Date(internship.end_date).toLocaleDateString()}
+              </small><br>
+              ${internship.application_fee !== null && !isNaN(internship.application_fee) ? `
+                <small class="text-muted">Amount: ₹${internship.application_fee} (Application Fee)</small>
+              ` : ''}
+            </p>
+            <span class="badge rounded-pill ${getStatusClass(internship.status)}">
+              ${internship.status}
+            </span>
+            ${hasApplied ? `
+              <span class="badge rounded-pill bg-info mt-2">
+                ${isPaid ? 'Payment Completed' : 'Application Submitted'}
+              </span>
+            ` : ''}
+          </div>
+          <div class="card-footer bg-transparent">
+            ${internship.status === 'active' ? `
+              <button class="btn btn-primary w-100" 
+                onclick="${hasApplied ? '' : `startApplication(${internship.id})`}"
+                ${hasApplied ? 'disabled' : ''}>
+                <i class="fas fa-paper-plane"></i> 
+                ${hasApplied ? 'Already Applied' : 'Apply Now'}
+              </button>
+            ` : `
+              <button class="btn btn-secondary w-100" disabled>
+                <i class="fas fa-ban"></i> Applications ${internship.status === 'completed' ? 'Closed' : 'Not Available'}
+              </button>
+            `}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
-    function getStatusClass(status) {
-      switch (status) {
-        case 'active': return 'badge-active';
-        case 'inactive': return 'badge-inactive';
-        case 'completed': return 'badge-completed';
-        default: return 'badge-secondary';
-      }
-    }
-
-    function startApplication(internshipId) {
-      currentInternshipId = internshipId;
-      resetApplicationModal();
-      applicationModal.show();
-    }
-
-    function resetApplicationModal() {
-      // Hide all steps
-      document.querySelectorAll('.application-flow').forEach(step => {
-        step.classList.remove('active-flow');
-      });
-      // Show first step
-      document.getElementById('confirmStep').classList.add('active-flow');
-      document.getElementById('applicationModalTitle').textContent = 'Apply for Internship';
-    }
-
-   async function confirmApplication() {
-
-
+   async function startApplication(internshipId) {
+  currentInternshipId = internshipId;
+  
   try {
-    const res = await fetch(`${BASE}/api/internships/${currentInternshipId}/apply`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-      
+    // First check if already applied
+    const checkRes = await fetch(`${BASE}/api/internships/applied`, {
+      headers: { Authorization: `Bearer ${token}` }
     });
-
-    if (!res.ok) {
-      const error = await res.json();
-      if (error.message === 'Already applied') {
-        applicationModal.hide();
-        await Swal.fire({
-          title: 'Already Applied',
-          text: 'You have already applied for this internship',
-          icon: 'info'
-        });
-        return;
+    
+    if (checkRes.ok) {
+      const applications = await checkRes.json();
+      const existingApplication = applications.find(app => app.internship_id === currentInternshipId);
+      
+      if (existingApplication) {
+        if (existingApplication.transaction_id) {
+          // Already applied and paid
+          await Swal.fire({
+            title: 'Already Applied',
+            text: 'You have already applied and paid for this internship',
+            icon: 'info'
+          });
+          return;
+        } else {
+          // Already applied but not paid - open modal directly to payment step
+          currentApplicationId = existingApplication.id;
+          resetApplicationModal();
+          showPaymentStep();
+          applicationModal.show();
+          return;
+        }
       }
-      throw new Error(error.message || 'Failed to apply');
     }
+    
+    // If not applied yet, open modal normally (confirmation first)
+    resetApplicationModal();
+    applicationModal.show();
+    
+  } catch (err) {
+    console.error('Error checking applications:', err);
+    // If error checking, proceed normally
+    resetApplicationModal();
+    applicationModal.show();
+  }
+}
 
-    const result = await res.json();
-   
-    currentApplicationId = result.applicationId;
+// Modify confirmApplication to just proceed to payment (no checks needed)
+async function confirmApplication() {
+  showPaymentStep();
+}
 
-    // Move to payment step
-    showPaymentStep();
+function resetApplicationModal() {
+  // Hide all steps
+  document.querySelectorAll('.application-flow').forEach(step => {
+    step.classList.remove('active-flow');
+  });
+  // Show first step
+  document.getElementById('confirmStep').classList.add('active-flow');
+  document.getElementById('applicationModalTitle').textContent = 'Apply for Internship';
+}
 
+
+
+async function showPaymentStep() {
+  try {
+    // Get internship details for payment QR
+    const res = await fetch(`${BASE}/api/internships/${currentInternshipId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    if (!res.ok) throw new Error('Failed to load internship details');
+    const internship = await res.json();
+    
+    // Update modal title
+    document.getElementById('applicationModalTitle').textContent = 'Complete Your Payment';
+    
+    // Populate payment content
+    document.getElementById('paymentContent').innerHTML = `
+      <div class="mb-3">
+        <h5>${internship.position} at ${internship.company_name}</h5>
+        <p class="text-muted">Please complete payment to finalize your application</p>
+      </div>
+      
+      <div class="payment-instructions">
+        <h6><i class="fas fa-info-circle me-2"></i>Payment Instructions:</h6>
+        <ol>
+          <li>Scan the QR code below using your payment app</li>
+          <li>Complete the payment</li>
+          <li>Enter the transaction ID/reference number below</li>
+          <li>Click "Submit Payment"</li>
+        </ol>
+      </div>
+      
+      ${internship.payment_qr ? `
+        <div class="text-center mb-4">
+          <p class="mb-2"><strong>Scan to Pay:</strong></p>
+          <img src="${internship.payment_qr}" class="img-fluid qr-img border p-2 mb-2">
+          <p class="small text-muted">Amount: ₹${internship.application_fee} (Application Fee)</p>
+        </div>
+      ` : `
+        <div class="alert alert-warning">
+          No payment QR code available for this internship
+        </div>
+      `}
+      
+      <div class="mb-3">
+        <label for="transactionNo" class="form-label">Transaction ID/Reference Number</label>
+        <input type="text" class="form-control" id="transactionNo" 
+              placeholder="Enter transaction ID from your payment receipt" required>
+        <div class="form-text">This is required to verify your payment</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="referralCode" class="form-label">Referral Code (Optional)</label>
+        <input type="text" class="form-control" id="referralCode" 
+              placeholder="Enter referral code if you have one">
+        <div class="form-text">Leave empty if you don't have a referral code</div>
+      </div>
+    `;
+    
+    // Switch to payment step
+    document.getElementById('confirmStep').classList.remove('active-flow');
+    document.getElementById('paymentStep').classList.add('active-flow');
   } catch (err) {
     applicationModal.hide();
     Swal.fire('Error', err.message, 'error');
   }
 }
 
-
-    async function showPaymentStep() {
-      try {
-        // Get internship details for payment QR
-        const res = await fetch(`${BASE}/api/internships/${currentInternshipId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (!res.ok) throw new Error('Failed to load internship details');
-        const internship = await res.json();
-        
-        // Update modal title
-        document.getElementById('applicationModalTitle').textContent = 'Complete Your Payment';
-        
-        // Populate payment content
-        document.getElementById('paymentContent').innerHTML = `
-          <div class="mb-3">
-            <h5>${internship.position} at ${internship.company_name}</h5>
-            <p class="text-muted">Please complete payment to finalize your application</p>
-          </div>
-          
-          <div class="payment-instructions">
-            <h6><i class="fas fa-info-circle me-2"></i>Payment Instructions:</h6>
-            <ol>
-              <li>Scan the QR code below using your payment app</li>
-              <li>Complete the payment</li>
-              <li>Enter the transaction ID/reference number below</li>
-              <li>Click "Submit Payment"</li>
-            </ol>
-          </div>
-          
-          ${internship.payment_qr ? `
-            <div class="text-center mb-4">
-              <p class="mb-2"><strong>Scan to Pay:</strong></p>
-              <img src="${internship.payment_qr}" class="img-fluid qr-img border p-2 mb-2">
-              <p class="small text-muted">Amount: ₹${internship.application_fee} (Application Fee)</p>
-            </div>
-          ` : `
-            <div class="alert alert-warning">
-              No payment QR code available for this internship
-            </div>
-          `}
-          
-         <div class="mb-3">
-  <label for="transactionNo" class="form-label">Transaction ID/Reference Number</label>
-  <input type="text" class="form-control" id="transactionNo" 
-         placeholder="Enter transaction ID from your payment receipt" required>
-  <div class="form-text">This is required to verify your payment</div>
-</div>
-
-<!-- 🧑‍🤝‍🧑 Referral Code -->
-<div class="mb-3">
-  <label for="referralCode" class="form-label">Referral Code (Optional)</label>
-  <input type="text" class="form-control" id="referralCode" 
-         placeholder="Enter referral code if you have one">
-  <div class="form-text">Leave empty if you don’t have a referral code</div>
-</div>
-
-        `;
-        
-        // Switch to payment step
-        document.getElementById('confirmStep').classList.remove('active-flow');
-        document.getElementById('paymentStep').classList.add('active-flow');
-      } catch (err) {
-        applicationModal.hide();
-        Swal.fire('Error', err.message, 'error');
-      }
-    }
-
-   async function submitPayment() {
+async function submitPayment() {
   try {
     const transactionNo = document.getElementById('transactionNo').value.trim();
     const referralCode = document.getElementById('referralCode')?.value?.trim() || null;
-
-    console.log('💳 Submitting Payment...');
-    console.log('➡️ Transaction No:', transactionNo);
-    console.log('➡️ Referral Code:', referralCode);
-    console.log('➡️ Internship ID:', currentInternshipId);
 
     if (!transactionNo) {
       throw new Error('Please enter your transaction ID/reference number');
     }
 
-    const res = await fetch(`${BASE}/api/internships/${currentInternshipId}/submit-payment`, {
+    // Show loading state
+    const submitBtn = document.querySelector('#paymentStep .btn-success');
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+    submitBtn.disabled = true;
+
+    // First create the application
+    const applyRes = await fetch(`${BASE}/api/internships/${currentInternshipId}/apply`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ transactionNo, referralCode })  // ✅ correctly formatted
+        'Authorization': `Bearer ${token}`
+      }
     });
 
-    console.log('📡 Response Status:', res.status);
-
-    if (!res.ok) {
-      const error = await res.json();
-      console.error('❌ Payment Submit Error:', error);
-      throw new Error(error.message || 'Failed to submit payment');
+    if (!applyRes.ok) {
+      const error = await applyRes.json();
+      throw new Error(error.message || 'Failed to apply');
     }
 
-    const result = await res.json();
-    console.log('✅ Payment Submit Success:', result);
+    const applyResult = await applyRes.json();
+    currentApplicationId = applyResult.applicationId;
+
+    // Then submit payment with the transaction details
+    const paymentRes = await fetch(`${BASE}/api/internships/${currentInternshipId}/submit-payment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ 
+        transactionNo,
+        referralCode
+      })
+    });
+
+    if (!paymentRes.ok) {
+      const error = await paymentRes.json();
+      throw new Error(error.message || 'Payment submission failed');
+    }
 
     // Show success step
     document.getElementById('paymentStep').classList.remove('active-flow');
     document.getElementById('successStep').classList.add('active-flow');
     document.getElementById('applicationModalTitle').textContent = 'Application Complete';
-
+    
   } catch (err) {
-    console.error('⚠️ Submit Payment Caught Error:', err.message);
-    applicationModal.hide();
+    // Reset button state
+    const submitBtn = document.querySelector('#paymentStep .btn-success');
+    submitBtn.innerHTML = 'Submit Payment';
+    submitBtn.disabled = false;
+    
     Swal.fire('Error', err.message, 'error');
   }
 }
-
 
     async function loadMyApplications() {
       try {
