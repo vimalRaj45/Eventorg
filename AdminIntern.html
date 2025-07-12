@@ -72,6 +72,11 @@
                   <option value="completed">Completed</option>
                 </select>
               </div>
+              <!-- Inside the createInternship form -->
+<div class="col-md-6">
+  <label class="form-label">Application Fee (₹)</label>
+  <input class="form-control" id="applicationFee" type="number" min="0" required>
+</div>
               <div class="col-md-6">
                 <label class="form-label">Payment QR Code (Image)</label>
                 <input class="form-control" type="file" id="paymentQrImg" accept="image/*">
@@ -146,6 +151,11 @@
                       <option value="completed">Completed</option>
                     </select>
                   </div>
+                  <!-- Inside the editInternshipForm -->
+<div class="col-md-6">
+  <label class="form-label">Application Fee (₹)</label>
+  <input class="form-control" id="editApplicationFee" type="number" min="0" required>
+</div>
                   <div class="col-md-6">
                     <label class="form-label">Payment QR Code (Image)</label>
                     <input class="form-control" type="file" id="editPaymentQrImg" accept="image/*">
@@ -325,6 +335,7 @@ function renderInternships(internships) {
           <h6 class="card-subtitle mb-2 text-muted">${i.position}</h6>
           ${i.description ? `<p class="card-text">${i.description}</p>` : ''}
           <p class="card-text">
+            <small class="text-muted">Application Fee: ₹${i.application_fee || 0}</small><br>
             <small class="text-muted">Duration: ${i.duration}</small><br>
             <small class="text-muted">Dates: ${new Date(i.start_date).toLocaleDateString()} to ${new Date(i.end_date).toLocaleDateString()}</small><br>
             <span class="badge ${getStatusBadgeClass(i.status)}">${i.status}</span>
@@ -386,6 +397,7 @@ async function openEditModal(id) {
 
     // Fill the form with the fetched data
     document.getElementById('editId').value = internship.id;
+    document.getElementById('editApplicationFee').value = internship.application_fee || 0;
     document.getElementById('editCompany').value = internship.company_name || '';
     document.getElementById('editPosition').value = internship.position || '';
     document.getElementById('editDescription').value = internship.description || '';
@@ -449,16 +461,17 @@ async function saveInternshipChanges() {
     }
 
     // First update the internship details (without QR code)
-    const body = {
-      company_name: document.getElementById('editCompany').value,
-      position: document.getElementById('editPosition').value,
-      description: document.getElementById('editDescription').value,
-      duration: document.getElementById('editDuration').value,
-      start_date: document.getElementById('editStart').value,
-      end_date: document.getElementById('editEnd').value,
-      status: document.getElementById('editStatus').value,
-      imgurl: imgurl || null
-    };
+const body = {
+  company_name: document.getElementById('company').value,
+  position: document.getElementById('position').value,
+  description: document.getElementById('description').value,
+  duration: document.getElementById('duration').value,
+  start_date: document.getElementById('start').value,
+  end_date: document.getElementById('end').value,
+  status: document.getElementById('status').value,
+  application_fee: document.getElementById('applicationFee').value,
+  imgurl: null
+};
 
     const res = await fetch(`${BASE}/api/internships/${id}`, {
       method: 'PUT',
@@ -561,16 +574,17 @@ document.getElementById('createInternship').addEventListener('submit', async (e)
     let paymentQrUrl = null;
 
     // First create the internship without QR code
-    const body = {
-      company_name: document.getElementById('company').value,
-      position: document.getElementById('position').value,
-      description: document.getElementById('description').value,
-      duration: document.getElementById('duration').value,
-      start_date: document.getElementById('start').value,
-      end_date: document.getElementById('end').value,
-      status: document.getElementById('status').value,
-      imgurl: null // We'll handle this after creation
-    };
+const body = {
+  company_name: document.getElementById('editCompany').value,
+  position: document.getElementById('editPosition').value,
+  description: document.getElementById('editDescription').value,
+  duration: document.getElementById('editDuration').value,
+  start_date: document.getElementById('editStart').value,
+  end_date: document.getElementById('editEnd').value,
+  status: document.getElementById('editStatus').value,
+  application_fee: document.getElementById('editApplicationFee').value,
+  imgurl: imgurl || null
+};
 
     // Upload internship image if selected
     if (fileInput.files.length > 0) {
