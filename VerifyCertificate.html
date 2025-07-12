@@ -273,7 +273,7 @@
     const API_BASE_URL = 'https://eventdb.onrender.com/api';
 
     async function searchCertificate() {
-      const code = document.getElementById('codeInput').value.trim().toUpperCase();
+      const code = document.getElementById('codeInput').value.trim();
       const errorCard = document.getElementById('errorCard');
       const resultCard = document.getElementById('resultCard');
       const verifyText = document.getElementById('verifyText');
