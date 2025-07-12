@@ -451,18 +451,43 @@ document.addEventListener('keydown', function(e) {
                 const card = document.createElement('div');
                 card.className = 'card certificate-card';
                 card.innerHTML = `
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-award"></i> ${cert.event_title}</h5>
-                        <p class="card-text"><strong>Type:</strong> ${cert.event_type}</p>
-                        <p class="card-text"><strong>Participant:</strong> ${cert.participant_name}</p>
-                        <p class="card-text"><strong>Issued At:</strong> ${new Date(cert.issued_at).toLocaleString()}</p>
-                        <p class="card-text"><strong>Code:</strong> <span class="certificate-code">${cert.unique_code}</span></p>
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="${cert.certificate_url}" class="btn btn-primary" target="_blank">
-                                <i class="fas fa-download me-1"></i> Download Certificate
-                            </a>
-                        </div>
-                    </div>
+                   <div class="card-body" style="font-family: 'Outfit', sans-serif;">
+  <h5 class="card-title">
+    <i class="fas fa-award"></i> ${cert.event_title}
+  </h5>
+  <p class="card-text"><strong>Type:</strong> ${cert.event_type}</p>
+  <p class="card-text"><strong>Participant:</strong> ${cert.participant_name}</p>
+  <p class="card-text"><strong>Issued At:</strong> ${new Date(cert.issued_at).toLocaleString()}</p>
+  <p class="card-text">
+    <strong>Code:</strong>
+    <span id="certCode-${cert.id}" style="font-family: monospace;">${cert.unique_code}</span>
+    <button style="
+      margin-left: 10px;
+      padding: 4px 10px;
+      font-size: 0.875rem;
+      border-radius: 6px;
+      border: 1px solid #6c757d;
+      background: white;
+      color: #6c757d;
+      cursor: pointer;
+    " onclick="navigator.clipboard.writeText(document.getElementById('certCode-${cert.id}').innerText).then(() => alert('Code copied!'))">
+      <i class="fas fa-copy"></i> Copy
+    </button>
+  </p>
+  <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+    <a href="${cert.certificate_url}" target="_blank" style="
+      padding: 8px 16px;
+      background: #6366f1;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+    ">
+      <i class="fas fa-download" style="margin-right: 6px;"></i> Download Certificate
+    </a>
+  </div>
+</div>
+
                 `;
                 container.appendChild(card);
             });
