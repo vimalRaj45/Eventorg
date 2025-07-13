@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -329,13 +330,13 @@
     list-style: none;
     align-items: center;
   ">
-    <a href="index.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Home</a>
-    <a href="events.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Events</a>
-    <a href="certificates.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Certificates</a>
-    <a href="results.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Results</a>
-    <a href="Intern.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Internships</a>
-    <a href="refer.html" style="text-decoration: none; color: #1f2937; font-weight: 650;">Referral</a>
-    <a href="1.html" style="text-decoration: none; color: #1f2937; font-weight: 500;">Profile</a>
+    <a href='/' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Home</a>
+    <a href='/events' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Events</a>
+    <a href='/certificates' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Certificates</a>
+    <a href='/results' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Results</a>
+    <a href='/intern' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Internships</a>
+    <a href='/refer' style='text-decoration: none; color: #1f2937; font-weight: 650;'>Referral</a>
+    <a href='/1' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Profile</a>
     <!-- Login and Logout -->
     <a id="loginItem" href="#" style="
       text-decoration: none;
@@ -394,7 +395,7 @@
                 <span id="loginSpinner" class="loading-spinner hidden"></span>
               </button>
               <div class="no-account">
-                Don't have an account? <a href="referRegister.html">Sign up</a>
+                Don't have an account? <a href='/referregister'>Sign up</a>
               </div>
             </div>
           </div>
@@ -958,8 +959,13 @@ async function loadDownlines() {
     const referralCode = currentUser.referral_code;
     const res = await fetch(`${BASE_URL}/studentsormentor/downlines/${referralCode}`);
     const downlines = await res.json();
+    console.log('All downlines:', downlines);
 
-    document.getElementById('downlineSelect').innerHTML = downlines.map(d =>
+    // Filter only students (exclude mentors)
+    const studentDownlines = downlines.filter(d => d.role === 'student');
+
+    // Populate the select dropdown
+    document.getElementById('downlineSelect').innerHTML = studentDownlines.map(d =>
       `<option value="${d.id}">${d.name}</option>`
     ).join('');
   } catch (err) {
@@ -967,6 +973,7 @@ async function loadDownlines() {
     alert('Failed to load downlines');
   }
 }
+
 
 
 
@@ -1162,3 +1169,5 @@ function toggleNavMenu() {
 
 </body>
 </html>
+
+
