@@ -41,7 +41,7 @@ body {
 }
 
 .nav-logo h2 {
-    color: #6366f1;
+    color:rgba(94,10,0,255);
     font-weight: 700;
     font-size: 1.8rem;
 }
@@ -63,18 +63,18 @@ body {
 }
 
 .nav-link:hover {
-    color: #6366f1;
+    color:rgba(94,10,0,255);
     background: rgba(99, 102, 241, 0.1);
 }
 
 .nav-link.btn-primary {
-    background: #6366f1;
+    background: rgba(94,10,0,255);
     color: white;
     padding: 0.75rem 1.5rem;
 }
 
 .nav-link.btn-primary:hover {
-    background: #5855eb;
+    background: rgba(94,10,0,255);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
@@ -168,12 +168,12 @@ body {
 }
 
 .btn-primary {
-    background: #6366f1;
+    background:rgba(94,10,0,255);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #5855eb;
+    background: rgba(94,10,0,255);
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
 }
@@ -186,18 +186,18 @@ body {
 
 .btn-secondary:hover {
     background: white;
-    color: #6366f1;
+    color:rgba(94,10,0,255);
     transform: translateY(-3px);
 }
 
 .btn-outline {
     background: transparent;
-    color: #6366f1;
-    border: 2px solid #6366f1;
+    color:rgba(94,10,0,255);
+    border: 2px solidrgba(94,10,0,255);
 }
 
 .btn-outline:hover {
-    background: #6366f1;
+    background:rgba(94,10,0,255);
     color: white;
     transform: translateY(-2px);
 }
@@ -241,7 +241,7 @@ body {
 
 .tab-btn.active,
 .tab-btn:hover {
-    background: #6366f1;
+    background:rgba(94,10,0,255);
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
@@ -383,7 +383,7 @@ body {
 .feature-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: rgba(94,10,0,255);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -392,6 +392,7 @@ body {
     color: white;
     font-size: 2rem;
 }
+
 
 .feature-card h3 {
     font-size: 1.25rem;
@@ -440,7 +441,7 @@ body {
 }
 
 .footer-section a:hover {
-    color: #6366f1;
+    color:rgba(94,10,0,255);
 }
 
 .footer-bottom {
