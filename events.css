@@ -2,7 +2,7 @@
 
 /* Page Header */
 .page-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: rgba(94,10,0,255);
     color: white;
     padding: 8rem 0 4rem;
     text-align: center;
@@ -63,7 +63,7 @@
 .filter-select:focus,
 .search-input:focus {
     outline: none;
-    border-color: #6366f1;
+    border-color:rgba(94,10,0,255);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
@@ -160,7 +160,7 @@
 }
 
 .view-poster-btn:hover {
-    background: #6366f1;
+    background:rgba(94,10,0,255);
     color: white;
     transform: translateY(-2px);
 }
@@ -279,7 +279,7 @@
 }
 
 .info-item i {
-    color: #6366f1;
+    color:rgba(94,10,0,255);
 }
 
 .event-actions {
@@ -390,7 +390,7 @@
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #6366f1;
+    border-color:rgba(94,10,0,255);
 }
 
 .form-actions {
@@ -406,7 +406,7 @@
 
 /* Navigation Active State */
 .nav-link.active {
-    color: #6366f1;
+    color:rgba(94,10,0,255);
     background: rgba(99, 102, 241, 0.1);
 }
 
