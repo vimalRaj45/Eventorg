@@ -50,7 +50,7 @@
 
 .form-header i {
     font-size: 3rem;
-    color: #6366f1;
+    color:rgba(94,10,0,255);
     margin-bottom: 1rem;
 }
 
@@ -94,7 +94,7 @@
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #6366f1;
+    border-color:rgba(94,10,0,255);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
@@ -194,7 +194,7 @@
 .stat-value {
     font-size: 2rem;
     font-weight: 700;
-    color: #6366f1;
+    color:rgba(94,10,0,255);
     margin-bottom: 0.5rem;
 }
 
@@ -251,13 +251,13 @@
 
 .bar {
     width: 30px;
-    background: linear-gradient(to top, #6366f1, #8b5cf6);
+    background: linear-gradient(to top,rgba(94,10,0,255), #8b5cf6);
     border-radius: 4px 4px 0 0;
     transition: all 0.3s ease;
 }
 
 .bar:hover {
-    background: linear-gradient(to top, #5855eb, #7c3aed);
+    background: linear-gradient(to top, rgba(94,10,0,255), #7c3aed);
 }
 
 .bar-label {
@@ -299,7 +299,7 @@
 
 .tab-btn.active,
 .tab-btn:hover {
-    background: #6366f1;
+    background:rgba(94,10,0,255);
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
@@ -343,7 +343,7 @@
 }
 
 .table-header {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg,rgba(94,10,0,255) 0%, #8b5cf6 100%);
     color: white;
     padding: 1rem;
     display: grid;
@@ -485,7 +485,7 @@
 .stat-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: rgba(94,10,0,255);
     border-radius: 50%;
     display: flex;
     align-items: center;
