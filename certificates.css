@@ -51,7 +51,7 @@
 
 .form-header i {
     font-size: 3rem;
-    color: #6366f1;
+    color:rgba(94,10,0,255);
     margin-bottom: 1rem;
 }
 
@@ -95,7 +95,7 @@
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #6366f1;
+    border-color:rgba(94,10,0,255);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
@@ -172,7 +172,7 @@
 }
 
 .certificate-item:hover {
-    border-color: #6366f1;
+    border-color:rgba(94,10,0,255);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
 }
 
@@ -330,7 +330,7 @@
 .cert-logo {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #6366f1;
+    color:rgba(94,10,0,255);
 }
 
 .cert-content {
@@ -353,7 +353,7 @@
     font-weight: 700;
     color: #1f2937;
     margin: 0.5rem 0;
-    border-bottom: 2px solid #6366f1;
+    border-bottom: 2px solidrgba(94,10,0,255);
     padding-bottom: 0.25rem;
 }
 
@@ -429,7 +429,7 @@
 .instruction-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: rgba(94,10,0,255);
     border-radius: 50%;
     display: flex;
     align-items: center;
