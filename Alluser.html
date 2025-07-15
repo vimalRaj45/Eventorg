@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EventDB Admin Dashboard</title>
+    <title>Edwyna Admin Dashboard</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- AOS CSS -->
@@ -54,7 +55,7 @@
             </button>
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <i class="bi bi-calendar-event me-2"></i>
-                <span class="fw-bold">EventDB</span>
+                <span class="fw-bold">Edwyna</span>
                 <span class="badge bg-light text-primary ms-2 d-none d-md-inline">Admin</span>
             </a>
         </div>
@@ -79,7 +80,7 @@
     <div class="offcanvas-header border-bottom border-light border-opacity-25 pb-3">
         <div class="d-flex align-items-center">
             <i class="bi bi-calendar-event fs-3 me-2"></i>
-            <h5 class="offcanvas-title mb-0 fw-bold">EventDB Admin</h5>
+            <h5 class="offcanvas-title mb-0 fw-bold">Edwyna Admin</h5>
         </div>
         <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
@@ -178,7 +179,7 @@
     <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
         <div class="position-sticky pt-3">
             <div class="text-center mb-4">
-                <h4 class="text-white">EventDB Admin</h4>
+                <h4 class="text-white">Edwyna Admin</h4>
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
@@ -584,7 +585,7 @@ document.addEventListener('keydown', function(e) {
             } catch (error) {
                 console.error('Error fetching users:', error);
                 alert('Error fetching users. Please check your JWT token and try again.');
-                localStorage.removeItem('eventdb_jwt');
+                localStorage.removeItem('Edwyna_jwt');
                 jwtToken = null;
                 jwtModal.show();
             }
