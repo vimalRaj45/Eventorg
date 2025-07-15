@@ -293,7 +293,7 @@
 }
 
 .certificate-template.participation {
-    border-color: #3b82f6;
+    border-color: rgba(94, 10, 0, 1);
     background: linear-gradient(135deg, #dbeafe 0%, #ffffff 100%);
 }
 
