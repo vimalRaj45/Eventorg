@@ -10,8 +10,7 @@
    
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    
-:root {
+   :root {
         --primary-color: #7b3f00;         /* Rich Brown (Primary) */
         --primary-dark: #4e2800;          /* Darker Rich Brown */
         --secondary-color: #f3e5d8;       /* Light Beige (Soft Background) */
@@ -23,17 +22,77 @@
         --brownish-color: #5e0a00;        /* Deep Brownish Red */
     }
 
+    /* Only override specific Bootstrap elements */
+    .bg-primary {
+        background-color: var(--primary-color) !important;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-dark);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+    }
+    
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .badge-active {
+        background-color: var(--success-color);
+    }
+    
+    .badge-inactive {
+        background-color: var(--dark-color);
+    }
+    
+    .badge-completed {
+        background-color: var(--primary-color);
+    }
+    
+    /* Navigation specific */
+    #loginItem {
+        background: var(--brownish-color) !important;
+    }
+    
+    #logoutItem {
+        background: var(--warning-color) !important;
+    }
+    
+    /* Card header override */
+    .card-header.bg-primary {
+        background-color: var(--primary-color) !important;
+    }
+    
+    /* Modal header override */
+    .modal-header.bg-primary {
+        background-color: var(--primary-color) !important;
+    }
+    
+    /* Background and text colors */
     body {
-        font-family: 'Outfit', sans-serif;
         background-color: var(--light-color);
         color: var(--dark-color);
     }
-
+    
+    /* Payment instructions */
+    .payment-instructions {
+        background-color: var(--secondary-color);
+    }
+    
+    /* Keep all other Bootstrap styles intact */
     .internship-card { 
         transition: all 0.2s; 
         cursor: pointer; 
-        background-color: white;
-        border: 1px solid rgba(0, 0, 0, 0.1);
     }
     
     .internship-card:hover { 
@@ -46,31 +105,9 @@
         object-fit: cover; 
     }
     
-    .badge-active { 
-        background-color: var(--success-color); 
-        color: white; 
-    }
-    
-    .badge-inactive { 
-        background-color: var(--dark-color); 
-        color: white; 
-    }
-    
-    .badge-completed { 
-        background-color: var(--primary-color); 
-        color: white; 
-    }
-    
     .qr-img { 
         max-width: 200px; 
         max-height: 200px; 
-    }
-    
-    .payment-instructions { 
-        background-color: var(--secondary-color); 
-        border-radius: 5px; 
-        padding: 15px; 
-        margin-bottom: 20px; 
     }
     
     .application-flow { 
@@ -79,121 +116,6 @@
     
     .active-flow { 
         display: block; 
-    }
-
-    /* Navigation */
-    nav {
-        background-color: white !important;
-        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Buttons */
-    .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-dark);
-    }
-
-    .btn-primary:hover {
-        background-color: var(--primary-dark);
-        border-color: var(--primary-dark);
-    }
-
-    .btn-outline-primary {
-        color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-
-    .btn-outline-primary:hover {
-        background-color: var(--primary-color);
-        color: white;
-    }
-
-    .btn-success {
-        background-color: var(--success-color);
-        border-color: var(--success-color);
-    }
-
-    .btn-success:hover {
-        background-color: #7a4d2d;
-        border-color: #7a4d2d;
-    }
-
-    /* Cards */
-    .card {
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        background-color: white;
-    }
-
-    .card-header {
-        background-color: var(--primary-color) !important;
-        color: white !important;
-    }
-
-    /* Modal */
-    .modal-header {
-        background-color: var(--primary-color) !important;
-        color: white !important;
-    }
-
-    /* Badges */
-    .badge.bg-info {
-        background-color: #5e8b9a !important; /* Adjusted to fit brown theme */
-    }
-
-    .badge.bg-success {
-        background-color: var(--success-color) !important;
-    }
-
-    .badge.bg-secondary {
-        background-color: #8b8b8b !important; /* Neutral gray */
-    }
-
-    /* Navigation login/logout buttons */
-    #loginItem {
-        background: var(--brownish-color) !important;
-    }
-
-    #logoutItem {
-        background: var(--warning-color) !important;
-    }
-
-    /* Table styling */
-    .table {
-        background-color: white;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: var(--secondary-color);
-    }
-
-    .table-light {
-        background-color: var(--secondary-color);
-    }
-
-    /* Alerts */
-    .alert-info {
-        background-color: #e3d9cb;
-        border-color: #d4c8b7;
-        color: var(--dark-color);
-    }
-
-    .alert-warning {
-        background-color: #f8e5d5;
-        border-color: #f5d9c0;
-        color: var(--dark-color);
-    }
-
-    .alert-danger {
-        background-color: #f5d5d5;
-        border-color: #f0c0c0;
-        color: var(--danger-color);
-    }
-
-    /* Responsive navigation */
-    @media (max-width: 768px) {
-        #navMenu {
-            background-color: white !important;
-        }
     }
   </style>
 </head>
