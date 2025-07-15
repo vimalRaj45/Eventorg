@@ -603,6 +603,24 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+     // ⛔ Disable right-click and certain dev tools
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', function(e) {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+  ) {
+    e.preventDefault();
+    showDevPopup();
+  }
+});
+
+// 🚫 Developer Tools Blocked Popup (SweetAlert2)
+function showDevPopup() {
+ console.warn('Developer tools are disabled for this page.');
+}
+
   const BASE_URL = 'https://eventdb.onrender.com';
   let currentUser = null;
   let referralTreeModal = null;
