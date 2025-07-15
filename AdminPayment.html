@@ -471,7 +471,7 @@
       // Prepare WhatsApp message
      const whatsappMessage = encodeURIComponent(
   `Hi ${p.user_name},\n\n` +
-  `This is a confirmation from *EventHub* regarding your payment for the event *${p.event_title}* (₹${p.event_fee || 0}):\n\n` +
+  `This is a confirmation from *edwyna* regarding your payment for the event *${p.event_title}* (₹${p.event_fee || 0}):\n\n` +
   `${p.payment_verified 
     ? '✅ Your payment has been successfully verified. Thank you for your participation!' 
     : '⏳ We are currently processing your payment. Please feel free to contact us if you have any questions.'}\n\n` +
@@ -479,7 +479,7 @@
   `📅 Event: ${p.event_title}\n` +
   `💰 Amount: ₹${p.event_fee || 0}\n\n` +
   `🔗 *The event link is now enabled in your event section on our website.*\n\n` +
-  `– Team EventHub`
+  `– Team edwyna`
 );
 
       
@@ -487,7 +487,7 @@
       const smsMessage = encodeURIComponent(
   `${p.payment_verified ? '✅ Payment verified' : '⏳ Payment processing'} for ${p.event_title} | ` +
   `Txn ID: ${p.transaction_id || 'N/A'}, Amt: ₹${p.event_fee || 0}. ` +
-  `Event link is enabled in your event section on our website. – EventHub`
+  `Event link is enabled in your event section on our website. – edwyna`
 );
 
       
