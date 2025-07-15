@@ -14,32 +14,186 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-              url('https://plus.unsplash.com/premium_vector-1705741561303-b811bea523bc?q=80&w=996&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?auto=format&fit=crop&w=800&q=80') center center/cover no-repeat;
-  color: white;
-        }
-        .badge-admin {
-            background-color: #ffc107;
-            color: #000;
-        }
-        .badge-participant {
-            background-color: #0d6efd;
-            color: #fff;
-        }
-        .cursor-pointer {
-            cursor: pointer;
-        }
+      
+    :root {
+        --primary-color: #7b3f00;         /* Rich Brown (Primary) */
+        --primary-dark: #4e2800;          /* Darker Rich Brown */
+        --secondary-color: #f3e5d8;       /* Light Beige (Soft Background) */
+        --success-color: #8b5e3c;         /* Earthy Greenish Brown (Success) */
+        --warning-color: #c97d30;         /* Amber-Brown (Warning) */
+        --danger-color: #8b0000;          /* Dark Red-Brown (Danger) */
+        --dark-color: #3b2f2f;            /* Very Dark Brown (Body Text) */
+        --light-color: #f9f4f0;           /* Very Light Brown/Beige (BG) */
+        --brownish-color: #5e0a00;        /* Deep Brownish Red */
+    }
 
-         .offcanvas {
-            max-width: 280px;
+    body {
+        background-color: var(--light-color);
+        color: var(--dark-color);
+    }
+
+    .sidebar {
+        min-height: 100vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+              url('https://plus.unsplash.com/premium_vector-1705741561303-b811bea523bc?q=80&w=996&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?auto=format&fit=crop&w=800&q=80') center center/cover no-repeat;
+        color: white;
+    }
+
+    .navbar {
+        background-color: var(--primary-color) !important;
+    }
+
+    .offcanvas-start {
+        background-color: var(--primary-color) !important;
+    }
+
+    .badge-admin {
+        background-color: var(--warning-color);
+        color: #000;
+    }
+
+    .badge-participant {
+        background-color: var(--primary-color);
+        color: #fff;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-dark);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+    }
+
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .btn-outline-secondary {
+        color: var(--dark-color);
+        border-color: var(--dark-color);
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: var(--dark-color);
+        color: white;
+    }
+
+    .card-header {
+        background-color: var(--secondary-color);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .card {
+        background-color: white;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .table {
+        background-color: white;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: var(--secondary-color);
+    }
+
+    /* Stats cards colors */
+    .bg-primary {
+        background-color: var(--primary-color) !important;
+    }
+
+    .bg-warning {
+        background-color: var(--warning-color) !important;
+    }
+
+    .bg-success {
+        background-color: var(--success-color) !important;
+    }
+
+    .bg-danger {
+        background-color: var(--danger-color) !important;
+    }
+
+    /* Toast colors */
+    .toast.bg-success {
+        background-color: var(--success-color) !important;
+    }
+
+    /* Modal header */
+    .modal-header {
+        background-color: var(--secondary-color);
+    }
+
+    /* Pagination */
+    .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-dark);
+    }
+
+    .page-link {
+        color: var(--primary-color);
+    }
+
+    /* Dropdown menu */
+    .dropdown-menu {
+        background-color: var(--light-color);
+    }
+
+    .dropdown-item:hover {
+        background-color: var(--secondary-color);
+    }
+
+    /* Borders */
+    .border-bottom {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Buttons in the table */
+    .btn-outline-success {
+        color: var(--success-color);
+        border-color: var(--success-color);
+    }
+
+    .btn-outline-success:hover {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    /* Badge colors for status */
+    .bg-info {
+        background-color: #5e8b9a !important; /* Adjusted to fit brown theme */
+    }
+
+    .bg-success {
+        background-color: var(--success-color) !important;
+    }
+
+    .bg-secondary {
+        background-color: #8b8b8b !important; /* Neutral gray */
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .offcanvas {
+        max-width: 280px;
+    }
+    
+    @media (min-width: 768px) {
+        .offcanvas-backdrop {
+            display: none !important;
         }
-        @media (min-width: 768px) {
-            .offcanvas-backdrop {
-                display: none !important;
-            }
-        }
+    }
         
     </style>
 </head>
