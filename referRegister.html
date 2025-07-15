@@ -452,6 +452,24 @@
   </div>
 
   <script>
+       // ⛔ Disable right-click and certain dev tools
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', function(e) {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+  ) {
+    e.preventDefault();
+    showDevPopup();
+  }
+});
+
+// 🚫 Developer Tools Blocked Popup (SweetAlert2)
+function showDevPopup() {
+ console.warn('Developer tools are disabled for this page.');
+}
+
     const baseUrl = "https://eventdb.onrender.com"; // Your backend URL
     const form = document.getElementById("registerForm");
     const result = document.getElementById("result");
