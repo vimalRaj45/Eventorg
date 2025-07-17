@@ -220,6 +220,7 @@
                   <li><strong>Phone:</strong> ${user.ph_no || 'Not provided'}</li>
                   <li><strong>Role:</strong> <span class="badge bg-primary">${user.role.toUpperCase()}</span></li>
                   <li><strong>Member Since:</strong> ${new Date(user.created_at).toLocaleDateString()}</li>
+                  <li><p><strong>Refer Code:</strong> ${referral.refer_code || 'Not provided'}</p></li>
                 </ul>
               </div>
             </div>
