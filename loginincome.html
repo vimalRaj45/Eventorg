@@ -299,45 +299,41 @@
             </div>
           </div>
         </div>
-   <div class="card border-left-primary shadow py-2 mb-3">
-           <div class="p-4 border rounded bg-light shadow-sm">
-  <h5 class="mb-3 text-primary">
-    <i class="bi bi-award-fill me-2"></i>Eligibility to Grow as a Mentor
-  </h5>
-
-  <p class="mb-2">
-    <i class="bi bi-person-plus-fill text-success me-2"></i>
-    Refer at least <strong>10 new students</strong> using your referral code
-  </p>
-
-<p class="mb-2">
-  <i class="bi bi-briefcase-fill text-warning me-2"></i>
-  Help students apply to <strong>100+ internships</strong> through your referral code
-</p>
-
-
-  <p class="mb-2">
-    <i class="bi bi-envelope-paper-fill text-info me-2"></i>
-    Ensure <strong>25+ successful invitations</strong> are accepted through your code
-  </p>
-
-
-
-  <p class="mb-0">
-    <i class="bi bi-lightbulb-fill text-warning me-2"></i>
-    Be <strong>consistent, encouraging</strong>, and share opportunities regularly
-  </p>
-
-  <p class="mb-2">
-  <i class="bi bi-check-circle-fill text-success me-2"></i>
-  If you successfully refer <strong>if you do all</strong>, 
-  you will <strong>receive a reward and earn money</strong> for your contribution.
-</p>
-
-</div>
-
-            </div>
       `;
+
+      // In the renderDashboard() function, wrap the eligibility card in a condition:
+if (user.role === 'user') {
+  dashboardHTML += `
+    
+      <div class="p-4 border rounded bg-light shadow-sm">
+        <h5 class="mb-3 text-primary">
+          <i class="bi bi-award-fill me-2"></i>Eligibility to Grow as a Mentor
+        </h5>
+        <p class="mb-2">
+          <i class="bi bi-person-plus-fill text-success me-2"></i>
+          Refer at least <strong>10 new students</strong> using your referral code
+        </p>
+        <p class="mb-2">
+          <i class="bi bi-briefcase-fill text-warning me-2"></i>
+          Help students apply to <strong>100+ internships</strong> through your referral code
+        </p>
+        <p class="mb-2">
+          <i class="bi bi-envelope-paper-fill text-info me-2"></i>
+          Ensure <strong>25+ successful invitations</strong> are accepted through your code
+        </p>
+        <p class="mb-0">
+          <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+          Be <strong>consistent, encouraging</strong>, and share opportunities regularly
+        </p>
+        <p class="mb-2">
+          <i class="bi bi-check-circle-fill text-success me-2"></i>
+          If you successfully refer <strong>if you do all</strong>, 
+          you will <strong>receive a reward and earn money</strong> for your contribution.
+        </p>
+      </div>
+
+  `;
+}
 
       // Downline Information for mentors
       if (user.role === 'mentor' && user.downline_name) {
