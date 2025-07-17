@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -416,7 +417,24 @@
     <h3>Current Targets</h3>
     <div id="targets-data">Loading targets data...</div>
      <div id="mentor-intern-data" ></div>
-</div>
+     <div class="container">
+    <h2 class="mb-4">All Students (Intern Attained)</h2>
+    <table class="table table-bordered table-striped" id="studentsTable">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Student Name</th>
+          <th>Student Email</th>
+          <th>Intern Attained</th>
+          <th>Mentor Name</th>
+          <th>Mentor Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data rows will be inserted here -->
+      </tbody>
+    </table>
+  </div>
    
     <!-- Student Detail Section -->
     <div id="student-detail-section" class="content-section">
@@ -486,7 +504,7 @@
 
 // Check if role is 'admin', otherwise redirect to login
 if (user.role !== 'admin') {
-  window.location.href = 'login.html'; // Replace with your actual login page path
+   window.location.href = 'login.html'; // Replace with your actual login page path
 }
 
    async function loadMentorInternTargets() {
@@ -1625,6 +1643,34 @@ async function viewReferralTree(referralCode) {
                 alert('Failed to assign students');
             }
         }
+
+       fetch("https://eventdb.onrender.com/all-mentors/students/intern-attained")
+      .then(response => response.json())
+      .then(data => {
+        const tableBody = document.querySelector("#studentsTable tbody");
+        let count = 1;
+
+        data.data.forEach(mentor => {
+          if (mentor.students && mentor.students.length > 0) {
+            mentor.students.forEach(student => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${count++}</td>
+                <td>${student.first_name}</td>
+                <td>${student.email}</td>
+                <td>${student.admin_intern_attained}</td>
+                <td>${mentor.mentor_name}</td>
+                <td>${mentor.mentor_email}</td>
+              `;
+              tableBody.appendChild(row);
+            });
+          }
+        });
+      })
+      .catch(error => {
+        console.error("Error fetching student data:", error);
+        alert("Failed to load student data.");
+      });
     </script>
 </body>
 </html>
