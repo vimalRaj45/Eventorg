@@ -129,6 +129,7 @@
               <th>Payment</th>
               <th>Downline</th>
               <th>Contact</th>
+               <th>Refer Code</th>  <
               <th>Profile</th>
               <th class="action-buttons">Actions</th>
             </tr>
@@ -165,6 +166,10 @@
                 <label class="form-label">Phone Number</label>
                 <input type="tel" class="form-control" id="ph_no" placeholder="+91XXXXXXXXXX">
               </div>
+              <div class="col-md-6">
+  <label class="form-label">Refer Code</label>
+  <input type="text" class="form-control" id="refer_code">
+</div>
               <div class="col-md-6">
                 <label class="form-label">Profile Picture URL</label>
                 <input type="url" class="form-control" id="profile_picture_url" placeholder="https://example.com/image.jpg">
@@ -275,6 +280,7 @@
               </td>
               <td>${r.downline_name || '-'}</td>
               <td>${r.ph_no || '-'}</td>
+              <td>${r.refer_code || '-'}</td>  <!-- Add this after the name column -->
               <td>
                 ${r.profile_picture_url ? 
                   `<img src="${r.profile_picture_url}" class="profile-img rounded-circle" alt="${r.stud_name}">` : 
@@ -331,6 +337,7 @@
                   <p><strong>Phone:</strong> ${referral.ph_no || 'Not provided'}</p>
                   <p><strong>Role:</strong> ${referral.role || 'Not specified'}</p>
                   <p><strong>Message:</strong> ${referral.msg || 'None'}</p>
+                  <p><strong>Refer Code:</strong> ${referral.refer_code || 'Not provided'}</p>
                 </div>
               </div>
             </div>
