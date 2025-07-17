@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -247,8 +248,8 @@
                   </div>
                   <div class="col-6">
                     <div class="mb-2">
-                      <small class="text-muted">Reward Amount</small>
-                      <h4>₹${user.reward_amount_inr}</h4>
+                      <small class="text-muted">Intern Achived</small>
+                      <h4>${user.inter_total}</h4>
                     </div>
                   </div>
                   <div class="col-6">
@@ -272,8 +273,8 @@
                 </h5>
                 <div class="row">
                   <div class="col-md-4 mb-3">
-                    <small class="text-muted">Inter Total</small>
-                    <h3>₹${user.inter_total}</h3>
+                    <small class="text-muted"> Total Rewards</small>
+                    <h3>₹${user.reward_amount_inr}</h3>
                   </div>
       `;
 
@@ -294,12 +295,42 @@
       dashboardHTML += `
                 </div>
                           <div class="card border-left-primary shadow py-2 mb-3">
-              <div class="card-body">
-                <h5 class="card-title">For Students</h5>
-                <p class="card-text mb-1">* 190 Participants</p>
-                <p class="card-text mb-1">* 100 Internships</p>
-                <p class="card-text">* 25 New Students</p>
-              </div>
+           <div class="p-4 border rounded bg-light shadow-sm">
+  <h5 class="mb-3 text-primary">
+    <i class="bi bi-award-fill me-2"></i>Eligibility to Grow as a Mentor
+  </h5>
+
+  <p class="mb-2">
+    <i class="bi bi-person-plus-fill text-success me-2"></i>
+    Refer at least <strong>10 new students</strong> using your referral code
+  </p>
+
+<p class="mb-2">
+  <i class="bi bi-briefcase-fill text-warning me-2"></i>
+  Help students apply to <strong>100+ internships</strong> through your referral code
+</p>
+
+
+  <p class="mb-2">
+    <i class="bi bi-envelope-paper-fill text-info me-2"></i>
+    Ensure <strong>25+ successful invitations</strong> are accepted through your code
+  </p>
+
+
+
+  <p class="mb-0">
+    <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+    Be <strong>consistent, encouraging</strong>, and share opportunities regularly
+  </p>
+
+  <p class="mb-2">
+  <i class="bi bi-check-circle-fill text-success me-2"></i>
+  If you successfully refer <strong>if you do all</strong>, 
+  you will <strong>receive a reward and earn money</strong> for your contribution.
+</p>
+
+</div>
+
             </div>
               </div>
             </div>
@@ -346,13 +377,6 @@
         
         dashboardHTML += `
                 </div>
-                 <div class="card border-left-success shadow py-2 mt-2">
-              <div class="card-body">
-                <h5 class="card-title">For Mentors to get promotion</h5>
-                <p class="card-text mb-1">* 1500 Participants</p>
-                <p class="card-text mb-1">* 1000 Internships</p>
-                <p class="card-text">* 25 New Invitations</p>
-              </div>
             </div>
               </div>
             </div>
