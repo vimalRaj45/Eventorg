@@ -316,9 +316,10 @@
     </div>
 
     <!-- Dashboard Section -->
-    <div id="dashboard-section" class="content-section">
-        <h2>Dashboard</h2>
-        <div class="stats-container" id="stats-data">
+<div id="dashboard-section" class="content-section">
+    <h2>Dashboard</h2>
+    <input type="search" id="dashboard-search" placeholder="Search assignments..." oninput="filterDashboard()" style="margin-bottom: 15px; padding: 8px; width: 100%; max-width: 400px;">
+    <div class="stats-container" id="stats-data">
             <!-- Stats will be loaded here -->
         </div>
         <!-- 📋 All Assignments: Mentors & Students -->
@@ -352,9 +353,10 @@
   
 
     <!-- Students Section -->
-    <div id="students-section" class="content-section">
-        <h2>All Students</h2>
-        <div id="students-data">Loading students...</div>
+  <div id="students-section" class="content-section">
+    <h2>All Students</h2>
+    <input type="search" id="student-search" placeholder="Search students..." oninput="filterStudents()" style="margin-bottom: 15px; padding: 8px; width: 100%; max-width: 400px;">
+    <div id="students-data">Loading students...</div>
         
         <h3>Assign Students to Mentor</h3>
         <div>
@@ -368,6 +370,7 @@
 
    <div id="targets-section" class="content-section">
     <h2>Target Management</h2>
+    
     
     <div class="target-controls">
         <div class="target-form">
@@ -446,9 +449,10 @@
     </div>
 
     <!-- Mentors Section -->
-    <div id="mentors-section" class="content-section">
-        <h2>Mentors</h2>
-        <div id="mentors-data">Loading mentors...</div>
+<div id="mentors-section" class="content-section">
+    <h2>Mentors</h2>
+    <input type="search" id="mentor-search" placeholder="Search mentors..." oninput="filterMentors()" style="margin-bottom: 15px; padding: 8px; width: 100%; max-width: 400px;">
+    <div id="mentors-data">Loading mentors...</div>
         
         <h3>Create New Mentor</h3>
         <form id="create-mentor-form" onsubmit="event.preventDefault(); createMentor();">
@@ -473,15 +477,17 @@
     </div>
 
     <!-- Approvals Section -->
-    <div id="approvals-section" class="content-section">
-        <h2>Pending Approvals</h2>
-        <div id="approvals-data">Loading pending approvals...</div>
+<div id="approvals-section" class="content-section">
+    <h2>Pending Approvals</h2>
+    <input type="search" id="approval-search" placeholder="Search pending approvals..." oninput="filterApprovals()" style="margin-bottom: 15px; padding: 8px; width: 100%; max-width: 400px;">
+    <div id="approvals-data">Loading pending approvals...</div>
     </div>
 
     <!-- Referrals Section -->
-    <div id="referrals-section" class="content-section">
-        <h2>Referral System</h2>
-        <div id="referral-data">Loading referral data...</div>
+<div id="referrals-section" class="content-section">
+    <h2>Referral System</h2>
+    <input type="search" id="referral-search" placeholder="Search referrals..." oninput="filterReferrals()" style="margin-bottom: 15px; padding: 8px; width: 100%; max-width: 400px;">
+    <div id="referral-data">Loading referral data...</div>
     </div>
 
     <!-- Referral Tree Section -->
@@ -492,9 +498,10 @@
 
 
     <!-- Unassigned Students Section -->
-    <div id="unassigned-section" class="content-section">
-        <h2>Unassigned Students & Attainment</h2>
-        <div id="unassigned-data">Loading unassigned students...</div>
+<div id="unassigned-section" class="content-section">
+    <h2>Unassigned Students & Attainment</h2>
+    <input type="search" id="unassigned-search" placeholder="Search unassigned students..." oninput="filterUnassigned()" style="margin-bottom: 15px; padding: 8px; width: 100%; max-width: 400px;">
+    <div id="unassigned-data">Loading unassigned students...</div>
     </div>
 
     <script>
@@ -1476,6 +1483,78 @@ async function viewReferralTree(referralCode) {
     }
 }
 
+
+
+// Filter functions for all sections
+function filterDashboard() {
+    const query = document.getElementById('dashboard-search').value.toLowerCase();
+    const rows = document.querySelectorAll('#targets-table-body tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+    });
+}
+
+function filterStudents() {
+    const query = document.getElementById('student-search').value.toLowerCase();
+    const rows = document.querySelectorAll('#students-data tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+    });
+}
+
+function filterMentors() {
+    const query = document.getElementById('mentor-search').value.toLowerCase();
+    const rows = document.querySelectorAll('#mentors-data tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+    });
+}
+
+function filterApprovals() {
+    const query = document.getElementById('approval-search').value.toLowerCase();
+    const rows = document.querySelectorAll('#approvals-data tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+    });
+}
+
+function filterReferrals() {
+    const query = document.getElementById('referral-search').value.toLowerCase();
+    const rows = document.querySelectorAll('#referral-data tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+    });
+}
+
+function filterUnassigned() {
+    const query = document.getElementById('unassigned-search').value.toLowerCase();
+    const rows = document.querySelectorAll('#unassigned-data tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+    });
+}
+
+function filterTargets() {
+    const query = document.getElementById('target-search').value.toLowerCase();
+    const rows = document.querySelectorAll('#targets-data tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+    });
+}
 
 
         async function generateReport() {
