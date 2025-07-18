@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -189,6 +190,11 @@
             <button onclick="uploadImage()" class="btn btn-sm btn-outline-primary w-100 mb-2">
               <i class="bi bi-upload"></i> Upload Image
             </button>
+            <!-- 👇 New message added -->
+    <p class="text-muted small mt-1">
+      <i class="bi bi-info-circle-fill me-1 text-primary"></i>
+      After New Changes click <strong>Update Profile</strong> to save changes.
+    </p>
             <img src="https://i.ibb.co/3yG7vQyZ/money-bag.gif" alt="Money Bag" class="money-bag-gif">
           </div>
           
@@ -199,8 +205,8 @@
             </div>
             
             <div class="mb-3">
-              <label for="profilePicUrl" class="form-label">Profile Picture URL</label>
-              <input type="text" class="form-control" id="profilePicUrl" value="${user.profile_picture_url || ''}" readonly>
+              <label for="profilePicUrl" class="form-label" style="display:none;">Profile Picture URL</label>
+              <input type="text" class="form-control" id="profilePicUrl" value="${user.profile_picture_url || ''}" readonly style="display:none;">
             </div>
             
             <button onclick="updateUser()" class="btn btn-primary">
@@ -219,14 +225,14 @@
                 <ul class="list-unstyled">
                   <li><strong>Email:</strong> ${user.email}</li>
                   <li><strong>Phone:</strong> ${user.ph_no || 'Not provided'}</li>
-                  <li><strong>Role:</strong> <span class="badge bg-primary">${user.role.toUpperCase()}</span></li>
+                  <li><strong>Role:</strong> <span class="badge bg-primary">${user.role}</span></li>
                   <li><strong>Member Since:</strong> ${new Date(user.created_at).toLocaleDateString()}</li>
                   <li><p><strong>Refer Code:</strong> ${user.refer_code || 'Not provided'}</p></li>
                 </ul>
               </div>
             </div>
           </div>
-          
+            
           <div class="col-md-6 mb-3">
             <div class="card stat-card border-left-success h-100">
               <div class="card-body">
@@ -234,6 +240,10 @@
                   <i class="bi bi-graph-up"></i> Quick Stats
                 </h5>
                 <div class="row">
+                  <div class="mb-2">
+                      <small class="text-muted">Your referal Participants</small>
+                      <h4>${user.downline_participants|| 0}</h4>
+                    </div>
                   <div class="col-6">
                     <div class="mb-2">
                       <small class="text-muted">Total Participants</small>
@@ -272,13 +282,18 @@
                   <i class="bi bi-currency-rupee"></i> Earnings Summary
                 </h5>
                 <div class="row">
-                  <div class="col-md-4 mb-3">
-                    <small class="text-muted"> Total Rewards</small>
-                    <h3>₹${user.reward_amount_inr}</h3>
-                  </div>
+                 <div class="col-md-4 mb-3">
+  <div class="p-4 rounded-4 bg-warning bg-opacity-25 shadow-sm border border-warning border-2 text-center" data-aos="zoom-in">
+    <i class="bi bi-gift-fill fs-3 text-warning mb-2"></i><br>
+    <small class="text-dark fw-bold d-block">Total Rewards</small>
+    <h3 class="text-warning fw-bold mb-0">₹${user.reward_amount_inr}</h3>
+  </div>
+</div>
+
       `;
 
       // Payment Information if available
+
       if (user.payment_date || user.transaction_id) {
         dashboardHTML += `
                   <div class="col-md-4 mb-3">
@@ -302,7 +317,7 @@
       `;
 
       // In the renderDashboard() function, wrap the eligibility card in a condition:
-if (user.role === 'user') {
+if (user.role === 'user' || user.role === 'student') {
   dashboardHTML += `
     
       <div class="p-4 border rounded bg-light shadow-sm mb-2">
@@ -341,6 +356,9 @@ if (user.role === 'user') {
 
   `;
 }
+
+
+
 
       // Downline Information for mentors
       if (user.role === 'mentor' && user.downline_name) {
@@ -389,6 +407,46 @@ if (user.role === 'user') {
         `;
       }
 
+      if (user.role === 'mentor') {
+  dashboardHTML += `
+    <div class="p-4 border rounded bg-light shadow-sm mb-2">
+      <h5 class="mb-3 text-success">
+        <i class="bi bi-people-fill me-2"></i> Mentor Guidelines & Benefits
+      </h5>
+
+      <p class="mb-2">
+        <i class="bi bi-graph-up-arrow text-primary me-2"></i>
+        As a mentor, you play a key role in guiding and supporting students.
+      </p>
+
+      <p class="mb-2">
+        <i class="bi bi-award-fill text-warning me-2"></i>
+        Motivate your mentees to apply for <strong>internships</strong> and build their careers.
+      </p>
+
+      <p class="mb-2">
+        <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+        Share relevant opportunities and tips with your students regularly.
+      </p>
+
+      <p class="mb-2">
+        <i class="bi bi-cash-coin text-success me-2"></i>
+        Consistent mentors will be <strong>recognized and rewarded</strong> for their contributions.
+      </p>
+
+      <p class="mb-2">
+        <i class="bi bi-patch-check-fill text-info me-2"></i>
+        Your impact as a mentor helps students grow and succeed faster.
+      </p>
+
+      <a href="https://wa.me/916380398393?text=Hi%20Edwyna%20Web%2C%20I%20have%20a%20mentor-related%20query." 
+         class="btn btn-success d-inline-flex align-items-center" target="_blank">
+        <i class="bi bi-whatsapp me-2 fs-5"></i> Contact us for mentor support
+      </a>
+    </div>
+  `;
+}
+
       // Message if available
       if (user.msg) {
         dashboardHTML += `
@@ -406,6 +464,8 @@ if (user.role === 'user') {
           </div>
         `;
       }
+
+      
 
       dashboard.innerHTML = dashboardHTML;
     }
