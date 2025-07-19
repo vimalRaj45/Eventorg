@@ -476,7 +476,7 @@ function stopCounter() {
   startCounter();
 
   try {
-    const response = await fetch(`http://localhost:4000/api/certificates/generate`, {
+    const response = await fetch(`${apiUrl}/api/certificates/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sheetId, sheetName, templateId, folderId, eventId })
