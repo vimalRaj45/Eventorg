@@ -318,7 +318,7 @@
               <div id="counter-container" class="text-center mb-3" style="display: none;">
   <h4>Time: <span id="certificate-counter">0</span></h4>
   <p class="text-warning">
-    ⏱ Please do not exceed <strong>6 minutes (360 seconds)</strong> to avoid session timeout.
+   ⏱ Please do not exceed <strong>6 minutes (4500 seconds (90 min)) per day</strong>. If exceeded, please try again tomorrow.
   </p>
   <p>Time Elapsed: <span id="elapsed-time" class="text-danger fw-bold">0</span>s</p>
 
@@ -452,73 +452,62 @@ function stopCounter() {
   log(`Counter stopped at ${certificateCount} certificates`);
 }
 
-    async function generateCertificates() {
-      const sheetId = getTrimmedValue('sheet-id');
-      const sheetName = getTrimmedValue('sheet-name');
-      const templateId = getTrimmedValue('template-id');
-      const folderId = getTrimmedValue('folder-id');
-      const eventId = getTrimmedValue('event-id-store');
+   async function generateCertificates() {
+  const sheetId = getTrimmedValue('sheet-id');
+  const sheetName = getTrimmedValue('sheet-name');
+  const templateId = getTrimmedValue('template-id');
+  const folderId = getTrimmedValue('folder-id');
+  const eventId = getTrimmedValue('event-id-store');
 
-      if (!sheetId || !sheetName || !templateId || !folderId || !eventId) {
-        return alert('❗ Please fill in all fields');
-      }
+  if (!sheetId || !sheetName || !templateId || !folderId || !eventId) {
+    return alert('❗ Please fill in all fields');
+  }
 
-      const generateBtn = document.getElementById('generate-btn');
-      const spinner = document.getElementById('generate-spinner');
-      
-      // Show loading state
-      generateBtn.disabled = true;
-      spinner.style.display = 'inline-block';
-      generateBtn.innerHTML = generateBtn.innerHTML.replace('Generate Certificates', 'Processing...');
-      
-      document.getElementById('progress-container').style.display = 'block';
-      updateProgress(5);
-      log('🚀 Starting certificate generation...');
-      log(`📄 Sheet: ${sheetId} (${sheetName})`);
-      log(`📝 Template: ${templateId}`);
-      log(`📁 Folder: ${folderId}`);
-      log(`🎯 Event ID: ${eventId}`);
-      log('----------------------------------------');
-     startCounter();
-      try {
-        const response = await fetch(`${apiUrl}/api/certificates/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sheetId, sheetName, templateId, folderId, eventId })
-        });
+  const generateBtn = document.getElementById('generate-btn');
+  const spinner = document.getElementById('generate-spinner');
 
-        const result = await response.json();
-        updateProgress(80);
+  generateBtn.disabled = true;
+  spinner.style.display = 'inline-block';
+  generateBtn.innerHTML = generateBtn.innerHTML.replace('Generate Certificates', 'Processing...');
 
-        if (result.success) {
-          log(`\n✅ Success! ${result.inserted.length} certificates generated:\n`);
-          result.inserted.forEach(cert => {
-            log(`👤 ${cert.name || 'Participant'}`);
-            log(`📧 ${cert.email}`);
-            log(`🔗 ${cert.url}\n`);
-          });
+  document.getElementById('progress-container').style.display = 'block';
+  updateProgress(5);
+  log('🚀 Starting certificate generation...');
+  startCounter();
 
-          if (result.skipped.length) {
-            log(`⚠ ${result.skipped.length} participants skipped:\n`);
-            result.skipped.forEach(s => {
-              log(`⛔ ${s.email} - ${s.reason}`);
-            });
-          }
-          
-          log('\n🎉 Certificate generation complete!');
-        } else {
-          log(`❌ Generation failed: ${result.error}`);
-        }
+  try {
+    const response = await fetch(`http://localhost:4000/api/certificates/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sheetId, sheetName, templateId, folderId, eventId })
+    });
 
-      } catch (error) {
-        log(`❌ Server error: ${error.message}`);
-      } finally {
-        generateBtn.disabled = false;
-        spinner.style.display = 'none';
-        generateBtn.innerHTML = '<i class="bi bi-rocket-takeoff me-2"></i>Generate Certificates';
-        updateProgress(100);
-      }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n');
+      lines.forEach(line => {
+        if (line.trim()) log(line);
+      });
     }
+
+    log('✅ Done receiving all logs.');
+    updateProgress(100);
+
+  } catch (err) {
+    log(`❌ Server error: ${err.message}`);
+  } finally {
+    generateBtn.disabled = false;
+    spinner.style.display = 'none';
+    generateBtn.innerHTML = '<i class="bi bi-rocket-takeoff me-2"></i>Generate Certificates';
+  }
+}
+
 
     function log(msg) {
       console.log(msg);
