@@ -209,39 +209,97 @@
             </div>
         </div>
     </section>
+<style>
+  /* Fullscreen overlay */
+  #imageOverlay {
+    position: fixed;
+    display: none;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
 
-    <section class="sample-certificates">
-  <div class="container">
-    <h2 class="section-title">Sample Certificates</h2>
-    <p class="section-subtitle">See examples of certificates you can earn by participating in our events</p>
+  #imageOverlay img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  }
 
-    <div class="samples-grid">
-      <div class="sample-card">
-        <div class="sample-image">
-          <img src="https://i.ibb.co/wFqKJVgc/Edwyna3.jpg" alt="Participation Certificate" class="img-fluid rounded shadow-sm">
+  #imageOverlay:active {
+    display: none;
+  }
+
+  @media (min-width: 992px) {
+    .certificate-flex {
+      flex-direction: row !important;
+    }
+  }
+</style>
+
+<section style="padding: 2rem 0;">
+  <div style="max-width: 1140px; margin: auto;">
+    <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2rem; font-weight: 600;">Sample Certificates</h2>
+    <p style="text-align: center; margin-bottom: 2rem; color: #6c757d;">
+      See examples of certificates you can earn by participating in our events
+    </p>
+
+    <div class="certificate-flex"
+         style="display: flex; flex-direction: column; gap: 2rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+
+      <!-- Participation Certificate -->
+      <div style="text-align: center;">
+        <div style="margin-bottom: 1rem;">
+          <img src="https://i.ibb.co/wFqKJVgc/Edwyna3.jpg" alt="Participation Certificate"
+               onclick="showFullImage(this.src)"
+               style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); cursor: pointer;">
         </div>
-        <h4>Participation Certificate</h4>
-        <p>Awarded to all participants who complete an event</p>
+        <h4 style="margin-bottom: 0.25rem;">Participation Certificate</h4>
+        <p style="font-size: 0.875rem; color: #6c757d;">Awarded to all participants who complete an event</p>
       </div>
 
-      <div class="sample-card">
-        <div class="sample-image">
-          <img src="https://i.ibb.co/LdkYq5RV/Edwyna2.jpg" alt="Achievement Certificate" class="img-fluid rounded shadow-sm">
+      <!-- Achievement Certificate -->
+      <div style="text-align: center;">
+        <div style="margin-bottom: 1rem;">
+          <img src="https://i.ibb.co/LdkYq5RV/Edwyna2.jpg" alt="Achievement Certificate"
+               onclick="showFullImage(this.src)"
+               style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); cursor: pointer;">
         </div>
-        <h4>Achievement Certificate</h4>
-        <p>Awarded to winners and top performers</p>
+        <h4 style="margin-bottom: 0.25rem;">Achievement Certificate</h4>
+        <p style="font-size: 0.875rem; color: #6c757d;">Awarded to winners and top performers</p>
       </div>
 
-      <div class="sample-card">
-        <div class="sample-image">
-          <img src="https://i.ibb.co/Y4p4tF8G/Edwyna1.jpg" alt="Completion Certificate" class="img-fluid rounded shadow-sm">
+      <!-- Completion Certificate -->
+      <div style="text-align: center;">
+        <div style="margin-bottom: 1rem;">
+          <img src="https://i.ibb.co/Y4p4tF8G/Edwyna1.jpg" alt="Completion Certificate"
+               onclick="showFullImage(this.src)"
+               style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); cursor: pointer;">
         </div>
-        <h4>Completion Certificate</h4>
-        <p>Awarded for completing workshops and courses</p>
+        <h4 style="margin-bottom: 0.25rem;">Completion Certificate</h4>
+        <p style="font-size: 0.875rem; color: #6c757d;">Awarded for completing workshops and courses</p>
       </div>
+
     </div>
   </div>
 </section>
+
+<!-- Image Overlay -->
+<div id="imageOverlay" onclick="this.style.display='none'">
+  <img id="overlayImage" src="">
+</div>
+
+<script>
+  function showFullImage(src) {
+    document.getElementById('overlayImage').src = src;
+    document.getElementById('imageOverlay').style.display = 'flex';
+  }
+</script>
+
+
 
 
     <!-- Instructions Section -->
