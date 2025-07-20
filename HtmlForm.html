@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -352,7 +353,7 @@
 
 
  <div class="quiz-container" data-aos="fade-up" data-aos-duration="800">
-  <div class="quiz-header" style="text-align: center; margin-bottom: 1.5rem margin-top:4%;">
+  <div class="quiz-header" style="text-align: center; margin-bottom: 1.5rem ;margin-top:4%;">
     <h2 style="color: #fff; font-size: 1.6rem; font-weight: 600; font-family: 'Outfit', sans-serif;">
       <i class="bi bi-pencil-square quiz-icon" style="margin-right: 8px;"></i>
       <span id="quizTitle">Edwyna Quiz</span>
@@ -661,6 +662,9 @@ async function loadQuiz() {
     emailField.name = "Email";
     emailField.value = userEmail;
     form.appendChild(emailField);
+
+    // ✅ Shuffle the questions array
+    questions.sort(() => Math.random() - 0.5);
 
     questions.forEach((q, index) => {
       const wrapper = document.createElement("div");
