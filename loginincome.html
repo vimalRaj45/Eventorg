@@ -407,48 +407,70 @@
 
 if (user.role === 'user' || user.role === 'student') {
   dashboardHTML += `
-    <div class="p-4 border rounded bg-light shadow-sm mb-3">
-  <h5 class="mb-3 text-primary">
-    <i class="bi bi-megaphone-fill me-2"></i>📢 Opportunity with Edwyna – Become a Mentor! 🌱
-  </h5>
-  <p>Hiii 👋<br>
-    You’ve joined <strong>Edwyna</strong> as a part-time team member – now it’s time to grow your impact and unlock your next level! 🚀
-  </p>
+   <div class="p-4 border rounded bg-white shadow-sm mb-4" style="max-width: 650px; margin: 0 auto; border-color: #e0e0e0;">
+  <div class="d-flex align-items-center mb-3">
+    <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
+      <i class="bi bi-megaphone-fill text-primary fs-4"></i>
+    </div>
+    <h5 class="mb-0 text-dark fw-semibold">Opportunity with Edwyna – Become a Mentor</h5>
+  </div>
 
-  <p class="mb-2"><strong>🎯 To become a Mentor at Edwyna, complete the following:</strong></p>
+  <div class="mb-4">
+    <p class="text-muted mb-3">Hello Team,<br>
+      You've joined <span class="text-primary fw-semibold">Edwyna</span> as a part-time team member – now it's time to elevate your impact and unlock new career milestones.</p>
 
-  <p class="mb-2">
-    <i class="bi bi-person-plus-fill text-success me-2"></i>
-    Refer <strong>150 students</strong> to attend any Edwyna events using your referral code 🎫
-  </p>
+    <div class="bg-light p-3 rounded mb-3">
+      <h6 class="fw-semibold mb-3 text-dark"> Mentor Promotion Requirements:</h6>
+      
+      <div class="d-flex align-items-start mb-2">
+        <div class="me-3 text-success">
+          <i class="bi bi-person-plus-fill fs-5"></i>
+        </div>
+        <div>
+          <strong>Refer 150 students</strong> to attend Edwyna events using your referral code
+        </div>
+      </div>
+      
+      <div class="d-flex align-items-start mb-2">
+        <div class="me-3 text-warning">
+          <i class="bi bi-briefcase-fill fs-5"></i>
+        </div>
+        <div>
+          <strong>Refer 100 students</strong> to register for Edwyna's Internship Program
+        </div>
+      </div>
+      
+      <div class="d-flex align-items-start">
+        <div class="me-3 text-info">
+          <i class="bi bi-people-fill fs-5"></i>
+        </div>
+        <div>
+          <strong>Help 25 students</strong> join Edwyna's part-time employment programs
+        </div>
+      </div>
+    </div>
 
-  <p class="mb-2">
-    <i class="bi bi-briefcase-fill text-warning me-2"></i>
-    Refer <strong>100 students</strong> to register for Edwyna’s Internship Program 🧑‍💻
-  </p>
+    <div class="border-start border-3 border-primary ps-3 mb-4">
+      <h6 class="fw-semibold text-dark">Upon achieving Mentor status, you'll receive:</h6>
+      <ul class="mb-0" style="list-style-type: none; padding-left: 0;">
+        <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i> Monthly leadership responsibilities</li>
+        <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i> Priority certification and experience letters</li>
+        <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i> Performance-based bonus incentives</li>
+        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Eligibility to lead future program cohorts</li>
+      </ul>
+    </div>
 
-  <p class="mb-2">
-    <i class="bi bi-people-fill text-info me-2"></i>
-    Help <strong>25 students</strong> join Edwyna’s part-time job/work programs 💼
-  </p>
+    <p class="text-muted mb-4">Strategically utilize your referral code to build your team and establish yourself as an Edwyna leader. We're committed to supporting your professional growth every step of the way.</p>
 
-  <p class="mb-3"><strong>💡 Once you complete these milestones, you’ll be promoted to <span class="text-success">Mentor Level</span> with:</strong></p>
-
-  <ul class="mb-3 ps-3">
-    <li>✅ Monthly <strong>Leadership Role</strong></li>
-    <li>✅ <strong>Priority Certificate</strong> & Experience Letter</li>
-    <li>✅ <strong>Bonus Rewards</strong> & Recognition</li>
-    <li>✅ Eligibility to <strong>lead future batches</strong></li>
-  </ul>
-
-  <p class="mb-3">Use your referral code wisely, grow your team, and become a leader within Edwyna!</p>
-  <p class="fw-semibold">Let’s rise together 🌱<br>– Team Edwyna</p>
-
-  <a href="https://wa.me/916380398393?text=Hi%20Edwyna%20Web%2C%20I%20have%20a%20problem%20to%20discuss." 
-     class="btn btn-success d-inline-flex align-items-center mt-2"
-     target="_blank">
-    <i class="bi bi-whatsapp me-2 fs-5"></i> Contact us if you have any difficulties
-  </a>
+    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+      <span class="text-muted small">Edwyna Leadership Team</span>
+      <a href="https://wa.me/916380398393?text=Hi%20Edwyna%20Web%2C%20I%20have%20a%20question%20about%20the%20Mentor%20Program." 
+         class="btn btn-success d-inline-flex align-items-center"
+         target="_blank">
+        <i class="bi bi-whatsapp me-2"></i> Contact Support
+      </a>
+    </div>
+  </div>
 </div>
 
   `;
@@ -500,44 +522,80 @@ if (user.role === 'mentor' && user.downline_name) {
 
 if (user.role === 'mentor') {
   dashboardHTML += `
-   <div class="p-4 border rounded bg-light shadow-sm mb-3">
-  <h5 class="mb-3 text-success">
-    <i class="bi bi-stars me-2"></i>🚀 Step Up to Edwyna's Core Team!
-  </h5>
+  <div class="p-4 border rounded bg-white shadow-sm mb-4" style="max-width: 650px; margin: 0 auto; border-color: #e0e0e0;">
+  <div class="d-flex align-items-center mb-4">
+    <div class="bg-success bg-opacity-10 p-2 rounded me-3">
+      <i class="bi bi-stars text-success fs-4"></i>
+    </div>
+    <h5 class="mb-0 text-dark fw-semibold">Advance to Edwyna's Core Leadership Team</h5>
+  </div>
 
-  <p class="mb-2">
-    Hi <strong>Mentor</strong>! Your journey as an <strong>Edwyna Mentor</strong> doesn't stop here — it's time to step up into the <strong>Core Team</strong> by growing your impact and your team! 💼🌱
-  </p>
+  <div class="mb-4">
+    <p class="text-muted mb-3">Dear Mentor,<br>
+      Your exceptional performance as an <span class="text-success fw-semibold">Edwyna Mentor</span> has qualified you for consideration to our <span class="text-primary fw-semibold">Core Leadership Team</span>. Continue expanding your impact to unlock this career advancement opportunity.</p>
 
-  <p class="mb-2 fw-semibold text-primary">🎯 To be promoted to the next level (Design & Idea / Core Team), complete the following:</p>
+    <div class="bg-light p-3 rounded mb-3">
+      <h6 class="fw-semibold mb-3 text-dark"> Core Team Promotion Criteria:</h6>
+      
+      <div class="d-flex align-items-start mb-2">
+        <div class="me-3 text-success">
+          <i class="bi bi-person-check-fill fs-5"></i>
+        </div>
+        <div>
+          <strong>2,000 event registrations</strong> through your referral network
+        </div>
+      </div>
+      
+      <div class="d-flex align-items-start mb-2">
+        <div class="me-3 text-warning">
+          <i class="bi bi-briefcase-fill fs-5"></i>
+        </div>
+        <div>
+          <strong>1,000 internship enrollments</strong> through your referral network
+        </div>
+      </div>
+      
+      <div class="d-flex align-items-start">
+        <div class="me-3 text-danger">
+          <i class="bi bi-cash-coin fs-5"></i>
+        </div>
+        <div>
+          <strong>60 successful job placements</strong> using your personal referral code
+          <div class="text-muted small mt-1">(Direct referrals only - team credits not applicable)</div>
+        </div>
+      </div>
+    </div>
 
-  <ul class="mb-3 ps-3">
-    <li><i class="bi bi-person-check-fill text-success me-2"></i>✅ <strong>2000 Event Registrations</strong> via you or your team referrals</li>
-    <li><i class="bi bi-briefcase-fill text-warning me-2"></i>✅ <strong>1000 Internship Registrations</strong> via you or your team referrals</li>
-    <li><i class="bi bi-cash-coin text-danger me-2"></i>❗ <strong>60 Job Joins</strong> using <u>your own referral code</u> only</li>
-  </ul>
+    <div class="alert alert-info mb-4">
+      <i class="bi bi-info-circle-fill me-2"></i>
+      <strong>Important Notes:</strong>
+      <ul class="mb-0 mt-2">
+        <li>You may delegate event and internship targets to your team members</li>
+        <li>Job placement referrals require your direct involvement</li>
+      </ul>
+    </div>
 
-  <p class="mb-2"><i class="bi bi-info-circle-fill text-info me-2"></i>This means:</p>
-  <ul class="ps-3">
-    <li>You can build a strong team and guide them to reach your <strong>event</strong> & <strong>internship</strong> targets</li>
-    <li><strong>Job referrals</strong> must be done <u>directly by you</u> (no team credit counted)</li>
-  </ul>
+    <div class="border-start border-3 border-success ps-3 mb-4">
+      <h6 class="fw-semibold text-dark">Core Team Benefits:</h6>
+      <ul class="mb-0" style="list-style-type: none; padding-left: 0;">
+        <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i> Membership in the Design & Strategy Team</li>
+        <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i> Executive Leadership Certification</li>
+        <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i> Eligibility for compensated projects</li>
+        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Featured recognition across Edwyna platforms</li>
+      </ul>
+    </div>
 
-  <p class="fw-semibold mb-2 text-success">🎁 Once done, you’ll unlock:</p>
-  <ul class="ps-3 mb-3">
-    <li>🌟 Design & Idea Team Role</li>
-    <li>📜 Core Leadership Certificate</li>
-    <li>💰 Access to Paid Projects</li>
-    <li>🏆 Recognition on Edwyna Platforms</li>
-  </ul>
+    <p class="text-muted mb-4">Develop your referral network strategically to position yourself for this leadership opportunity. We provide the platform - you bring the vision and execution.</p>
 
-  <p class="mb-3">Start growing your <strong>referral tree 🌳</strong> — and lead Edwyna from the front!</p>
-  <p class="fw-semibold">– Team Edwyna</p>
-
-  <a href="https://wa.me/916380398393?text=Hi%20Edwyna%20Web%2C%20I%20have%20a%20mentor-related%20query." 
-     class="btn btn-success d-inline-flex align-items-center mt-2" target="_blank">
-    <i class="bi bi-whatsapp me-2 fs-5"></i> Contact us for mentor support
-  </a>
+    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+      <span class="text-muted small">Edwyna Executive Committee</span>
+      <a href="https://wa.me/916380398393?text=Hi%20Edwyna%20Web%2C%20I%20have%20questions%20about%20Core%20Team%20promotion." 
+         class="btn btn-success d-inline-flex align-items-center"
+         target="_blank">
+        <i class="bi bi-whatsapp me-2"></i> Leadership Support
+      </a>
+    </div>
+  </div>
 </div>
 
   `;
