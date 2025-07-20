@@ -652,11 +652,26 @@
 
   <script>
 
+     // Disable right-click context menu
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// Disable specific key shortcuts
+document.addEventListener('keydown', function(e) {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+  ) {
+    e.preventDefault();
+    
+  }
+});
+
       function logout() {
   localStorage.clear(); // Clears all localStorage keys
   window.location.href = "Login.html"; // Redirect to login/home page
 }
-
+ 
 
 function filterEvents() {
   const status = document.getElementById('event-status').value;
@@ -1600,7 +1615,7 @@ function formatDate(dateStr) {
   });
 }
 
-window.addEventListener('Loaded', () => {
+window.addEventListener('DOMContentLoaded', () => {
   getAllEvents();
   
   if (currentToken) {
@@ -1657,22 +1672,17 @@ function toggleNavMenu() {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      document.getElementById("logoutItem").style.display = "block";
+      document.getElementById("loginItem").style.display = "none";
+    } else {
+      document.getElementById("logoutItem").style.display = "none";
+      document.getElementById("loginItem").style.display = "block";
+    }
     handleResize();
   });
-  const user = localStorage.getItem("jwtToken");
 
-    const loginItem = document.getElementById("loginItem");
-    const logoutItem = document.getElementById("logoutItem");
-
-    if (loginItem && logoutItem) {
-      if (user) {
-        logoutItem.style.display = "block";
-        loginItem.style.display = "none";
-      } else {
-        logoutItem.style.display = "none";
-        loginItem.style.display = "block";
-      }
-    }
   window.addEventListener('resize', handleResize);
   </script>
 </body>
