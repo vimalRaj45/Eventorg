@@ -695,10 +695,10 @@ function showDevPopup() {
 
     if (user.is_mentor) {
       loadMentorDashboard(user);
-      window.location.reload();
+      
     } else {
       loadStudentDashboard(user);
-      window.location.reload();
+     
     }
   }
 
@@ -750,6 +750,9 @@ function showDevPopup() {
       document.getElementById('targetTableBody').innerHTML = 
         '<tr><td colspan="6" class="text-center text-danger">Error loading targets</td></tr>';
     }
+   finally {
+    window.location.reload(); // ✅ Always runs after try/catch
+  }
 
     // Load mentor info
     try {
@@ -788,6 +791,7 @@ function showDevPopup() {
       loadDownlines(user.id),
       loadEvents()
     ]);
+    window.location.reload();
   }
 
   // Load mentor's own progress
