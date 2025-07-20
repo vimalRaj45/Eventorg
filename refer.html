@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -464,7 +465,7 @@
         <div class="col-md-4 mb-2 mb-md-0">
           <p class="mb-1"><strong>Name:</strong> <span id="mentorName">-</span></p>
         </div>
-        <div class="col-md-4 mb-2 mb-md-0">
+        <div class="col-md-4 mb-2 mb-md-0" style="display: none;">
           <p class="mb-1"><strong>Email:</strong> <span id="mentorEmail">-</span></p>
         </div>
         <div class="col-md-4">
@@ -695,10 +696,9 @@ function showDevPopup() {
 
   if (user.is_mentor) {
     loadMentorDashboard(user);
-    });
+    
   } else {
     loadStudentDashboard(user);
-    });
   }
 }
 
@@ -784,12 +784,10 @@ function showDevPopup() {
     const shareURL = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
     document.getElementById('mentorShareLink').href = shareURL;
 
-    // Load all data
-    await Promise.all([
-      loadMentorProgress(user.id),
-      loadDownlines(user.id),
-      loadEvents()
-    ]);
+   await loadMentorProgress(user.id);
+await loadDownlines(user.id);
+await loadEvents();
+
     
   }
 
@@ -1063,8 +1061,6 @@ async function loadDownlines() {
               </div>
               <div class="col-md-6">
                 <p><strong>Contact:</strong> ${treeData.upline.contact_number}</p>
-                <p><strong>Email:</strong> ${treeData.upline.email}</p>
-               
               </div>
             </div>
           </div>
@@ -1194,5 +1190,3 @@ function toggleNavMenu() {
 
 </body>
 </html>
-
-
