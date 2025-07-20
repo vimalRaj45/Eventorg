@@ -656,15 +656,7 @@
   localStorage.clear(); // Clears all localStorage keys
   window.location.href = "Login.html"; // Redirect to login/home page
 }
- const user = localStorage.getItem("user");
 
-    if (user) {
-      document.getElementById("logoutItem").style.display = "block";
-      document.getElementById("loginItem").style.display = "none";
-    } else {
-      document.getElementById("logoutItem").style.display = "none";
-      document.getElementById("loginItem").style.display = "block";
-    }
 
 function filterEvents() {
   const status = document.getElementById('event-status').value;
@@ -1608,7 +1600,7 @@ function formatDate(dateStr) {
   });
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('Loaded', () => {
   getAllEvents();
   
   if (currentToken) {
@@ -1665,17 +1657,22 @@ function toggleNavMenu() {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      document.getElementById("logoutItem").style.display = "block";
-      document.getElementById("loginItem").style.display = "none";
-    } else {
-      document.getElementById("logoutItem").style.display = "none";
-      document.getElementById("loginItem").style.display = "block";
-    }
     handleResize();
   });
+  const user = localStorage.getItem("jwtToken");
 
+    const loginItem = document.getElementById("loginItem");
+    const logoutItem = document.getElementById("logoutItem");
+
+    if (loginItem && logoutItem) {
+      if (user) {
+        logoutItem.style.display = "block";
+        loginItem.style.display = "none";
+      } else {
+        logoutItem.style.display = "none";
+        loginItem.style.display = "block";
+      }
+    }
   window.addEventListener('resize', handleResize);
   </script>
 </body>
