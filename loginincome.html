@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,79 +6,168 @@
   <title>Edwyna Referral Dashboard</title>
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <!-- Outfit Font -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
+      /* Default theme */
       --primary-color: #4e73df;
       --secondary-color: #1cc88a;
       --accent-color: #36b9cc;
       --dark-color: #5a5c69;
+      --light-bg: #f8f9fc;
+      --card-bg: #ffffff;
+      --text-color: #2d3748;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
     
     body {
       font-family: 'Outfit', sans-serif;
-      background-color: #f8f9fc;
+      background-color: var(--light-bg);
+      color: var(--text-color);
     }
     
+    /* Mentor Theme (Dark Red) */
+    .mentor-theme {
+      --primary-color: #660b14;
+      --primary-hover: #8c0d1e;
+      --secondary-color: #a61125;
+      --accent-color: #d4152f;
+      --light-bg: #fff5f6;
+      --card-bg: #ffffff;
+      --text-color: #2d3748;
+      --highlight-bg: rgba(102, 11, 20, 0.1);
+    }
+    
+    /* Student Theme (Golden) */
+    .student-theme {
+      --primary-color: #a66f00;
+      --primary-hover: #c78200;
+      --secondary-color: #e89500;
+      --accent-color: #ffa800;
+      --light-bg: #fffaf0;
+      --card-bg: #ffffff;
+      --text-color: #2d3748;
+      --highlight-bg: rgba(166, 111, 0, 0.1);
+    }
+    
+    /* Shared Components */
     .login-container, .dashboard-container {
       max-width: 100%;
-      border-radius: 15px;
-      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    }
-    
-    .login-container {
-      background: linear-gradient(135deg, #f8f9fc 0%, #e2e8f0 100%);
-    }
-    
-    .dashboard-container {
-      background-color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      background-color: var(--card-bg);
     }
     
     .company-logo {
       font-weight: 700;
       color: var(--primary-color);
       letter-spacing: 1px;
+      text-transform: uppercase;
     }
     
     .stat-card {
-      border-left: 4px solid;
-      transition: transform 0.3s;
+      border-left: 4px solid var(--primary-color);
+      border-radius: var(--border-radius);
+      transition: all 0.3s ease;
+      background-color: var(--card-bg);
+      box-shadow: var(--box-shadow);
     }
     
     .stat-card:hover {
       transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
     }
     
     .profile-img {
       width: 120px;
       height: 120px;
       object-fit: cover;
+      border: 3px solid var(--primary-color);
     }
     
-    .downline-badge {
-      background-color: var(--secondary-color);
+    .badge-primary {
+      background-color: var(--primary-color);
+      color: white;
     }
     
     .money-bag-gif {
       width: 100px;
       height: 100px;
       object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
     }
     
+    /* Enhanced UI Elements */
+    .nav-pills .nav-link.active {
+      background-color: var(--primary-color);
+    }
+    
+    .progress {
+      height: 8px;
+      border-radius: 4px;
+    }
+    
+    .progress-bar {
+      background-color: var(--primary-color);
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
+    }
+    
+    /* Theme-specific backgrounds */
+    .mentor-theme .dashboard-container {
+      background-color: var(--light-bg);
+      background-image: radial-gradient(circle at 10% 20%, rgba(102, 11, 20, 0.05) 0%, rgba(102, 11, 20, 0.01) 90%);
+    }
+    
+    .student-theme .dashboard-container {
+      background-color: var(--light-bg);
+      background-image: radial-gradient(circle at 10% 20%, rgba(166, 111, 0, 0.05) 0%, rgba(166, 111, 0, 0.01) 90%);
+    }
+    
+    /* Highlight sections */
+    .highlight-section {
+      background-color: var(--highlight-bg);
+      border-left: 4px solid var(--primary-color);
+      border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    }
+    
+    /* Responsive adjustments */
     @media (max-width: 768px) {
       .profile-section {
         flex-direction: column;
       }
       
       .profile-img {
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      :root {
+        --border-radius: 10px;
       }
     }
   </style>
 </head>
 <body class="bg-light">
-  <!-- Login Section (Visible by default) -->
+  <!-- Login Section -->
   <div id="loginSection" class="container my-5">
     <div class="row justify-content-center">
       <div class="col-lg-6 col-md-8">
@@ -96,20 +183,18 @@
             <input type="email" class="form-control form-control-lg" id="userEmail" placeholder="name@example.com">
           </div>
           
-          <button onclick="fetchData()" class="btn btn-primary btn-lg w-100 mb-3">
+          <button onclick="fetchData()" class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center">
             <span id="loginButtonText">Continue to Dashboard</span>
             <span id="loginSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
           </button>
-          
-          
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Dashboard Section (Hidden by default) -->
+  <!-- Dashboard Section -->
   <div id="dashboardSection" class="container my-5 d-none">
-    <div class="dashboard-container p-4">
+    <div class="dashboard-container p-4 p-lg-5">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 company-logo mb-0">EDWYNA</h1>
         <button onclick="logout()" class="btn btn-outline-secondary">
@@ -180,6 +265,15 @@
 
     function renderDashboard() {
       const dashboard = document.getElementById("dashboardContent");
+      const dashboardContainer = document.getElementById("dashboardSection");
+      
+      // Apply theme based on role
+      dashboardContainer.classList.remove("mentor-theme", "student-theme");
+      if (user.role === 'mentor') {
+        dashboardContainer.classList.add("mentor-theme");
+      } else if (user.role === 'student' || user.role === 'user') {
+        dashboardContainer.classList.add("student-theme");
+      }
       
       let dashboardHTML = `
         <div class="row mb-4 profile-section">
@@ -190,12 +284,11 @@
             <button onclick="uploadImage()" class="btn btn-sm btn-outline-primary w-100 mb-2">
               <i class="bi bi-upload"></i> Upload Image
             </button>
-            <!-- 👇 New message added -->
-    <p class="text-muted small mt-1">
-      <i class="bi bi-info-circle-fill me-1 text-primary"></i>
-      After New Changes click <strong>Update Profile</strong> to save changes.
-    </p>
-            <img src="https://i.ibb.co/3yG7vQyZ/money-bag.gif" alt="Money Bag" class="money-bag-gif">
+            <p class="text-muted small mt-1">
+              <i class="bi bi-info-circle-fill me-1 text-primary"></i>
+              After New Changes click <strong>Update Profile</strong> to save changes.
+            </p>
+           <img src="https://i.ibb.co/3yG7vQyZ/money-bag.gif" alt="Money Bag" style="border-radius: 12px; max-width: 42%; height: auto;">
           </div>
           
           <div class="col-md-9">
@@ -283,16 +376,13 @@
                 </h5>
                 <div class="row">
                  <div class="col-md-4 mb-3">
-  <div class="p-4 rounded-4 bg-warning bg-opacity-25 shadow-sm border border-warning border-2 text-center" data-aos="zoom-in">
+  <div class="p-4 rounded-4 bg-warning bg-opacity-25 shadow-sm border border-warning border-2 text-center">
     <i class="bi bi-gift-fill fs-3 text-warning mb-2"></i><br>
     <small class="text-dark fw-bold d-block">Total Rewards</small>
     <h3 class="text-warning fw-bold mb-0">₹${user.reward_amount_inr}</h3>
   </div>
 </div>
-
       `;
-
-      // Payment Information if available
 
       if (user.payment_date || user.transaction_id) {
         dashboardHTML += `
@@ -308,7 +398,6 @@
       }
       
       dashboardHTML += `
-      
                 </div>
               </div>
             </div>
@@ -316,98 +405,87 @@
         </div>
       `;
 
-      // In the renderDashboard() function, wrap the eligibility card in a condition:
 if (user.role === 'user' || user.role === 'student') {
   dashboardHTML += `
-    
-      <div class="p-4 border rounded bg-light shadow-sm mb-2">
-        <h5 class="mb-3 text-primary">
-          <i class="bi bi-award-fill me-2"></i>Eligibility to Grow as a Mentor
-        </h5>
-        <p class="mb-2">
-          <i class="bi bi-person-plus-fill text-success me-2"></i>
-          Refer at least <strong>10 new students</strong> using your referral code
-        </p>
-        <p class="mb-2">
-          <i class="bi bi-briefcase-fill text-warning me-2"></i>
-          Help students apply to <strong>100+ internships</strong> through your referral code
-        </p>
-        <p class="mb-2">
-          <i class="bi bi-envelope-paper-fill text-info me-2"></i>
-          Ensure <strong>25+ successful invitations</strong> are accepted through your code
-        </p>
-        <p class="mb-0">
-          <i class="bi bi-lightbulb-fill text-warning me-2"></i>
-          Be <strong>consistent, encouraging</strong>, and share opportunities regularly
-        </p>
-        <p class="mb-2">
-          <i class="bi bi-check-circle-fill text-success me-2"></i>
-          If you successfully refer <strong>if you do all</strong>, 
-          you will <strong>receive a reward and earn money</strong> for your contribution.
-        </p>
-        <a href="https://wa.me/916380398393?text=Hi%20Edwyna%20Web%2C%20I%20have%20a%20problem%20to%20discuss." 
-   class="btn btn-success d-inline-flex align-items-center"
-   target="_blank">
-  <i class="bi bi-whatsapp me-2 fs-5"></i> Contact us if you have any difficulties
-</a>
-
-      </div>
-      
-
+    <div class="p-4 border rounded bg-light shadow-sm mb-2">
+      <h5 class="mb-3 text-primary">
+        <i class="bi bi-award-fill me-2"></i>Eligibility to Grow as a Mentor
+      </h5>
+      <p class="mb-2">
+        <i class="bi bi-person-plus-fill text-success me-2"></i>
+        Refer at least <strong>10 new students</strong> using your referral code
+      </p>
+      <p class="mb-2">
+        <i class="bi bi-briefcase-fill text-warning me-2"></i>
+        Help students apply to <strong>100+ internships</strong> through your referral code
+      </p>
+      <p class="mb-2">
+        <i class="bi bi-envelope-paper-fill text-info me-2"></i>
+        Ensure <strong>25+ successful invitations</strong> are accepted through your code
+      </p>
+      <p class="mb-0">
+        <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+        Be <strong>consistent, encouraging</strong>, and share opportunities regularly
+      </p>
+      <p class="mb-2">
+        <i class="bi bi-check-circle-fill text-success me-2"></i>
+        If you successfully refer <strong>if you do all</strong>, 
+        you will <strong>receive a reward and earn money</strong> for your contribution.
+      </p>
+      <a href="https://wa.me/916380398393?text=Hi%20Edwyna%20Web%2C%20I%20have%20a%20problem%20to%20discuss." 
+         class="btn btn-success d-inline-flex align-items-center"
+         target="_blank">
+        <i class="bi bi-whatsapp me-2 fs-5"></i> Contact us if you have any difficulties
+      </a>
+    </div>
   `;
 }
 
-
-
-
-      // Downline Information for mentors
-      if (user.role === 'mentor' && user.downline_name) {
-        const downlines = user.downline_name.split(',');
-        
-        dashboardHTML += `
-        <div class="row mb-4">
-          <div class="col-12">
-            <div class="card stat-card border-left-warning">
-              <div class="card-body">
-                <h5 class="card-title text-warning">
-                  <i class="bi bi-people"></i> Downline Network
-                </h5>
-                
-                <div class="row mb-3">
-                  <div class="col-md-4 mb-2">
-                    <div class="p-3 bg-light rounded">
-                      <small class="text-muted">Total Downline Participants</small>
-                      <h4>${user.total_downline_participants}</h4>
-                    </div>
-                  </div>
-                </div>
-                
-                <h6 class="mt-3">Downline Members</h6>
-                <div class="d-flex flex-wrap gap-2">
-        `;
-        
-        downlines.forEach(downline => {
-          if (downline.trim()) {
-            dashboardHTML += `
-              <span class="badge downline-badge rounded-pill p-2">
-                <i class="bi bi-person-check"></i> ${downline.trim()}
-              </span>
-            `;
-          }
-        });
-        
-        dashboardHTML += `
-                </div>
-            </div>
+if (user.role === 'mentor' && user.downline_name) {
+  const downlines = user.downline_name.split(',');
+  
+  dashboardHTML += `
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card stat-card border-left-warning">
+        <div class="card-body">
+          <h5 class="card-title text-warning">
+            <i class="bi bi-people"></i> Downline Network
+          </h5>
+          
+          <div class="row mb-3">
+            <div class="col-md-4 mb-2">
+              <div class="p-3 bg-light rounded">
+                <small class="text-muted">Total Downline Participants</small>
+                <h4>${user.total_downline_participants}</h4>
               </div>
             </div>
           </div>
+          
+          <h6 class="mt-3">Downline Members</h6>
+          <div class="d-flex flex-wrap gap-2">
+  `;
+  
+  downlines.forEach(downline => {
+    if (downline.trim()) {
+      dashboardHTML += `
+        <span class="badge downline-badge rounded-pill p-2">
+          <i class="bi bi-person-check"></i> ${downline.trim()}
+        </span>
+      `;
+    }
+  });
+  
+  dashboardHTML += `
+          </div>
         </div>
-                  
-        `;
-      }
+      </div>
+    </div>
+  </div>
+  `;
+}
 
-      if (user.role === 'mentor') {
+if (user.role === 'mentor') {
   dashboardHTML += `
     <div class="p-4 border rounded bg-light shadow-sm mb-2">
       <h5 class="mb-3 text-success">
@@ -447,7 +525,6 @@ if (user.role === 'user' || user.role === 'student') {
   `;
 }
 
-      // Message if available
       if (user.msg) {
         dashboardHTML += `
         <div class="row">
@@ -458,22 +535,14 @@ if (user.role === 'user' || user.role === 'student') {
             </div>
           </div>
         </div>
-        <div class="text-center mt-4">
-            
-           
-          </div>
         `;
       }
-
-      
 
       dashboard.innerHTML = dashboardHTML;
     }
 
     function logout() {
-      // Clear the saved email from localStorage
       localStorage.removeItem('edwynaReferralEmail');
-      
       user = null;
       document.getElementById('userEmail').value = '';
       document.getElementById('loginSection').classList.remove('d-none');
