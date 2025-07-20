@@ -702,6 +702,7 @@ function showDevPopup() {
 
   // Load student dashboard
   async function loadStudentDashboard(user) {
+    window.location.reload();
     // Set up UI elements
     document.getElementById('studentDashboard').classList.remove('hidden');
     document.getElementById('studentName').textContent = `${user.first_name} ${user.last_name}`;
@@ -766,6 +767,7 @@ function showDevPopup() {
 
   // Load mentor dashboard
   async function loadMentorDashboard(user) {
+    window.location.reload();
     document.getElementById('mentorDashboard').classList.remove('hidden');
     document.getElementById('mentorNameDisplay').textContent = `${user.first_name} ${user.last_name}`;
     document.getElementById('mentorAvatar').textContent = user.first_name.charAt(0) + user.last_name.charAt(0);
