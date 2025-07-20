@@ -769,27 +769,77 @@ function showDevPopup() {
     }
   }
 
-  // Load mentor dashboard
-  async function loadMentorDashboard(user) {
-   
-    document.getElementById('mentorDashboard').classList.remove('hidden');
-    document.getElementById('mentorNameDisplay').textContent = `${user.first_name} ${user.last_name}`;
-    document.getElementById('mentorAvatar').textContent = user.first_name.charAt(0) + user.last_name.charAt(0);
-    document.getElementById('internTarget').textContent = user.admin_intern_target || 0;
-    document.getElementById('internAttained').textContent = user.admin_intern_attained || 0;
-    
-    // Set up referral code
-    document.getElementById('mentorReferralCode').textContent = user.referral_code || 'N/A';
-    const shareMessage = `Join our platform using my referral code: ${user.referral_code}`;
-    const shareURL = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
-    document.getElementById('mentorShareLink').href = shareURL;
+  // Update the loadMentorDashboard function to properly load all data
+async function loadMentorDashboard(user) {
+  document.getElementById('mentorDashboard').classList.remove('hidden');
+  document.getElementById('mentorNameDisplay').textContent = `${user.first_name} ${user.last_name}`;
+  document.getElementById('mentorAvatar').textContent = user.first_name.charAt(0) + user.last_name.charAt(0);
+  document.getElementById('internTarget').textContent = user.admin_intern_target || 0;
+  document.getElementById('internAttained').textContent = user.admin_intern_attained || 0;
+  
+  // Set up referral code
+  document.getElementById('mentorReferralCode').textContent = user.referral_code || 'N/A';
+  const shareMessage = `Join our platform using my referral code: ${user.referral_code}`;
+  const shareURL = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
+  document.getElementById('mentorShareLink').href = shareURL;
 
-   await loadMentorProgress(user.id);
-await loadDownlines(user.id);
-await loadEvents();
+  // Load all mentor data in parallel
+  await Promise.all([
+    loadMentorProgress(user.id),
+    loadDownlines(user.id), // For the dropdown
+    loadDownlinesfor(user.id), // For the progress table
+    loadEvents()
+  ]);
+}
 
+// Improved loadDownlinesfor function with better error handling
+async function loadDownlinesfor(mentorId) {
+  try {
+    const tbody = document.getElementById('progressTableBody');
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center"><div class="spinner-border spinner-border-sm text-primary"></div> Loading downlines...</td></tr>';
+
+    const res = await fetch(`${BASE_URL}/api/targets/admin/downlines-with-progress/${mentorId}`);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     
+    const data = await res.json();
+    console.log('Downlines with progress:', data);
+    tbody.innerHTML = '';
+
+    if (data.data && data.data.length > 0) {
+      data.data.forEach((item, index) => {
+        if (item.student_id !== mentorId) {
+          const progressPercent = item.target > 0 ? Math.round((item.attained / item.target) * 100) : 0;
+          tbody.innerHTML += `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${item.first_name} ${item.last_name}</td>
+              <td class="d-none d-md-table-cell">${item.email || '-'}</td>
+              <td>${item.event_title || 'General'}</td>
+              <td>${item.target || 0}</td>
+              <td>${item.attained || 0}</td>
+              <td>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-outline-primary" onclick="updateTarget(${item.target_id})">
+                    <i class="bi bi-arrow-repeat"></i> <span class="d-none d-md-inline">Update</span>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="deleteTarget(${item.target_id})">
+                    <i class="bi bi-trash"></i> <span class="d-none d-md-inline">Remove</span>
+                  </button>
+                </div>
+              </td>
+            </tr>`;
+        }
+      });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center">No downlines found</td></tr>';
+    }
+  } catch (err) {
+    console.error('Error loading downlines:', err);
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading downlines: ' + err.message + '</td></tr>';
   }
+}
+
+
 
   // Load mentor's own progress
   async function loadMentorProgress(mentorId) {
