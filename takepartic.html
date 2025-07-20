@@ -322,9 +322,13 @@
   </p>
   <p>Time Elapsed: <span id="elapsed-time" class="text-danger fw-bold">0</span>s</p>
 
-  <button id="stop-counter-btn" class="btn btn-danger btn-sm mt-2" onclik="stopCounter()">
+  <button id="stop-counter-btn" class="btn btn-danger btn-sm mt-2" onclik="stopCounter()" style="display: none;">
     <i class="bi bi-stop-fill"></i> Stop Counter
   </button>
+  <button class="btn btn-outline-danger btn-sm mt-2" onclick="clearSavedInputs()">
+  <i class="bi bi-x-circle me-1"></i> Clear Saved Inputs
+</button>
+
 </div>
 
               <div class="d-flex align-items-center justify-content-between mb-3">
@@ -346,184 +350,205 @@
     </div>
   </div>
 
-  <script>
-    const apiUrl = 'https://eventdb.onrender.com';
-    let eventsData = [];
+<script>
+  const apiUrl = 'https://eventdb.onrender.com';
+  let eventsData = [];
 
-    // Initialize the page
-    document.addEventListener('DOMContentLoaded', function() {
-      loadEvents();
+  document.addEventListener('DOMContentLoaded', function () {
+    loadEvents();
+    restoreSavedInputs(); // ✅ Restore inputs on load
+    bindInputListeners(); // ✅ Listen and save changes
+  });
+
+  const inputFields = ['sheet-id', 'sheet-name', 'template-id', 'folder-id', 'event-id-store'];
+
+  function restoreSavedInputs() {
+    inputFields.forEach(id => {
+      const saved = localStorage.getItem(id);
+      if (saved) {
+        document.getElementById(id).value = saved;
+      }
     });
-
-    // Load events from API
-    async function loadEvents() {
-      try {
-        const response = await fetch(`${apiUrl}/api/events`);
-        if (!response.ok) throw new Error('Failed to load events');
-        
-        eventsData = await response.json();
-        populateEventDropdown();
-      } catch (err) {
-        document.getElementById('event-select').innerHTML = '<option value="" selected disabled>Error loading events</option>';
-        log(`❌ Error loading events: ${err.message}`);
-      }
-    }
-
-    // Populate the event dropdown
-    function populateEventDropdown() {
-      const select = document.getElementById('event-select');
-      select.innerHTML = '<option value="" selected disabled>Select an event</option>';
-      
-      eventsData.forEach(event => {
-        const option = document.createElement('option');
-        option.value = event.id;
-        option.textContent = `${event.id} - ${event.title} (${new Date(event.start_date).toLocaleDateString()})`;
-        select.appendChild(option);
-      });
-    }
-
-    function getTrimmedValue(id) {
-      return document.getElementById(id).value.trim();
-    }
-
-    async function downloadCSV() {
-      const eventId = document.getElementById('event-select').value;
-      if (!eventId) return alert('❗ Please select an event first');
-      
-      const downloadBtn = document.getElementById('download-csv-btn');
-      const spinner = document.getElementById('download-spinner');
-      const successMsg = document.getElementById('download-success');
-      
-      // Show loading state
-      downloadBtn.disabled = true;
-      spinner.style.display = 'inline-block';
-      downloadBtn.innerHTML = downloadBtn.innerHTML.replace('Download CSV', 'Preparing...');
-      successMsg.style.display = 'none';
-      
-      try {
-        const response = await fetch(`${apiUrl}/api/events/${eventId}/participants-csv`);
-        if (!response.ok) throw new Error('Failed to download CSV');
-
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `participants_event_${eventId}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-
-        // Update UI for success
-        document.getElementById('event-id-store').value = eventId;
-        successMsg.style.display = 'inline-block';
-        log(`✅ CSV downloaded for event ${eventId}`);
-        
-      } catch (err) {
-        log(`❌ Error downloading CSV: ${err.message} or no participants found`);
-      } finally {
-        // Reset button state
-        downloadBtn.disabled = false;
-        spinner.style.display = 'none';
-        downloadBtn.innerHTML = '<i class="bi bi-download me-2"></i>Download CSV';
-      }
-    }
-
-
-
-    // Add these variables at the top of your script
-let certificateCount = 0;
-let counterInterval;
-
-// Add this new function to start the counter
-function startCounter() {
-  certificateCount = 0;
-  document.getElementById('certificate-counter').textContent = '0';
-  document.getElementById('counter-container').style.display = 'block';
-  
-  counterInterval = setInterval(() => {
-    certificateCount++;
-    document.getElementById('certificate-counter').textContent = certificateCount;
-  }, 1000); // Updates every second
-}
-
-// Add this function to stop the counter
-function stopCounter() {
-  clearInterval(counterInterval);
-  log(`Counter stopped at ${certificateCount} certificates`);
-}
-
-   async function generateCertificates() {
-  const sheetId = getTrimmedValue('sheet-id');
-  const sheetName = getTrimmedValue('sheet-name');
-  const templateId = getTrimmedValue('template-id');
-  const folderId = getTrimmedValue('folder-id');
-  const eventId = getTrimmedValue('event-id-store');
-
-  if (!sheetId || !sheetName || !templateId || !folderId || !eventId) {
-    return alert('❗ Please fill in all fields');
   }
 
-  const generateBtn = document.getElementById('generate-btn');
-  const spinner = document.getElementById('generate-spinner');
-
-  generateBtn.disabled = true;
-  spinner.style.display = 'inline-block';
-  generateBtn.innerHTML = generateBtn.innerHTML.replace('Generate Certificates', 'Processing...');
-
-  document.getElementById('progress-container').style.display = 'block';
-  updateProgress(5);
-  log('🚀 Starting certificate generation...');
-  startCounter();
-
-  try {
-    const response = await fetch(`${apiUrl}/api/certificates/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sheetId, sheetName, templateId, folderId, eventId })
+  function bindInputListeners() {
+    inputFields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', (e) => {
+          localStorage.setItem(id, e.target.value);
+        });
+      }
     });
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder('utf-8');
-
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-
-      const chunk = decoder.decode(value, { stream: true });
-      const lines = chunk.split('\n');
-      lines.forEach(line => {
-        if (line.trim()) log(line);
-      });
-    }
-
-    log('✅ Done receiving all logs.');
-    updateProgress(100);
-
-  } catch (err) {
-    log(`❌ Server error: ${err.message}`);
-  } finally {
-    generateBtn.disabled = false;
-    spinner.style.display = 'none';
-    generateBtn.innerHTML = '<i class="bi bi-rocket-takeoff me-2"></i>Generate Certificates';
   }
-}
 
+  function clearSavedInputs() {
+    inputFields.forEach(id => localStorage.removeItem(id));
+    alert('✅ Saved inputs cleared! Reloading...');
+    location.reload();
+  }
 
-    function log(msg) {
-      console.log(msg);
-      const box = document.getElementById('log');
-      box.textContent += `${msg}\n`;
-      box.scrollTop = box.scrollHeight;
+  async function loadEvents() {
+    try {
+      const response = await fetch(`${apiUrl}/api/events`);
+      if (!response.ok) throw new Error('Failed to load events');
+
+      eventsData = await response.json();
+      populateEventDropdown();
+    } catch (err) {
+      document.getElementById('event-select').innerHTML = '<option value="" selected disabled>Error loading events</option>';
+      log(`❌ Error loading events: ${err.message}`);
     }
-    
-    function clearLog() {
-      document.getElementById('log').textContent = 'Log cleared. Ready for new generation.\n';
+  }
+
+  function populateEventDropdown() {
+    const select = document.getElementById('event-select');
+    select.innerHTML = '<option value="" selected disabled>Select an event</option>';
+
+    eventsData.forEach(event => {
+      const option = document.createElement('option');
+      option.value = event.id;
+      option.textContent = `${event.id} - ${event.title} (${new Date(event.start_date).toLocaleDateString()})`;
+      select.appendChild(option);
+    });
+  }
+
+  function getTrimmedValue(id) {
+    return document.getElementById(id).value.trim();
+  }
+
+  async function downloadCSV() {
+    const eventId = document.getElementById('event-select').value;
+    if (!eventId) return alert('❗ Please select an event first');
+
+    const downloadBtn = document.getElementById('download-csv-btn');
+    const spinner = document.getElementById('download-spinner');
+    const successMsg = document.getElementById('download-success');
+
+    downloadBtn.disabled = true;
+    spinner.style.display = 'inline-block';
+    downloadBtn.innerHTML = downloadBtn.innerHTML.replace('Download CSV', 'Preparing...');
+    successMsg.style.display = 'none';
+
+    try {
+      const response = await fetch(`${apiUrl}/api/events/${eventId}/participants-csv`);
+      if (!response.ok) throw new Error('Failed to download CSV');
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `participants_event_${eventId}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      document.getElementById('event-id-store').value = eventId;
+      localStorage.setItem('event-id-store', eventId); // ✅ Save event ID too
+      successMsg.style.display = 'inline-block';
+      log(`✅ CSV downloaded for event ${eventId}`);
+
+    } catch (err) {
+      log(`❌ Error downloading CSV: ${err.message}`);
+    } finally {
+      downloadBtn.disabled = false;
+      spinner.style.display = 'none';
+      downloadBtn.innerHTML = '<i class="bi bi-download me-2"></i>Download CSV';
+    }
+  }
+
+  let certificateCount = 0;
+  let counterInterval;
+
+  function startCounter() {
+    certificateCount = 0;
+    document.getElementById('certificate-counter').textContent = '0';
+    document.getElementById('counter-container').style.display = 'block';
+
+    counterInterval = setInterval(() => {
+      certificateCount++;
+      document.getElementById('certificate-counter').textContent = certificateCount;
+      document.getElementById('elapsed-time').textContent = certificateCount;
+    }, 1000);
+  }
+
+  function stopCounter() {
+    clearInterval(counterInterval);
+    log(`Counter stopped at ${certificateCount} seconds`);
+  }
+
+  async function generateCertificates() {
+    const sheetId = getTrimmedValue('sheet-id');
+    const sheetName = getTrimmedValue('sheet-name');
+    const templateId = getTrimmedValue('template-id');
+    const folderId = getTrimmedValue('folder-id');
+    const eventId = getTrimmedValue('event-id-store');
+
+    if (!sheetId || !sheetName || !templateId || !folderId || !eventId) {
+      return alert('❗ Please fill in all fields');
     }
 
-    function updateProgress(percent) {
-      document.getElementById('progress-bar').style.width = percent + '%';
-      document.getElementById('progress-text').textContent = percent + '%';
+    const generateBtn = document.getElementById('generate-btn');
+    const spinner = document.getElementById('generate-spinner');
+
+    generateBtn.disabled = true;
+    spinner.style.display = 'inline-block';
+    generateBtn.innerHTML = generateBtn.innerHTML.replace('Generate Certificates', 'Processing...');
+
+    document.getElementById('progress-container').style.display = 'block';
+    updateProgress(5);
+    log('🚀 Starting certificate generation...');
+    startCounter();
+
+    try {
+      const response = await fetch(`${apiUrl}/api/certificates/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sheetId, sheetName, templateId, folderId, eventId })
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+        lines.forEach(line => {
+          if (line.trim()) log(line);
+        });
+      }
+
+      log('✅ Done receiving all logs.');
+      updateProgress(100);
+
+    } catch (err) {
+      log(`❌ Server error: ${err.message}`);
+    } finally {
+      generateBtn.disabled = false;
+      spinner.style.display = 'none';
+      generateBtn.innerHTML = '<i class="bi bi-rocket-takeoff me-2"></i>Generate Certificates';
     }
-  </script>
+  }
+
+  function log(msg) {
+    console.log(msg);
+    const box = document.getElementById('log');
+    box.textContent += `${msg}\n`;
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function clearLog() {
+    document.getElementById('log').textContent = 'Log cleared. Ready for new generation.\n';
+  }
+
+  function updateProgress(percent) {
+    document.getElementById('progress-bar').style.width = percent + '%';
+    document.getElementById('progress-text').textContent = percent + '%';
+  }
+</script>
+
 </body>
 </html>
