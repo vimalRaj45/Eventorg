@@ -694,12 +694,10 @@ function showDevPopup() {
   document.getElementById('loginSection').classList.add('hidden');
 
   if (user.is_mentor) {
-    loadMentorDashboard(user).then(() => {
-      setTimeout(() => window.location.reload(), 50); // 💡 Safe 1-time reload after dashboard is loaded
+    loadMentorDashboard(user);
     });
   } else {
-    loadStudentDashboard(user).then(() => {
-      setTimeout(() => window.location.reload(), 50); // 💡 Safe 1-time reload after student data is loaded
+    loadStudentDashboard(user);
     });
   }
 }
