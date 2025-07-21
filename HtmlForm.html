@@ -418,7 +418,9 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
 <script>
-
+ // Add these with your other global variables at the top
+let currentQuestionIndex = 0;
+let questionCards = [];
 
   //precations
   const beforeUnloadHandler = function (e) {
@@ -818,6 +820,9 @@ questionCards.forEach((card, i) => {
       form.appendChild(wrapper);
     });
 
+    // Initialize questionCards after all questions are created
+  questionCards = document.querySelectorAll('.question-card');
+
     // Add submit button
     const submitWrapper = document.createElement("div");
     submitWrapper.classList.add("d-grid", "gap-2", "mt-3", "desktop-submit");
@@ -835,7 +840,7 @@ questionCards.forEach((card, i) => {
     `;
     form.appendChild(submitWrapper);
 
-    // Attach event listeners after buttons are created
+   // Update these event listeners in buildQuiz()
 document.getElementById('prevBtn').addEventListener('click', () => {
   if (currentQuestionIndex > 0) {
     currentQuestionIndex--;
