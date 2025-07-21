@@ -311,6 +311,35 @@
   -moz-user-select: none;
 }
 
+/* Add to your existing styles */
+.question-card {
+  margin-bottom: 1.25rem;
+  border-left: 4px solid var(--primary-color);
+  background-color: var(--secondary-color);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  transition: transform 0.3s ease;
+}
+
+/* New styles for mobile keyboard handling */
+@media (max-width: 576px) {
+  body.keyboard-open {
+    position: fixed;
+    width: 100%;
+  }
+  
+  .keyboard-open .quiz-container {
+    transform: translateY(-50%);
+  }
+  
+  .keyboard-open .question-card {
+    transform: scale(0.95);
+  }
+  
+  input, textarea, select {
+    font-size: 16px !important; /* Prevent iOS zoom */
+  }
+}
   </style>
 </head>
 <body>
@@ -532,6 +561,42 @@ window.addEventListener("beforeunload", beforeUnloadHandler);
       <p>Loading quiz questions...</p>
     </div>
   `;
+
+
+  // Add to your existing JavaScript
+function handleMobileKeyboard() {
+  if (window.innerWidth > 576) return; // Only for mobile
+  
+  const inputs = document.querySelectorAll('input, textarea, select');
+  
+  inputs.forEach(input => {
+    input.addEventListener('focus', () => {
+      document.body.classList.add('keyboard-open');
+      // Scroll the input into view
+      setTimeout(() => {
+        input.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }, 300);
+    });
+    
+    input.addEventListener('blur', () => {
+      document.body.classList.remove('keyboard-open');
+    });
+  });
+  
+  // Handle Android keyboard detection (resize event)
+  let initialHeight = window.innerHeight;
+  window.addEventListener('resize', () => {
+    if (window.innerHeight < initialHeight * 0.7) {
+      document.body.classList.add('keyboard-open');
+    } else {
+      document.body.classList.remove('keyboard-open');
+    }
+  });
+}
+
 
 async function loadQuiz() {
   try {
@@ -823,6 +888,7 @@ questionCards.forEach((card, i) => {
   if (currentCard) {
     currentCard.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+   handleMobileKeyboard();
 }
 
   function startGlobalCountdown(seconds) {
