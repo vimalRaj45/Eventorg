@@ -71,42 +71,117 @@
     </div>
   </div>
   <div id="main-content">
-   <a href="https://easyevents.netlify.app/Edwyna.apk"
-   target="_blank"
+  <!-- Download Button -->
+<a href="#"
+   onclick="showDownloadModal(event)"
    style="
      position: fixed;
-     bottom: 20px;
-     left: 20px;
-     background-color: #a0522d; /* brownish */
-     color: #ffffff;
-     padding: 10px 16px;
+     bottom: 16px;
+     left: 16px;
+     background-color: #ffffff;
+     color: #4e2c14;
+     padding: 4px 8px;
      font-family: 'Outfit', sans-serif;
-     font-size: 14px;
+     font-size: 12px;
      border-radius: 6px;
      text-decoration: none;
-     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+     box-shadow: 0 2px 6px rgba(139, 69, 19, 0.3);
      z-index: 9999;
      display: inline-flex;
      align-items: center;
-     gap: 8px;
-     animation: shake 1.5s infinite;
-     transition: background 0.3s;
+     gap: 6px;
+     animation: shake 1.8s infinite;
+     transition: all 0.3s ease;
    "
-   onmouseover="this.style.backgroundColor='#7a3e22'"
-   onmouseout="this.style.backgroundColor='#a0522d'">
-  <i class="bi bi-download"></i> Download Edwyna App
+   onmouseover="this.style.boxShadow='0 2px 8px rgba(139, 69, 19, 0.5)'"
+   onmouseout="this.style.boxShadow='0 2px 6px rgba(139, 69, 19, 0.3)'">
+  <img src="https://i.ibb.co/QvQYLhVq/image-2.png" alt="Edwyna App Icon"
+       style="width: 18px; height: 18px; border-radius: 4px;" />
+  Edwyna App
 </a>
 
+<!-- Modal -->
+<div id="downloadModal" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Outfit', sans-serif;
+">
+  <div style="
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 320px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+  ">
+    <h3 style="margin-bottom: 12px; font-size: 18px; color: #4e2c14;">Trusted App Notice</h3>
+    <p style="font-size: 14px; color: #333;">
+      This app is developed and verified by the Edwyna team.<br>
+      It’s completely safe and does not contain any harmful software.
+    </p>
+    <div style="margin-top: 18px; display: flex; justify-content: center; gap: 10px;">
+      <button onclick="startDownload()" style="
+        padding: 6px 12px;
+        background: #a0522d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+      ">Download Now</button>
+      <button onclick="closeDownloadModal()" style="
+        padding: 6px 12px;
+        background: #ddd;
+        color: #333;
+        border: none;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+      ">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Shake & Fade CSS -->
 <style>
   @keyframes shake {
-    0% { transform: translate(0px, 0px) rotate(0deg); }
-    20% { transform: translate(1px, -1px) rotate(-2deg); }
-    40% { transform: translate(-1px, 1px) rotate(2deg); }
-    60% { transform: translate(1px, -1px) rotate(-1.5deg); }
-    80% { transform: translate(-1px, 1px) rotate(1.5deg); }
-    100% { transform: translate(0px, 0px) rotate(0deg); }
+    0% { transform: translate(0, 0) rotate(0deg); }
+    20% { transform: translate(1px, -1px) rotate(-1.5deg); }
+    40% { transform: translate(-1px, 1px) rotate(1.5deg); }
+    60% { transform: translate(1px, -1px) rotate(-1deg); }
+    80% { transform: translate(-1px, 1px) rotate(1deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
   }
 </style>
+
+<!-- JavaScript -->
+<script>
+  function showDownloadModal(event) {
+    event.preventDefault();
+    document.getElementById("downloadModal").style.display = "flex";
+  }
+
+  function closeDownloadModal() {
+    document.getElementById("downloadModal").style.display = "none";
+  }
+
+  function startDownload() {
+    window.location.href = "https://easyevents.netlify.app/Edwyna.apk";
+    closeDownloadModal();
+  }
+</script>
 
 
     <style>
