@@ -61,6 +61,7 @@
 </head>
 
 <body>
+  
  <div id="splash-screen">
     <div class="container">
       <div class="logo-wrapper" id="logo">
@@ -70,6 +71,44 @@
     </div>
   </div>
   <div id="main-content">
+   <a href="https://easyevents.netlify.app/Edwyna.apk"
+   target="_blank"
+   style="
+     position: fixed;
+     bottom: 20px;
+     left: 20px;
+     background-color: #a0522d; /* brownish */
+     color: #ffffff;
+     padding: 10px 16px;
+     font-family: 'Outfit', sans-serif;
+     font-size: 14px;
+     border-radius: 6px;
+     text-decoration: none;
+     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+     z-index: 9999;
+     display: inline-flex;
+     align-items: center;
+     gap: 8px;
+     animation: shake 1.5s infinite;
+     transition: background 0.3s;
+   "
+   onmouseover="this.style.backgroundColor='#7a3e22'"
+   onmouseout="this.style.backgroundColor='#a0522d'">
+  <i class="bi bi-download"></i> Download Edwyna App
+</a>
+
+<style>
+  @keyframes shake {
+    0% { transform: translate(0px, 0px) rotate(0deg); }
+    20% { transform: translate(1px, -1px) rotate(-2deg); }
+    40% { transform: translate(-1px, 1px) rotate(2deg); }
+    60% { transform: translate(1px, -1px) rotate(-1.5deg); }
+    80% { transform: translate(-1px, 1px) rotate(1.5deg); }
+    100% { transform: translate(0px, 0px) rotate(0deg); }
+  }
+</style>
+
+
     <style>
       
       /* Add these new styles at the top */
