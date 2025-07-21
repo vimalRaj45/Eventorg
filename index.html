@@ -70,37 +70,7 @@
   </div>
   <div id="main-content">
     <style>
-      /* Splash Screen Styles */
-#splash-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
-  transition: opacity 0.8s ease-out;
-}
-
-/* Main Content Styles */
-#main-content {
-  opacity: 0;
-  transition: opacity 0.8s ease-in;
-  display: block !important; /* Force display */
-}
-
-/* When active */
-.main-content-visible {
-  opacity: 1 !important;
-}
-
-.splash-hidden {
-  opacity: 0;
-  pointer-events: none; /* Allows clicking through */
-}
+      
       /* Add these new styles at the top */
     #splash-screen {
       position: fixed;
@@ -819,26 +789,30 @@
 </footer>
 
     <script>
-     // After 2 seconds, start animation
-  setTimeout(() => {
-    const logo = document.getElementById("logo");
-    logo.classList.add("fly-away");
+      const splashShownAt = localStorage.getItem("splash-shown-at");
+  const now = Date.now();
+  const TEN_MINUTES = 5 * 60 * 1000;
 
-    // After animation completes (1 second), fade out splash
+  if (!splashShownAt || now - splashShownAt > TEN_MINUTES) {
+    // Show splash and run your animation
+    localStorage.setItem("splash-shown-at", now);
+
+    // After 2 seconds, fly away toward 30° angle (no rotation)
     setTimeout(() => {
-      const splash = document.getElementById("splash-screen");
-      splash.classList.add("splash-hidden");
-      
-      // Fade in main content
-      const mainContent = document.getElementById("main-content");
-      mainContent.classList.add("main-content-visible");
-      
-      // Remove splash screen after animation completes
+      const logo = document.getElementById("logo");
+      logo.classList.add("fly-away");
+
+      // After animation completes, hide splash and show main content
       setTimeout(() => {
-        splash.style.display = "none";
-      }, 800); // Match this with your CSS transition time
-    }, 1000);
-  }, 2000);
+        document.getElementById("splash-screen").style.display = "none";
+        document.getElementById("main-content").style.display = "block";
+      }, 1000);
+    }, 2000);
+  } else {
+    // Skip splash and show main content instantly
+    document.getElementById("splash-screen").style.display = "none";
+    document.getElementById("main-content").style.display = "block";
+  }
     // ⛔ Disable right-click and certain dev tools
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', function(e) {
