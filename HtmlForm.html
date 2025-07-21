@@ -367,6 +367,7 @@
 
     
     <div class="quiz-body">
+      <div class="question-nav mb-3" id="questionNav" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 8px;"></div>
       <div class="progress-container">
         <div class="progress-bar" id="quizProgress" style="width: 0%"></div>
       </div>
@@ -645,6 +646,72 @@ async function loadQuiz() {
       // remove email prompt
       form.innerHTML = "";
       buildQuiz(questions);
+      let currentQuestionIndex = 0;
+const questionCards = document.querySelectorAll('.question-card');
+
+function showQuestion(index) {
+  questionCards.forEach((card, i) => {
+    card.style.display = i === index ? 'block' : 'none';
+  });
+  updateNavigationButtons();
+  updateQuestionNav();
+}
+
+function updateNavigationButtons() {
+  document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+  document.getElementById('nextBtn').disabled = currentQuestionIndex === questionCards.length - 1;
+}
+
+function updateQuestionNav() {
+  const nav = document.getElementById('questionNav');
+  nav.innerHTML = '';
+  questionCards.forEach((card, i) => {
+    const input = card.querySelector('input, select');
+    const isAnswered = input && ((input.type === 'text' && input.value.trim()) || 
+                                 (input.tagName === 'SELECT' && input.value && input.value !== ''));
+    const btn = document.createElement('button');
+    btn.textContent = i + 1;
+    btn.className = `btn rounded-circle d-flex align-items-center justify-content-center ${
+      isAnswered ? 'btn-success' : 'btn-danger'
+    }`;
+    btn.style.width = '32px';
+    btn.style.height = '32px';
+    btn.style.fontSize = '0.8rem';
+    btn.onclick = () => {
+      currentQuestionIndex = i;
+      showQuestion(i);
+    };
+    nav.appendChild(btn);
+  });
+}
+
+// Initialize question navigation
+updateQuestionNav();
+showQuestion(currentQuestionIndex);
+
+// Add event listeners for navigation
+document.getElementById('prevBtn').addEventListener('click', () => {
+  if (currentQuestionIndex > 0) {
+    currentQuestionIndex--;
+    showQuestion(currentQuestionIndex);
+  }
+});
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if (currentQuestionIndex < questionCards.length - 1) {
+    currentQuestionIndex++;
+    showQuestion(currentQuestionIndex);
+  }
+});
+
+// Update answered status on input change
+questionCards.forEach((card, i) => {
+  const input = card.querySelector('input, select');
+  if (input) {
+    input.addEventListener('change', () => {
+      updateQuestionNav();
+    });
+  }
+});
     });
   }
 
@@ -726,10 +793,16 @@ async function loadQuiz() {
     const submitWrapper = document.createElement("div");
     submitWrapper.classList.add("d-grid", "gap-2", "mt-3", "desktop-submit");
     submitWrapper.innerHTML = `
-      <button type="submit" class="btn btn-primary btn-submit" id="submitBtn">
-        <span id="submitText">Submit Answers</span>
-        <span class="loading-spinner" id="submitSpinner" style="display: none;"></span>
-      </button>
+     <div class="d-flex justify-content-between align-items-center mt-3">
+ <button type="button" class="btn btn-outline-secondary" id="prevBtn">Previous</button>
+  <button type="button" class="btn btn-outline-secondary" id="nextBtn">Next</button>
+</div>
+<div class="d-grid gap-2 mt-2 desktop-submit">
+  <button type="submit" class="btn btn-primary btn-submit" id="submitBtn">
+    <span id="submitText">Submit Answers</span>
+    <span class="loading-spinner" id="submitSpinner" style="display: none;"></span>
+  </button>
+</div>
     `;
     form.appendChild(submitWrapper);
 
@@ -805,6 +878,9 @@ async function loadQuiz() {
       submitQuiz();
     }
   });
+
+  
+
 async function submitQuiz() {
   const fullscreenLoader = document.getElementById("fullscreenLoader");
   const progressBar = document.getElementById("submitProgressBar");
