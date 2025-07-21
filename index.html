@@ -60,13 +60,140 @@
 </head>
 
 <body>
+ <div id="splash-screen">
+    <div class="container">
+      <div class="logo-wrapper" id="logo">
+        <img src="https://i.ibb.co/QvQYLhVq/image-2.png" alt="Event Hub Logo" />
+      </div>
+      <div class="brand">Edwyna Rise Beyond</div>
+    </div>
+  </div>
+  <div id="main-content">
     <style>
+      /* Splash Screen Styles */
+#splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  transition: opacity 0.8s ease-out;
+}
+
+/* Main Content Styles */
+#main-content {
+  opacity: 0;
+  transition: opacity 0.8s ease-in;
+  display: block !important; /* Force display */
+}
+
+/* When active */
+.main-content-visible {
+  opacity: 1 !important;
+}
+
+.splash-hidden {
+  opacity: 0;
+  pointer-events: none; /* Allows clicking through */
+}
+      /* Add these new styles at the top */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999; /* Higher than everything else */
+    }
      /* ===== Base Styles ===== */
     body {
       margin: 0;
       font-family: 'Outfit', sans-serif;
-      background: #f1f1f1;
+      background: #ffffff;
      
+    }
+
+    /* Add this new style at the top of your CSS */
+    #main-content {
+      display: none; /* Hide main content initially */
+    }
+
+    .container {
+      text-align: center;
+      animation: fadeIn 1.2s ease-in-out;
+    }
+
+    .logo-wrapper {
+      display: inline-block;
+      animation: subtleShake 1.2s ease-in-out;
+      transition: transform 1s ease, opacity 1s ease;
+    }
+
+    .logo-wrapper.fly-away {
+      transform: translate(120px, -200px) scale(0.8); /* 30° diagonal direction */
+      opacity: 0;
+    }
+
+    .logo-wrapper img {
+      width: 120px;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .brand {
+      margin-top: 16px;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #222;
+      letter-spacing: 1px;
+    }
+
+    .brand::after {
+      content: ' ✦';
+      color: #8e44ad;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes subtleShake {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-6deg); }
+      50% { transform: rotate(6deg); }
+      75% { transform: rotate(-3deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @media (max-width: 480px) {
+      .logo-wrapper img {
+        width: 90px;
+      }
+      .brand {
+        font-size: 1.4rem;
+      }
     }
 
     /* ===== Announcement Bar ===== */
@@ -690,7 +817,28 @@
     </div>
   </div>
 </footer>
+
     <script>
+     // After 2 seconds, start animation
+  setTimeout(() => {
+    const logo = document.getElementById("logo");
+    logo.classList.add("fly-away");
+
+    // After animation completes (1 second), fade out splash
+    setTimeout(() => {
+      const splash = document.getElementById("splash-screen");
+      splash.classList.add("splash-hidden");
+      
+      // Fade in main content
+      const mainContent = document.getElementById("main-content");
+      mainContent.classList.add("main-content-visible");
+      
+      // Remove splash screen after animation completes
+      setTimeout(() => {
+        splash.style.display = "none";
+      }, 800); // Match this with your CSS transition time
+    }, 1000);
+  }, 2000);
     // ⛔ Disable right-click and certain dev tools
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', function(e) {
@@ -914,5 +1062,6 @@ function toggleNavMenu() {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</div>
 </body>
 </html>
