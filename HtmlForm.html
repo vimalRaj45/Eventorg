@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Dynamic Quiz App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
@@ -309,6 +309,21 @@
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
+}
+
+@media (max-width: 768px) {
+  .question-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: white;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
 }
 
   </style>
@@ -655,6 +670,11 @@ function showQuestion(index) {
   });
   updateNavigationButtons();
   updateQuestionNav();
+
+  // Scroll to current question on mobile
+  if (window.innerWidth <= 768) {
+    scrollToCurrentQuestion(index);
+  }
 }
 
 function updateNavigationButtons() {
@@ -812,6 +832,13 @@ questionCards.forEach((card, i) => {
     startGlobalCountdown(totalTimeout);
     startAutoSubmit(totalTimeout);
   }
+
+  function scrollToCurrentQuestion(index) {
+  const currentCard = questionCards[index];
+  if (currentCard) {
+    currentCard.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
 
   function startGlobalCountdown(seconds) {
     let remaining = seconds;
