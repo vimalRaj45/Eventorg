@@ -860,6 +860,8 @@ document.getElementById('nextBtn').addEventListener('click', () => {
 
     startGlobalCountdown(totalTimeout);
     startAutoSubmit(totalTimeout);
+    // ✅ Add this line at the end of the buildQuiz function
+    setupInputFocusHandlers();
   }
 
   function scrollToCurrentQuestion(index) {
@@ -867,6 +869,7 @@ document.getElementById('nextBtn').addEventListener('click', () => {
   if (currentCard) {
     currentCard.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+  
 }
 
   function startGlobalCountdown(seconds) {
@@ -1160,6 +1163,32 @@ async function checkReferralAndProceed() {
   }
 }
 
+  // Function to hide question navigation on input focus
+  function setupInputFocusHandlers() {
+    const questionNav = document.getElementById("questionNav");
+    const toggleIcon = document.getElementById("toggleIcon");
+    const allInputs = document.querySelectorAll(".question-card input, .question-card select");
+
+    allInputs.forEach(input => {
+      input.addEventListener("focus", () => {
+        // Hide the question status nav
+        questionNav.style.maxHeight = "0";
+        toggleIcon.classList.remove("bi-chevron-down");
+        toggleIcon.classList.add("bi-chevron-up");
+        navOpen = false;
+      });
+
+      input.addEventListener("blur", () => {
+        // Show the question status nav again
+        setTimeout(() => {
+          questionNav.style.maxHeight = questionNav.scrollHeight + "px";
+          toggleIcon.classList.remove("bi-chevron-up");
+          toggleIcon.classList.add("bi-chevron-down");
+          navOpen = true;
+        }, 100); // small delay to avoid conflict with click events
+      });
+    });
+  }
 
 
 
