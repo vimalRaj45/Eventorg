@@ -367,7 +367,31 @@
 
     
     <div class="quiz-body">
-      <div class="question-nav mb-3" id="questionNav" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 8px;"></div>
+    <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+  <span class="text-muted small">See Question Status</span>
+  <button
+    id="toggleBtn"
+    class="btn btn-sm btn-light border-0 shadow-none p-0"
+    onclick="toggleNav()"
+    aria-label="Toggle progress section"
+  >
+    <i class="bi bi-chevron-down fs-5" id="toggleIcon"></i>
+  </button>
+</div>
+
+
+<!-- Question Navigation Container (Initially Collapsed) -->
+<div id="questionNav" style="
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 4px;
+">
+</div>
       <div class="progress-container">
         <div class="progress-bar" id="quizProgress" style="width: 0%"></div>
       </div>
@@ -996,6 +1020,22 @@ else {
       confirmButtonColor: 'var(--primary-color)'
     });
   }
+}
+
+let navOpen = false;
+function toggleNav() {
+  const nav = document.getElementById("questionNav");
+  const btn = document.getElementById("toggleBtn");
+
+  if (!navOpen) {
+    nav.style.maxHeight = nav.scrollHeight + "px"; // Full height of content
+    btn.innerHTML = "&#x25B2;"; // Up arrow
+  } else {
+    nav.style.maxHeight = "0";
+    btn.innerHTML = "&#x25BC;"; // Down arrow
+  }
+
+  navOpen = !navOpen;
 }
 
 
