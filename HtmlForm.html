@@ -835,6 +835,21 @@ questionCards.forEach((card, i) => {
     `;
     form.appendChild(submitWrapper);
 
+    // Attach event listeners after buttons are created
+document.getElementById('prevBtn').addEventListener('click', () => {
+  if (currentQuestionIndex > 0) {
+    currentQuestionIndex--;
+    showQuestion(currentQuestionIndex);
+  }
+});
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if (currentQuestionIndex < questionCards.length - 1) {
+    currentQuestionIndex++;
+    showQuestion(currentQuestionIndex);
+  }
+});
+
     // Update progress bar
     quizProgress.style.width = `${100/questionsCount}%`;
 
