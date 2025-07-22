@@ -501,6 +501,32 @@
       once: true,
       easing: 'ease-out-quad'
     });
+    // Function to parse URL parameters
+function getUrlParameter(name) {
+  name = name.replace(/[\[\]]/g, '\\$&');
+  const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+  const results = regex.exec(window.location.href);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+    // Check for reset token in URL on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const resetToken = getUrlParameter('resttoken');
+  if (resetToken) {
+    showSection('reset-section');
+    document.getElementById('reset-token').value = resetToken;
+    document.getElementById('new-password').focus();
+    
+    // Show a message to the user
+    showToast('info', 'Password Reset', 'Please enter your new password below');
+    
+    // Clean up the URL (optional)
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+});
+    
     
     // Initialize toasts
     const successToast = new bootstrap.Toast(document.getElementById('successToast'));
