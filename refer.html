@@ -643,7 +643,7 @@ async function deleteTarget(targetId) {
         console.error('Error:', error);
     }
   finally{
-        loadDownlines(currentUser.id); // Refresh downline progress after deletion  
+        loadDownlinesfor(currentUser.id); // Refresh downline progress after deletion  
     }
 }
 
@@ -999,8 +999,8 @@ async function loadDownlinesfor(mentorId) {
     } catch (err) {
       alert(err.message);
     }
-    finally {
-      window.location.reload();
+    finally{
+        loadDownlinesfor(currentUser.id); // Refresh downline progress after deletion  
     }
   }
 
