@@ -125,6 +125,7 @@
     <p style="font-size: 14px; color: #333;">
       This app is developed and verified by the Edwyna team.<br>
       It’s completely safe and does not contain any harmful software.
+      I already installed – Skip This 
     </p>
     <div style="margin-top: 18px; display: flex; justify-content: center; gap: 10px;">
        <button onclick="startDownload()" style="
@@ -137,7 +138,7 @@
         cursor: pointer;
       ">Download Now</button>
       
-      <button onclick="skipDownload()" style="
+      <button onclick="closeDownloadModal()" style="
         padding: 8px 12px;
         background: #f0f0f0;
         color: #444;
@@ -145,17 +146,9 @@
         border-radius: 4px;
         font-size: 13px;
         cursor: pointer;
-      ">I already installed – Skip</button>
+      ">Close</button>
 
-      <button onclick="closeDownloadModal()" style="
-        padding: 6px 12px;
-        background: transparent;
-        color: #888;
-        border: none;
-        font-size: 13px;
-        text-decoration: underline;
-        cursor: pointer;
-      ">Cancel</button>
+      
     </div>
   </div>
 </div>
