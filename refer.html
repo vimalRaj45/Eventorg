@@ -642,6 +642,9 @@ async function deleteTarget(targetId) {
     } catch (error) {
         console.error('Error:', error);
     }
+  finally{
+        loadDownlines(currentUser.id); // Refresh downline progress after deletion  
+    }
 }
 
   const BASE_URL = 'https://eventdb.onrender.com';
