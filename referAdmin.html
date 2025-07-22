@@ -505,17 +505,29 @@
     </div>
 
     <script>
+
+
+ // ⛔ Disable right-click and certain dev tools
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', function(e) {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+  ) {
+    e.preventDefault();
+    showDevPopup();
+  }
+});
+
+// 🚫 Developer Tools Blocked Popup (SweetAlert2)
+function showDevPopup() {
+ console.warn('Developer tools are disabled for this page.');
+}
         const BASE_URL = 'https://eventdb.onrender.com';
         let currentStudentId = null;
         let currentMentorId = null;
 
-
-      const user = JSON.parse(localStorage.getItem('user')) || {};
-
-// Check if role is 'admin', otherwise redirect to login
-if (user.role !== 'admin') {
-  window.location.href = 'login.html'; // Replace with your actual login page path
-}
 
    async function loadMentorInternTargets() {
     try {
@@ -659,10 +671,13 @@ async function loadTargetsSection() {
     mentors.map(m => `<option value="${m.mentor_id}">${m.mentor_name} (ID: ${m.mentor_id})</option>`).join('');
     
 
-        // Populate student dropdown
-        document.getElementById('student-target-select').innerHTML =
-            '<option value="">Select Student</option>' +
-            students.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name} (ID: ${s.id})</option>`).join('');
+       document.getElementById('student-target-select').innerHTML =
+  '<option value="">Select Student</option>' +
+  students
+    .filter(s => s.role === 'student') // only include role = student
+    .map(s => `<option value="${s.id}">${s.first_name} ${s.last_name} (ID: ${s.id})</option>`)
+    .join('');
+
 
         // Display targets table
         document.getElementById('targets-data').innerHTML = `
@@ -829,7 +844,7 @@ async function setStudentTarget() {
                 student_id: studentId,
                 event_id: eventId,
                 target: targetValue,
-                assigned_by: user.id // Assuming user object is available
+                assigned_by: localStorage.getItem('user')?.id || 10000 // Assuming user object is available
             })
         });
 
@@ -838,7 +853,12 @@ async function setStudentTarget() {
         if (response.ok) {
             alert('Target assigned to student successfully!');
             loadTargetsSection();
-        } else {
+        }
+        else if (response.status === 409) {
+      // Handle conflict: already assigned
+      alert(`⚠️ ${result.error || 'Target already assigned to this student for this event by another admin.'}`);
+    }
+         else {
             throw new Error(result.error || 'Failed to assign target');
         }
     } catch (error) {
