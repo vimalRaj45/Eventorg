@@ -289,8 +289,31 @@
                 <input type="number" class="form-control" id="inter_total">
               </div>
               <div class="col-6 col-md-4">
-                <label class="form-label">Role</label>
-                <input type="text" class="form-control" id="role">
+               <label class="form-label">Role*</label>
+<input
+  type="text"
+  class="form-control"
+  id="role"
+  value="student"
+  readonly
+  onclick="toggleRole()"
+  required
+  placeholder="Select role"
+/>
+
+<script>
+  function toggleRole() {
+    const input = document.getElementById("role");
+    const current = input.value.toLowerCase();
+
+    if (current === "student") {
+      input.value = "mentor";
+    } else {
+      input.value = "student";
+    }
+  }
+</script>
+
               </div>
             </div>
           </div>
@@ -407,21 +430,7 @@
 
 
 
-    // Disable right-click context menu
-document.addEventListener('contextmenu', e => e.preventDefault());
-
-// Disable specific key shortcuts
-document.addEventListener('keydown', function(e) {
-  if (
-    e.key === 'F12' ||
-    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
-    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
-  ) {
-    e.preventDefault();
     
-  }
-});
-
     // Toggle form section visibility
     function toggleFormSection(show = true) {
       const formSection = document.getElementById('formSection');
@@ -670,38 +679,95 @@ document.addEventListener('keydown', function(e) {
       }
     };
 
-    document.getElementById("referralForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const data = {};
-      document.querySelectorAll("#referralForm input, #referralForm textarea").forEach(input => {
-        data[input.id] = input.value;
-      });
+ document.getElementById("referralForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  console.log("🔹 Form submission intercepted.");
 
-      const isEdit = !!data.referralId;
-      const method = isEdit ? "PUT" : "POST";
-      const url = isEdit ? `${api}/${data.referralId}` : api;
-      delete data.referralId;
+  const data = {};
+  console.log("🔹 Collecting form data...");
 
-      try {
-        const response = await fetch(url, {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
+  document.querySelectorAll("#referralForm input, #referralForm textarea").forEach(input => {
+    data[input.id] = input.value.trim();  // trim whitespace
+  });
 
-        if (!response.ok) throw new Error('Network response was not ok');
+  console.log("✅ Collected form data:", data);
 
-        const result = await response.json();
-        fetchData();
-        if (!isEdit) {
-          e.target.reset();
-        }
-        showToast(`Referral ${isEdit ? 'updated' : 'added'} successfully`, 'success');
-      } catch (error) {
-        console.error("Error saving referral:", error);
-        showToast('Failed to save referral', 'danger');
+  const isEdit = !!data.referralId;
+  console.log(`🔹 Operation: ${isEdit ? "Edit (PUT)" : "Add (POST)"}`);
+
+  const method = isEdit ? "PUT" : "POST";
+  const url = isEdit ? `${api}/${data.referralId}` : api;
+  console.log("🔹 API URL:", url);
+
+  delete data.referralId;
+  console.log("🔹 Cleaned data for API (removed referralId):", data);
+
+  // ✅ Set default value for optional fields (POST only)
+  if (!isEdit) {
+    const optionalFields = [
+      "msg", "refer_code", "ph_no", "downline_name",
+      "role", "reward_amount_inr", "transaction_id"
+    ];
+    optionalFields.forEach(field => {
+      if (!data[field]) {
+        data[field] = "N/A"; // or "No note given" for msg
+        console.log(`✍️ Set default for ${field}:`, data[field]);
       }
     });
+
+    // ✅ Enforce required fields (custom JS validation)
+    const requiredFields = [
+      "stud_name", "email", "downline_participants",
+      "current_participants", "total_invitations", "inter_total",
+      "total_participants", "total_downline_participants", "payment_date"
+    ];
+
+    const missingFields = requiredFields.filter(field => !data[field]);
+
+    if (missingFields.length > 0) {
+      alert("Please fill all required fields:\n" + missingFields.join(", "));
+      console.warn("❌ Missing fields:", missingFields);
+      return;
+    }
+  }
+
+  try {
+    console.log(`📡 Sending ${method} request...`);
+
+    const response = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    console.log("✅ Received response:", response);
+
+    if (!response.ok) {
+      console.error("❌ Response not OK:", response.status, response.statusText);
+      throw new Error('Network response was not ok');
+    }
+
+    const result = await response.json();
+    console.log("✅ Parsed response JSON:", result);
+
+    fetchData();
+    console.log("🔄 Refetching updated data...");
+
+    if (!isEdit) {
+      e.target.reset();
+      console.log("🔁 Form reset after adding new referral.");
+    }
+
+    showToast(`Referral ${isEdit ? 'updated' : 'added'} successfully`, 'success');
+    console.log("✅ Toast shown: Success");
+  } catch (error) {
+    console.error("❌ Error saving referral:", error);
+    showToast('Failed to save referral', 'danger');
+    console.log("⚠️ Toast shown: Failure");
+  }
+});
+
+
 
     function showToast(message, type = 'success') {
       const toastContainer = document.createElement('div');
@@ -759,7 +825,22 @@ document.addEventListener('keydown', function(e) {
       });
     });
 
-    const user = JSON.parse(localStorage.getItem('user')) || {};
+   // Disable right-click context menu
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// Disable specific key shortcuts
+document.addEventListener('keydown', function(e) {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+  ) {
+    e.preventDefault();
+    
+  }
+});
+
+ const user = JSON.parse(localStorage.getItem('user')) || {};
 const token = localStorage.getItem('jwtToken');
 
 if (user.role !== 'admin' || !token) {
