@@ -1196,7 +1196,7 @@ events = sortEventsByStatus(events);
           <ul class="list-unstyled mt-3 mb-4 small">
             <li class="mb-2"><i class="bi bi-calendar-event me-2"></i><strong>Start:</strong> ${formatDate(event.start_date)}</li>
             <li class="mb-2"><i class="bi bi-calendar2-check me-2"></i><strong>End:</strong> ${formatDate(event.end_date)}</li>
-            <li><i class="bi bi-people-fill me-2"></i><strong>Participants:</strong> ${event.current_participants}/${event.max_participants}</li>
+           ${event.max_participants ? `<li><i class="bi bi-people-fill me-2"></i><strong>Participants:</strong> ${event.current_participants}/${event.max_participants}</li>` : ''}
           </ul>
 
           <button class="btn btn-primary w-100" onclick='showEventModal(${JSON.stringify(event)})'>
@@ -1520,26 +1520,29 @@ async function showEventModal(event) {
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-header">
-            <i class="bi bi-people me-2"></i>Availability
-          </div>
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div class="progress flex-grow-1 me-2" style="height: 10px;">
-                <div class="progress-bar" role="progressbar" 
-                  style="width: ${Math.min(100, (event.current_participants / event.max_participants) * 100)}%" 
-                  aria-valuenow="${event.current_participants}" 
-                  aria-valuemin="0" 
-                  aria-valuemax="${event.max_participants}">
-                </div>
-              </div>
-              <span>${event.current_participants}/${event.max_participants || '∞'}</span>
+      ${event.max_participants ? `
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <i class="bi bi-people me-2"></i>Availability
+      </div>
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="progress flex-grow-1 me-2" style="height: 10px;">
+            <div class="progress-bar" role="progressbar" 
+              style="width: ${Math.min(100, (event.current_participants / event.max_participants) * 100)}%" 
+              aria-valuenow="${event.current_participants}" 
+              aria-valuemin="0" 
+              aria-valuemax="${event.max_participants}">
             </div>
           </div>
+          <span>${event.current_participants}/${event.max_participants}</span>
         </div>
       </div>
+    </div>
+  </div>
+` : ''}
+
     </div>
     
     ${paymentSection}
