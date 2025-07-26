@@ -41,7 +41,80 @@
       font-family: 'Outfit', sans-serif;
       color: #333;
     }
-    
+
+
+/* Container for the slideshow */
+/* Container for the slideshow */
+.event-img-container {
+  position: relative;
+  height: 280px; /* Increased from 220px */
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  background: #f8f9fa;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.event-img-container:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Slideshow strip */
+.event-img-slideshow {
+  display: flex;
+  height: 100%;
+  transition: transform 0.6s ease-in-out;
+}
+
+/* Each image in the slideshow */
+.event-img-slideshow img {
+  min-width: 100%;
+  height: 100%;
+  object-fit: cover;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+/* Optional zoom effect on hover */
+.event-img-slideshow img:hover {
+  transform: scale(1.02);
+}
+
+/* Navigation arrows container */
+.slideshow-controls {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  transform: translateY(-50%);
+  padding: 0 12px;
+  pointer-events: none;
+}
+
+/* Prev/Next buttons */
+.slideshow-prev,
+.slideshow-next {
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: all;
+  transition: background 0.3s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.slideshow-prev:hover,
+.slideshow-next:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
 
 /* ========== COMMON SHIMMER BASE ========== */
 .badge-shimmer {
@@ -698,8 +771,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-
-     // Disable right-click context menu
+// Disable right-click context menu
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 // Disable specific key shortcuts
@@ -713,12 +785,12 @@ document.addEventListener('keydown', function(e) {
     
   }
 });
+   
 
-      function logout() {
+function logout() {
   localStorage.clear(); // Clears all localStorage keys
   window.location.href = "Login.html"; // Redirect to login/home page
 }
- 
 
 function filterEvents() {
   const status = document.getElementById('event-status').value;
@@ -733,9 +805,6 @@ function filterEvents() {
     return;
   }
 
-
-
-    
   const filteredEvents = allEventsData.filter(event => 
     event.status.toLowerCase() === status.toLowerCase()
   );
@@ -792,7 +861,9 @@ const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
 
 const API_BASE_URL = 'https://eventdb.onrender.com/api';
 let currentToken = localStorage.getItem('jwtToken') || '';
-let currentUserProfile = null;function showToast(message = 'This is a toast message', title = 'Notification') {
+let currentUserProfile = null;
+
+function showToast(message = 'This is a toast message', title = 'Notification') {
   const toastContainer = document.getElementById('toastPlacement');
 
   const toast = document.createElement('div');
@@ -819,7 +890,6 @@ let currentUserProfile = null;function showToast(message = 'This is a toast mess
     toast.remove();
   }, 5000);
 }
-
 
 function checkTransactionId() {
   const txnId = document.getElementById('transaction-id').value.trim();
@@ -889,10 +959,8 @@ async function getMyProfile() {
     document.getElementById('verified-contact').value = result.contact_no || 'Not provided';
     document.getElementById('profileVerificationSection').style.display = 'block';
     
-    
     return result;
   } catch (error) {
-    
     throw error;
   }
 }
@@ -969,7 +1037,7 @@ async function getMyEvents() {
     container.innerHTML = `
       <div class="col-12">
         <div class="alert alert-danger">
-          <i class="bi bi-exclamation-triangle me-2"></i>Error fetching your events: ${error.message}
+          <i class="bi bi-exclamation-triangle me-2"></i>Error fetching your events: Please make sure you are <strong>logged in</strong>.
         </div>
       </div>`;
   }
@@ -1108,8 +1176,6 @@ async function getAllEvents() {
   }
 }
 
-
-
 function sortEventsByStatus(events) {
   const now = new Date();
 
@@ -1133,7 +1199,6 @@ function sortEventsByStatus(events) {
   });
 }
 
-
 function preloadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -1143,11 +1208,113 @@ function preloadImage(src) {
   });
 }
 
+async function loadEventImages(eventId, event) {
+  console.group(`🖼️ Loading images for event ${eventId}: ${event.title}`);
+  console.log('📋 Event data:', {
+    id: event.id,
+    image_urls: event.image_urls,
+    banner_url: event.banner_url,
+    poster_url: event.poster_url
+  });
+
+  const slideshow = document.getElementById(`slideshow-${eventId}`);
+  
+  if (!slideshow) {
+    console.error(`❌ Slideshow container not found for event ${eventId}`);
+    console.groupEnd();
+    return;
+  }
+
+  slideshow.innerHTML = ''; // Clear existing images
+
+  function isValidImageUrl(url) {
+    if (!url) return false;
+    if (url === 'a') return false;
+    if (url.startsWith('upi://')) return false;
+    if (!url.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) && !url.startsWith('http')) return false;
+    return true;
+  }
+
+  let imageUrls = [];
+
+  // Priority 1: image_urls
+  if (event.image_urls && event.image_urls.length > 0) {
+    imageUrls = event.image_urls.filter(isValidImageUrl);
+  }
+
+  // Priority 2: banner_url
+  if (imageUrls.length === 0 && isValidImageUrl(event.banner_url)) {
+    imageUrls = [event.banner_url];
+  }
+
+  // Priority 3: poster_url
+  if (imageUrls.length === 0 && isValidImageUrl(event.poster_url)) {
+    imageUrls = [event.poster_url];
+  }
+
+  // Final fallback
+  const fallbackUrl = 'https://plus.unsplash.com/premium_vector-1682303174219-9018338d4b5d?q=80&w=1039&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+  if (imageUrls.length === 0) {
+    console.warn(`⚠️ No valid images found. Using fallback: ${fallbackUrl}`);
+    imageUrls = [fallbackUrl];
+  }
+
+  console.log('🎬 Final images to display:', imageUrls);
+
+  imageUrls.forEach((url, index) => {
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = `Event image ${index + 1}`;
+    img.loading = 'lazy';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+
+    img.onload = () => {
+      console.log(`🖼️ Successfully loaded image ${index + 1}: ${url}`);
+    };
+
+    img.onerror = () => {
+      console.error(`❌ Failed to load image ${index + 1}: ${url}`);
+      img.src = fallbackUrl;
+    };
+
+    slideshow.appendChild(img);
+  });
+
+  slideshow.dataset.currentIndex = '0';
+  updateSlidePosition(eventId);
+  console.groupEnd();
+}
+
+
+function changeSlide(eventId, direction) {
+  const slideshow = document.getElementById(`slideshow-${eventId}`);
+  if (!slideshow) return;
+  
+  const images = slideshow.querySelectorAll('img');
+  if (images.length <= 1) return;
+  
+  let currentIndex = parseInt(slideshow.dataset.currentIndex || '0');
+  currentIndex = (currentIndex + direction + images.length) % images.length;
+  slideshow.dataset.currentIndex = currentIndex;
+  
+  updateSlidePosition(eventId);
+}
+
+function updateSlidePosition(eventId) {
+  const slideshow = document.getElementById(`slideshow-${eventId}`);
+  if (!slideshow) return;
+  
+  const currentIndex = parseInt(slideshow.dataset.currentIndex || '0');
+  slideshow.style.transform = `translateX(-${currentIndex * 100}%)`;
+}
 
 async function displayEvents(events) {
+  console.group('📅 Displaying Events');
+  console.log(`Received ${events.length} events from API`);
+  
   const container = document.getElementById('events-container');
-
-  // Show loading spinner first
   container.innerHTML = `
     <div class="col-12 text-center py-4" id="loading-indicator">
       <div class="spinner-border text-primary" role="status">
@@ -1157,35 +1324,42 @@ async function displayEvents(events) {
     </div>`;
 
   if (!events.length) {
+    console.warn('No events found to display');
     container.innerHTML = `
       <div class="col-12 text-center">
         <div class="alert alert-warning">
           <i class="bi bi-calendar-x me-2"></i>No events found for the selected filter.
         </div>
       </div>`;
+    console.groupEnd();
     return;
   }
 
   const fragment = document.createDocumentFragment();
-events = sortEventsByStatus(events);
+  events = sortEventsByStatus(events);
+  console.log('Sorted events:', events);
 
-  const imageLoadPromises = events.map(async event => {
+  // First create all cards
+  events.forEach(event => {
+    console.log(`🛠️ Creating card for event: ${event.title} (ID: ${event.id})`);
+    
     const card = document.createElement('div');
     card.className = 'col-md-6 col-lg-4';
     card.setAttribute('data-aos', 'fade-up');
-
-    let imageUrl = imageCache.get(event.id);
-    if (!imageUrl) {
-      imageUrl = await getFirstGalleryImage(event.id);
-      imageCache.set(event.id, imageUrl);
-    }
-
-    await preloadImage(imageUrl);
+    card.id = `event-card-${event.id}`;
 
     card.innerHTML = `
       <div class="card h-100 event-card position-relative">
         ${getTopRightBadge(event)}
-        <img loading="lazy" src="${imageUrl}" class="event-img card-img-top" alt="${event.title}">
+        <div class="event-img-container">
+          <div class="event-img-slideshow" id="slideshow-${event.id}">
+            <!-- Images will be added here dynamically -->
+          </div>
+          <div class="slideshow-controls">
+            <button class="slideshow-prev" onclick="changeSlide('${event.id}', -1)">❮</button>
+            <button class="slideshow-next" onclick="changeSlide('${event.id}', 1)">❯</button>
+          </div>
+        </div>
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-start mb-2">
             <h5 class="card-title mb-0">${event.title}</h5>
@@ -1196,7 +1370,7 @@ events = sortEventsByStatus(events);
           <ul class="list-unstyled mt-3 mb-4 small">
             <li class="mb-2"><i class="bi bi-calendar-event me-2"></i><strong>Start:</strong> ${formatDate(event.start_date)}</li>
             <li class="mb-2"><i class="bi bi-calendar2-check me-2"></i><strong>End:</strong> ${formatDate(event.end_date)}</li>
-           ${event.max_participants ? `<li><i class="bi bi-people-fill me-2"></i><strong>Participants:</strong> ${event.current_participants}/${event.max_participants}</li>` : ''}
+            ${event.max_participants ? `<li><i class="bi bi-people-fill me-2"></i><strong>Participants:</strong> ${event.current_participants}/${event.max_participants}</li>` : ''}
           </ul>
 
           <button class="btn btn-primary w-100" onclick='showEventModal(${JSON.stringify(event)})'>
@@ -1205,17 +1379,33 @@ events = sortEventsByStatus(events);
         </div>
       </div>
     `;
-    return card;
+
+    fragment.appendChild(card);
   });
 
-  const cards = await Promise.all(imageLoadPromises);
-  cards.forEach(card => fragment.appendChild(card));
-
+  // Add all cards to DOM first
   container.innerHTML = '';
   container.appendChild(fragment);
+
+  // Then load images for each card
+  const imageLoadPromises = events.map(event => {
+    const card = document.getElementById(`event-card-${event.id}`);
+    if (!card) {
+      console.error(`Card not found for event ${event.id}`);
+      return Promise.resolve();
+    }
+    return loadEventImages(event.id, event);
+  });
+
+  try {
+    await Promise.all(imageLoadPromises);
+    console.log('✅ Successfully rendered all event cards');
+  } catch (error) {
+    console.error('❌ Error rendering event cards:', error);
+  }
+  
+  console.groupEnd();
 }
-
-
 function getTopRightBadge(event) {
   const now = new Date();
   const createdAt = new Date(event.created_at);
@@ -1236,8 +1426,6 @@ function getTopRightBadge(event) {
 
   return '';
 }
-
-
 
 async function showEventModal(event) {
   document.getElementById('eventModalLabel').textContent = event.title;
@@ -1424,10 +1612,9 @@ async function showEventModal(event) {
           </div>
         </div>
         <div class="mb-3 mt-2">
-  <label for="referral-code" class="form-label">Referral Code (optional)</label>
-  <input type="text" class="form-control" id="referral-code" placeholder="e.g., ID1234ABCD">
-</div>
-
+          <label for="referral-code" class="form-label">Referral Code (optional)</label>
+          <input type="text" class="form-control" id="referral-code" placeholder="e.g., ID1234ABCD">
+        </div>
       </div>
     </div>
   ` : `
@@ -1521,28 +1708,27 @@ async function showEventModal(event) {
         </div>
       </div>
       ${event.max_participants ? `
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-header">
-        <i class="bi bi-people me-2"></i>Availability
-      </div>
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="progress flex-grow-1 me-2" style="height: 10px;">
-            <div class="progress-bar" role="progressbar" 
-              style="width: ${Math.min(100, (event.current_participants / event.max_participants) * 100)}%" 
-              aria-valuenow="${event.current_participants}" 
-              aria-valuemin="0" 
-              aria-valuemax="${event.max_participants}">
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-header">
+              <i class="bi bi-people me-2"></i>Availability
+            </div>
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="progress flex-grow-1 me-2" style="height: 10px;">
+                  <div class="progress-bar" role="progressbar" 
+                    style="width: ${Math.min(100, (event.current_participants / event.max_participants) * 100)}%" 
+                    aria-valuenow="${event.current_participants}" 
+                    aria-valuemin="0" 
+                    aria-valuemax="${event.max_participants}">
+                  </div>
+                </div>
+                <span>${event.current_participants}/${event.max_participants}</span>
+              </div>
             </div>
           </div>
-          <span>${event.current_participants}/${event.max_participants}</span>
         </div>
-      </div>
-    </div>
-  </div>
-` : ''}
-
+      ` : ''}
     </div>
     
     ${paymentSection}
@@ -1572,15 +1758,6 @@ async function showEventModal(event) {
   eventModal.show();
 }
 
-async function getFirstGalleryImage(eventId) {
-  try {
-    const res = await makeRequest('GET', `/events/${eventId}/gallery`, null, false);
-    return res?.[0]?.image_url || 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80';
-  } catch (error) {
-    console.warn(`No gallery for event ${eventId}:`, error.message);
-    return 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80';
-  }
-}
 async function registerForEvent() {
   const eventId = document.getElementById('register-event-id').value;
   const registerButton = document.getElementById('registerButton');
@@ -1614,22 +1791,21 @@ async function registerForEvent() {
       referral_code: referralCode
     });
 
-   Swal.fire({
-  icon: 'success',
-  title: '🎉 Registration Successful!',
-  html: `<p>You have successfully registered for the event.</p><p><strong>Would you like to view your events now?</strong></p>`,
-  showCancelButton: true,
-  confirmButtonText: '✅ Yes, show my events',
-  cancelButtonText: '❌ No, maybe later',
-  confirmButtonColor: '#198754',
-  cancelButtonColor: '#6c757d'
-}).then((response) => {
-  if (response.isConfirmed) {
-    window.scrollTo({ top: 10, behavior: 'smooth' }); // 👈 scroll to top
-    getMyEvents(); // 👈 load the events section
-  }
-});
-
+    Swal.fire({
+      icon: 'success',
+      title: '🎉 Registration Successful!',
+      html: `<p>You have successfully registered for the event.</p><p><strong>Would you like to view your events now?</strong></p>`,
+      showCancelButton: true,
+      confirmButtonText: '✅ Yes, show my events',
+      cancelButtonText: '❌ No, maybe later',
+      confirmButtonColor: '#198754',
+      cancelButtonColor: '#6c757d'
+    }).then((response) => {
+      if (response.isConfirmed) {
+        window.scrollTo({ top: 10, behavior: 'smooth' });
+        getMyEvents();
+      }
+    });
 
     eventModal.hide();
     getAllEvents();
@@ -1640,8 +1816,6 @@ async function registerForEvent() {
     registerButton.innerHTML = `<i class="bi bi-check-circle me-1"></i>Confirm Registration`;
   }
 }
-
-
 
 function getStatusColor(status) {
   switch (status) {
@@ -1675,71 +1849,65 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-
-
-  window.addEventListener('DOMContentLoaded', getMyProfile);
-    // Disable right-click context menu
-
-
-    function logout() {
+function logout() {
   localStorage.clear(); // Clears all localStorage keys
   window.location.href = "Login.html"; // Redirect to login/home page
 }
 
 function toggleNavMenu() {
-    const navMenu = document.getElementById('navMenu');
-    navMenu.style.left = navMenu.style.left === '0px' ? '-100%' : '0px';
+  const navMenu = document.getElementById('navMenu');
+  navMenu.style.left = navMenu.style.left === '0px' ? '-100%' : '0px';
+}
+
+function handleResize() {
+  const hamburger = document.getElementById('hamburgerBtn');
+  const navMenu = document.getElementById('navMenu');
+  if (window.innerWidth <= 768) {
+    hamburger.style.display = 'flex';
+    navMenu.style.position = 'fixed';
+    navMenu.style.left = '-100%';
+    navMenu.style.top = '70px';
+    navMenu.style.width = '100%';
+    navMenu.style.background = 'white';
+    navMenu.style.flexDirection = 'column';
+    navMenu.style.textAlign = 'center';
+    navMenu.style.padding = '2rem 0';
+    navMenu.style.transition = 'left 0.3s ease';
+    navMenu.style.boxShadow = '0 10px 27px rgba(0, 0, 0, 0.05)';
+  } else {
+    hamburger.style.display = 'none';
+    navMenu.removeAttribute('style');
+    navMenu.style.display = 'flex';
+    navMenu.style.gap = '2rem';
+    navMenu.style.listStyle = 'none';
+    navMenu.style.alignItems = 'center';
   }
+}
 
-  function handleResize() {
-    const hamburger = document.getElementById('hamburgerBtn');
-    const navMenu = document.getElementById('navMenu');
-    if (window.innerWidth <= 768) {
-      hamburger.style.display = 'flex';
-      navMenu.style.position = 'fixed';
-      navMenu.style.left = '-100%';
-      navMenu.style.top = '70px';
-      navMenu.style.width = '100%';
-      navMenu.style.background = 'white';
-      navMenu.style.flexDirection = 'column';
-      navMenu.style.textAlign = 'center';
-      navMenu.style.padding = '2rem 0';
-      navMenu.style.transition = 'left 0.3s ease';
-      navMenu.style.boxShadow = '0 10px 27px rgba(0, 0, 0, 0.05)';
-    } else {
-      hamburger.style.display = 'none';
-      navMenu.removeAttribute('style');
-      navMenu.style.display = 'flex';
-      navMenu.style.gap = '2rem';
-      navMenu.style.listStyle = 'none';
-      navMenu.style.alignItems = 'center';
-    }
+function logoutUser() {
+  localStorage.clear(); // Clear all localStorage keys
+  window.location.href = "Login.html";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  handleResize();
+});
+
+window.addEventListener('resize', handleResize);
+
+const user = localStorage.getItem("jwtToken");
+const loginItem = document.getElementById("loginItem");
+const logoutItem = document.getElementById("logoutItem");
+
+if (loginItem && logoutItem) {
+  if (user) {
+    logoutItem.style.display = "block";
+    loginItem.style.display = "none";
+  } else {
+    logoutItem.style.display = "none";
+    loginItem.style.display = "block";
   }
-
-  function logoutUser() {
-    localStorage.clear(); // Clear all localStorage keys
-    window.location.href = "Login.html";
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    handleResize();
-  });
-  
-  window.addEventListener('resize', handleResize);
-      const user = localStorage.getItem("jwtToken");
-
-    const loginItem = document.getElementById("loginItem");
-    const logoutItem = document.getElementById("logoutItem");
-
-    if (loginItem && logoutItem) {
-      if (user) {
-        logoutItem.style.display = "block";
-        loginItem.style.display = "none";
-      } else {
-        logoutItem.style.display = "none";
-        loginItem.style.display = "block";
-      }
-    }
+}
   </script>
 </body>
 </html>
