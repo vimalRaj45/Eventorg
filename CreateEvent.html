@@ -72,6 +72,12 @@
   <label for="event-banner-url" class="form-label">Upload Payment QR</label>
   <input type="file" class="form-control" id="event-banner-url" accept="image/*">
 </div>
+<div class="mb-3">
+  <label for="event-images" class="form-label">Upload Event Images</label>
+  <input type="file" class="form-control" id="event-images" multiple accept="image/*">
+  <div id="event-images-preview" class="d-flex flex-wrap mt-2"></div>
+</div>
+
 
       </div>
       <div class="row">
@@ -170,7 +176,16 @@
   <small id="qr-label" class="text-muted mt-1" style="display:none;">Current QR Code</small>
   <img id="edit-event-banner-preview" src="" alt="QR Preview" class="img-thumbnail mt-2" style="max-height: 150px; display: none;">
 </div>
-
+<!-- In Edit Event Card -->
+<div class="mb-3">
+  <label for="edit-event-images" class="form-label">Upload Event Images</label>
+  <input type="file" class="form-control" id="edit-event-images" multiple accept="image/*">
+  <div id="edit-event-images-preview" class="d-flex flex-wrap mt-2"></div>
+  <div id="existing-images-container" class="mt-2">
+    <small class="text-muted">Existing Images</small>
+    <div id="existing-images" class="d-flex flex-wrap"></div>
+  </div>
+</div>
         <div class="row">
           <div class="col-md-4 mb-3">
             <label for="edit-event-start-date" class="form-label">Start Date</label>
@@ -245,6 +260,74 @@
     }
   });
   
+
+  // Image upload function
+// Image Upload Service
+const ImageUploader = {
+  apiKey: '76954d664f0beaf57b8c5a5b0eca84e6',
+
+  async upload(file) {
+    const formData = new FormData();
+    formData.append('key', this.apiKey);
+    formData.append('image', file);
+
+    const response = await fetch('https://api.imgbb.com/1/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('Image upload failed');
+    }
+
+    const data = await response.json();
+    return data.data.url;
+  },
+
+  async uploadMultiple(files) {
+    const urls = [];
+    for (const file of files) {
+      try {
+        const url = await this.upload(file);
+        urls.push(url);
+      } catch (error) {
+        console.error(`Failed to upload ${file.name}:`, error);
+        throw error;
+      }
+    }
+    return urls;
+  }
+};
+
+
+// Preview images before upload
+function setupImagePreview(inputId, previewId) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+
+  input.addEventListener('change', function() {
+    preview.innerHTML = '';
+    if (this.files) {
+      Array.from(this.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.className = 'img-thumbnail me-2 mb-2';
+          img.style.maxHeight = '100px';
+          preview.appendChild(img);
+        }
+        reader.readAsDataURL(file);
+      });
+    }
+  });
+}
+
+// Initialize image previews
+setupImagePreview('event-images', 'event-images-preview');
+setupImagePreview('edit-event-images', 'edit-event-images-preview');
+
+
   const API_BASE_URL = 'https://eventdb.onrender.com/api';
   let currentToken = localStorage.getItem('jwtToken') || '';
 
@@ -319,81 +402,142 @@
     }
   }
 
-  async function HandlecreateEvent() {
+ 
+
+async function HandlecreateEvent() {
   showLoader();
   try {
-    // Step 1: Handle QR Upload (if any file selected)
-    const qrInput = document.getElementById('event-banner-url');
-    const qrFile = qrInput?.files[0];
-    let qrImageUrl = null;
+    // Upload all images at once
+    const imageFiles = Array.from(document.getElementById('event-images').files);
+    const qrFile = document.getElementById('event-banner-url').files[0];
+    
+    const [imageUrls, bannerUrl] = await Promise.all([
+      imageFiles.length ? ImageUploader.uploadMultiple(imageFiles) : Promise.resolve([]),
+      qrFile ? ImageUploader.upload(qrFile) : Promise.resolve('')
+    ]);
 
-    if (qrFile) {
-      const base64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(qrFile);
-      });
-
-      const formData = new FormData();
-      formData.append('key', '76954d664f0beaf57b8c5a5b0eca84e6');
-      formData.append('image', base64);
-
-      const uploadRes = await fetch('https://api.imgbb.com/1/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      const uploadData = await uploadRes.json();
-      if (uploadData.success) {
-        qrImageUrl = uploadData.data.url;
-      } else {
-        showToast('❌ QR Upload Failed: ' + uploadData.error.message, 'danger');
-        hideLoader();
-        return;
-      }
-    }
-
-    // Step 2: Prepare and send event data
-    const data = {
+    const eventData = {
       title: document.getElementById('event-title').value,
       description: document.getElementById('event-description').value,
       detailed_description: document.getElementById('event-detailed-description').value,
       rules: document.getElementById('event-rules').value,
       event_type: document.getElementById('event-type').value,
       poster_url: document.getElementById('event-poster-url').value,
-      banner_url: qrImageUrl, // use uploaded QR URL here
+      banner_url: bannerUrl,
       start_date: document.getElementById('event-start-date').value,
       end_date: document.getElementById('event-end-date').value,
       registration_deadline: document.getElementById('event-registration-deadline').value,
       max_participants: parseInt(document.getElementById('event-max-participants').value) || null,
       event_fee: parseFloat(document.getElementById('event-fee').value) || 0,
-      status: document.getElementById('event-status-create').value
+      status: document.getElementById('event-status-create').value,
+      image_urls: imageUrls
     };
 
-    for (const key in data) {
-      if (data[key] === '') data[key] = null;
-    }
-
-    await makeRequest('POST', '/events', data);
+    console.log('Creating event with:', eventData); // Debug log
+    const response = await makeRequest('POST', '/events', eventData);
     showToast('✅ Event created successfully!', 'success');
-
-    // Step 3: Reset form
-    document.getElementById('event-title').value = '';
-    document.getElementById('event-description').value = '';
-    document.getElementById('event-detailed-description').value = '';
-    document.getElementById('event-rules').value = '';
-    document.getElementById('event-poster-url').value = '';
-    qrInput.value = ''; // clear file input
-    document.getElementById('event-start-date').value = '';
-    document.getElementById('event-end-date').value = '';
-    document.getElementById('event-registration-deadline').value = '';
-    document.getElementById('event-max-participants').value = '';
-    document.getElementById('event-fee').value = '';
-    document.getElementById('event-status-create').value = 'upcoming';
-
+    resetCreateEventForm();
     await populateEventDropdown();
 
+  } catch (error) {
+    showToast(`❌ Error: ${error.message}`, 'danger');
+    console.error('Create event error:', error);
+  } finally {
+    hideLoader();
+  }
+}
+
+  // Enhanced loadEventDetails function
+async function loadEventDetails() {
+  showLoader();
+  const eventId = document.getElementById('edit-event-id').value;
+
+  try {
+    if (!eventId) throw new Error('Please enter an Event ID');
+    
+    const event = await makeRequest('GET', `/events/${eventId}`);
+    
+    // Populate form fields
+    document.getElementById('edit-event-title').value = event.title || '';
+    document.getElementById('edit-event-type').value = event.event_type || '';
+    document.getElementById('edit-event-description').value = event.description || '';
+    document.getElementById('edit-event-detailed-description').value = event.detailed_description || '';
+    document.getElementById('edit-event-rules').value = event.rules || '';
+    document.getElementById('edit-event-poster-url').value = event.poster_url || '';
+    document.getElementById('edit-event-max-participants').value = event.max_participants || '';
+    document.getElementById('edit-event-fee').value = event.event_fee || 0;
+    document.getElementById('edit-event-status').value = event.status || 'upcoming';
+    
+    // Date fields
+    document.getElementById('edit-event-start-date').value = formatDateTime(event.start_date);
+    document.getElementById('edit-event-end-date').value = formatDateTime(event.end_date);
+    document.getElementById('edit-event-registration-deadline').value = formatDateTime(event.registration_deadline);
+    
+    // Banner/QR code
+    const bannerPreview = document.getElementById('edit-event-banner-preview');
+    const qrLabel = document.getElementById('qr-label');
+    if (event.banner_url) {
+      bannerPreview.src = event.banner_url;
+      bannerPreview.style.display = 'block';
+      qrLabel.style.display = 'block';
+    } else {
+      bannerPreview.style.display = 'none';
+      qrLabel.style.display = 'none';
+    }
+    
+    // Display existing images
+    const existingImagesContainer = document.getElementById('existing-images');
+    existingImagesContainer.innerHTML = '';
+    
+    if (event.image_urls && event.image_urls.length > 0) {
+      event.image_urls.forEach(url => {
+        const imgWrapper = document.createElement('div');
+        imgWrapper.className = 'position-relative';
+        
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'img-thumbnail';
+        img.style.height = '100px';
+        img.style.width = 'auto';
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0';
+        deleteBtn.innerHTML = '&times;';
+        deleteBtn.onclick = () => removeImage(eventId, url);
+        
+        imgWrapper.appendChild(img);
+        imgWrapper.appendChild(deleteBtn);
+        existingImagesContainer.appendChild(imgWrapper);
+      });
+    }
+    
+    // Show the form
+    document.getElementById('edit-event-form').style.display = 'block';
+    showToast('✅ Event loaded successfully', 'success');
+    
+  } catch (error) {
+    showToast(`❌ ${error.message}`, 'danger');
+    console.error('Error loading event:', error);
+  } finally {
+    hideLoader();
+  }
+}
+
+  async function removeImage(eventId, imageUrl) {
+  if (!confirm('Are you sure you want to remove this image?')) return;
+  
+  try {
+    showLoader();
+    const event = await makeRequest('GET', `/events/${eventId}`);
+    const updatedImages = event.image_urls.filter(url => url !== imageUrl);
+    
+    await makeRequest('PUT', `/events/${eventId}`, {
+      ...event,
+      image_urls: updatedImages
+    });
+    
+    showToast('✅ Image removed successfully!', 'success');
+    loadEventDetails(); // Refresh the view
   } catch (error) {
     showToast(`❌ ${error.message}`, 'danger');
   } finally {
@@ -401,130 +545,56 @@
   }
 }
 
-  async function loadEventDetails() {
-    showLoader();
-
-    try {
-      const eventIdInput = document.getElementById('edit-event-id');
-      if (!eventIdInput) throw new Error('Event ID input not found.');
-
-      const eventId = eventIdInput.value;
-      if (!eventId) throw new Error('Event ID is empty.');
-
-      const result = await makeRequest('GET', `/events/${eventId}`);
-
-      // Safely populate fields
-      const safeSet = (id, value) => {
-        const el = document.getElementById(id);
-        if (el) el.value = value ?? '';
-      };
-
-      safeSet('edit-event-title', result.title);
-      safeSet('edit-event-type', result.event_type || 'quiz');
-      safeSet('edit-event-description', result.description);
-      safeSet('edit-event-detailed-description', result.detailed_description);
-      safeSet('edit-event-rules', result.rules);
-      safeSet('edit-event-poster-url', result.poster_url);
-      safeSet('edit-event-max-participants', result.max_participants);
-      safeSet('edit-event-fee', result.event_fee || 0);
-      safeSet('edit-event-status', result.status || 'upcoming');
-
-      const safeSetDate = (id, dateVal) => {
-        const el = document.getElementById(id);
-        if (el && dateVal) el.value = formatDateTime(dateVal);
-      };
-
-      safeSetDate('edit-event-start-date', result.start_date);
-      safeSetDate('edit-event-end-date', result.end_date);
-      safeSetDate('edit-event-registration-deadline', result.registration_deadline);
-
-      const qrPreview = document.getElementById('edit-event-banner-preview');
-      const qrLabel = document.getElementById('qr-label');
-      if (result.banner_url) {
-        if (qrPreview) {
-          qrPreview.src = result.banner_url;
-          qrPreview.style.display = 'block';
-        }
-        if (qrLabel) qrLabel.style.display = 'block';
-      } else {
-        if (qrPreview) qrPreview.style.display = 'none';
-        if (qrLabel) qrLabel.style.display = 'none';
-      }
-
-      const form = document.getElementById('edit-event-form');
-      if (form) form.style.display = 'block';
-
-      showToast('✅ Event loaded successfully', 'success');
-
-    } catch (error) {
-      showToast(`❌ ${error.message}`, 'danger');
-      console.error('loadEventDetails error:', error);
-    } finally {
-      hideLoader();
-    }
-  }
-
   async function HandleEditEvent() {
   showLoader();
   const eventId = document.getElementById('edit-event-id').value;
-  let qrImageUrl = null;
-
+  
   try {
-    // Step 1: Check for QR file and upload to ImgBB
-    const qrInput = document.getElementById('edit-event-banner-url');
-    const qrFile = qrInput?.files[0];
+    if (!eventId) throw new Error('Event ID is required');
 
-    if (qrFile) {
-      const base64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(qrFile);
-      });
+    // Get existing images from preview container
+    const existingImages = Array.from(document.getElementById('existing-images').children)
+      .map(imgWrapper => imgWrapper.querySelector('img').src);
 
-      const formData = new FormData();
-      formData.append('key', '76954d664f0beaf57b8c5a5b0eca84e6');
-      formData.append('image', base64);
+    // Upload new files
+    const newImageFiles = Array.from(document.getElementById('edit-event-images').files);
+    const qrFile = document.getElementById('edit-event-banner-url').files[0];
+    
+    const [newImageUrls, bannerUrl] = await Promise.all([
+      newImageFiles.length ? ImageUploader.uploadMultiple(newImageFiles) : Promise.resolve([]),
+      qrFile ? ImageUploader.upload(qrFile) : Promise.resolve(null)
+    ]);
 
-      const uploadRes = await fetch('https://api.imgbb.com/1/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      const uploadData = await uploadRes.json();
-      if (uploadData.success) {
-        qrImageUrl = uploadData.data.url;
-      } else {
-        showToast('❌ QR Upload Failed: ' + uploadData.error.message, 'danger');
-        hideLoader();
-        return;
-      }
-    }
-
-    // Step 2: Prepare updated data payload
-    const payload = {
+    const updateData = {
       title: document.getElementById('edit-event-title').value,
       description: document.getElementById('edit-event-description').value,
       detailed_description: document.getElementById('edit-event-detailed-description').value,
       rules: document.getElementById('edit-event-rules').value,
       event_type: document.getElementById('edit-event-type').value,
       poster_url: document.getElementById('edit-event-poster-url').value,
-      banner_url: qrImageUrl || null, // if uploaded, use ImgBB URL
+      banner_url: bannerUrl || document.getElementById('edit-event-banner-preview').src || '',
       start_date: document.getElementById('edit-event-start-date').value,
       end_date: document.getElementById('edit-event-end-date').value,
       registration_deadline: document.getElementById('edit-event-registration-deadline').value,
       max_participants: parseInt(document.getElementById('edit-event-max-participants').value),
       event_fee: parseFloat(document.getElementById('edit-event-fee').value) || 0,
-      status: document.getElementById('edit-event-status').value
+      status: document.getElementById('edit-event-status').value,
+      image_urls: [...existingImages, ...newImageUrls] // Combine old and new images
     };
 
-    // Step 3: Send update to backend
-    await makeRequest('PUT', `/events/${eventId}`, payload);
+    console.log('Updating event with:', updateData); // Debug log
+    await makeRequest('PUT', `/events/${eventId}`, updateData);
     showToast('✅ Event updated successfully!', 'success');
-    await populateEventDropdown();
+    
+    // Reset inputs and reload
+    document.getElementById('edit-event-images').value = '';
+    document.getElementById('edit-event-images-preview').innerHTML = '';
+    document.getElementById('edit-event-banner-url').value = '';
+    loadEventDetails();
 
   } catch (error) {
-    showToast(`❌ ${error.message}`, 'danger');
+    showToast(`❌ Error: ${error.message}`, 'danger');
+    console.error('Update event error:', error);
   } finally {
     hideLoader();
   }
@@ -590,6 +660,29 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+  .img-thumbnail {
+  max-height: 100px;
+  object-fit: cover;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
 
+.position-relative {
+  position: relative;
+}
+
+.position-absolute {
+  position: absolute;
+}
+
+.top-0 {
+  top: 0;
+}
+
+.end-0 {
+  right: 0;
+}
+</style>
 </body>
 </html>
