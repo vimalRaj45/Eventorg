@@ -635,20 +635,7 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <!-- Custom JS -->
     <script>
-        // Disable right-click context menu
-document.addEventListener('contextmenu', e => e.preventDefault());
-
-// Disable specific key shortcuts
-document.addEventListener('keydown', function(e) {
-  if (
-    e.key === 'F12' ||
-    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
-    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
-  ) {
-    e.preventDefault();
     
-  }
-});
           function logout() {
     // Clear localStorage
     localStorage.clear();
