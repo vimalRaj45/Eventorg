@@ -82,10 +82,10 @@
 
 /* Navigation arrows container */
 .slideshow-controls {
+  display: none; /* Changed from flex to none */
   position: absolute;
   top: 50%;
   width: 100%;
-  display: flex;
   justify-content: space-between;
   transform: translateY(-50%);
   padding: 0 12px;
@@ -1282,6 +1282,18 @@ async function loadEventImages(eventId, event) {
     slideshow.appendChild(img);
   });
 
+  
+  // Hide controls if only one image
+  const controls = document.getElementById(`slideshow-controls-${eventId}`);
+  if (controls && imageUrls.length <= 1) {
+    controls.style.display = 'none';
+  } else if (controls) {
+    controls.style.display = 'flex';
+  }
+
+  slideshow.dataset.currentIndex = '0';
+  updateSlidePosition(eventId);
+
   slideshow.dataset.currentIndex = '0';
   updateSlidePosition(eventId);
   console.groupEnd();
@@ -1352,14 +1364,14 @@ async function displayEvents(events) {
       <div class="card h-100 event-card position-relative">
         ${getTopRightBadge(event)}
         <div class="event-img-container">
-          <div class="event-img-slideshow" id="slideshow-${event.id}">
-            <!-- Images will be added here dynamically -->
-          </div>
-          <div class="slideshow-controls">
-            <button class="slideshow-prev" onclick="changeSlide('${event.id}', -1)">❮</button>
-            <button class="slideshow-next" onclick="changeSlide('${event.id}', 1)">❯</button>
-          </div>
-        </div>
+      <div class="event-img-slideshow" id="slideshow-${event.id}">
+        <!-- Images will be added here dynamically -->
+      </div>
+      <div class="slideshow-controls" id="slideshow-controls-${event.id}">
+        <button class="slideshow-prev" onclick="changeSlide('${event.id}', -1)">❮</button>
+        <button class="slideshow-next" onclick="changeSlide('${event.id}', 1)">❯</button>
+      </div>
+    </div>
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-start mb-2">
             <h5 class="card-title mb-0">${event.title}</h5>
