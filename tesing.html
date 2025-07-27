@@ -1,49 +1,172 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>FreeImage.host Uploader</title>
+  <meta charset="UTF-8">
+  <title>Multi Image Upload & Retrieve Links</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+    }
+    #previewContainer img {
+      max-width: 200px;
+      margin: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .link-box {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .link-box input {
+      width: 80%;
+      padding: 6px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .link-box button {
+      padding: 5px 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .link-box button:hover {
+      background-color: #0056b3;
+    }
+    #copyAllBtn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #copyAllBtn:hover {
+      background-color: #1e7e34;
+    }
+    #loading {
+      margin: 15px 0;
+      color: #0066cc;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h2>Upload Image to FreeImage.host</h2>
-  <input type="file" id="imageInput">
-  <button onclick="uploadImage()">Upload</button>
 
-  <p id="status"></p>
-  <img id="preview" src="" alt="Preview" style="max-width: 300px; margin-top: 10px; display:none;">
+  <h2>Upload Images</h2>
+  <input type="file" id="imageInput" multiple accept="image/*">
+  <button onclick="uploadImages()">Upload</button>
+
+  <div id="loading" style="display: none;">Uploading... Please wait.</div>
+
+  <h3>Uploaded Images:</h3>
+  <div id="previewContainer"></div>
+
+  <h3>Image Links:</h3>
+  <div id="linksContainer"></div>
+  <button id="copyAllBtn" onclick="copyAllLinks()" style="display: none;">Copy All Links</button>
 
   <script>
-    const apiKey = "chv_NVV8_01d12ddb7a14b60578f1eaca7261c654f7e98b9c40e63c8fc6ebd8da2e88796ae03a1e4dcc623e9603952fa88122d39b70ead7b481843d023606815004fd5822"; // Replace with your actual key
-
-    async function uploadImage() {
+    async function uploadImages() {
       const input = document.getElementById("imageInput");
-      const file = input.files[0];
-      if (!file) {
-        alert("Please choose a file.");
+      const files = input.files;
+      const preview = document.getElementById("previewContainer");
+      const links = document.getElementById("linksContainer");
+      const loading = document.getElementById("loading");
+      const copyAllBtn = document.getElementById("copyAllBtn");
+
+      preview.innerHTML = '';
+      links.innerHTML = '';
+      copyAllBtn.style.display = 'none';
+
+      if (!files.length) {
+        alert("Please select image files.");
         return;
       }
 
       const formData = new FormData();
-      formData.append("source", file);
+      for (const file of files) {
+        formData.append("images", file); // Field name must match backend
+      }
 
-      const res = await fetch("https://freeimage.host/api/1/upload", {
-        method: "POST",
-        headers: {
-          "X-API-Key": apiKey
-        },
-        body: formData
-      });
+      loading.style.display = "block";
 
-      const data = await res.json();
-      if (data.status_code === 200) {
-        const imageUrl = data.image.url;
-        document.getElementById("status").innerText = "Uploaded successfully!";
-        const img = document.getElementById("preview");
-        img.src = imageUrl;
-        img.style.display = "block";
-      } else {
-        document.getElementById("status").innerText = "Upload failed: " + data.error.message;
+      try {
+        const res = await fetch("http://eventdb.onrender.com/api/upload-images45", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+        loading.style.display = "none";
+
+        if (res.ok && data.uploaded) {
+          let allLinks = [];
+
+          data.uploaded.forEach((item, i) => {
+            if (typeof item === "string") {
+              // Preview image
+              const img = document.createElement("img");
+              img.src = item;
+              preview.appendChild(img);
+
+              // Individual link with copy
+              const linkBox = document.createElement("div");
+              linkBox.className = "link-box";
+
+              const input = document.createElement("input");
+              input.type = "text";
+              input.value = item;
+              input.readOnly = true;
+
+              const copyBtn = document.createElement("button");
+              copyBtn.innerText = "Copy";
+              copyBtn.onclick = () => {
+                input.select();
+                document.execCommand("copy");
+              };
+
+              linkBox.appendChild(input);
+              linkBox.appendChild(copyBtn);
+              links.appendChild(linkBox);
+
+              allLinks.push(item);
+            } else {
+              const err = document.createElement("p");
+              err.textContent = `Error: ${item.error}`;
+              err.style.color = 'red';
+              preview.appendChild(err);
+            }
+          });
+
+          if (allLinks.length > 0) {
+            copyAllBtn.style.display = 'inline-block';
+            copyAllBtn.dataset.links = allLinks.join("\n");
+          }
+
+        } else {
+          alert("Upload failed: " + (data.message || data.error));
+          loading.style.display = "none";
+        }
+
+      } catch (error) {
+        loading.style.display = "none";
+        alert("Request failed: " + error.message);
       }
     }
+
+    function copyAllLinks() {
+      const text = document.getElementById("copyAllBtn").dataset.links;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("All links copied to clipboard!");
+      });
+    }
   </script>
+
 </body>
 </html>
