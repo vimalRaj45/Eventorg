@@ -653,20 +653,7 @@
     <!-- Custom JS -->
     <script>
     
-          function logout() {
-    // Clear localStorage
-    localStorage.clear();
-
-    // Show toast
-    const toastEl = document.getElementById('logoutToast');
-    const toast = new bootstrap.Toast(toastEl);
-    toast.show();
-
-    // Redirect after 2 seconds
-    setTimeout(() => {
-      window.location.href = "Login.html";
-    }, 200);
-  }
+         
         // Initialize AOS
         AOS.init({
             duration: 800,
@@ -679,6 +666,8 @@ let currentPage = 1;
 const usersPerPage = 10;
 const tokenKey = 'jwtToken'; // Consistent token key
 let jwtToken = localStorage.getItem(tokenKey);
+
+        alert(jwtToken);
 
 // Initialize the application
 function initApp() {
