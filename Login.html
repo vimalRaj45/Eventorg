@@ -668,8 +668,17 @@ async function loginUser() {
     }, 2000);
 
   } catch (error) {
-    showToast('error', 'Login Failed', error.message || 'Invalid credentials. Please try again.');
-  } finally {
+  const msg = error.message || '';
+  
+  if (msg.includes('Email not found')) {
+    showToast('error', 'No Account Found', 'This email is not registered. Please sign up first.');
+  } else if (msg.includes('Incorrect password')) {
+    showToast('error', 'Wrong Password', 'The password you entered is incorrect.');
+  } else {
+    showToast('error', 'Login Failed', 'Invalid credentials. Please try again.');
+  }
+}
+ finally {
     // Reset button state
     loginBtn.disabled = false;
     loginBtnText.textContent = 'Sign In';
@@ -777,20 +786,27 @@ async function loginUser() {
 
         const data = await res.json();
         
-        if (res.ok) {
-          showToast('success', 'Reset Link Sent', 'Check your email for the password reset link.');
-          
-          if (data.resetLink) {
-            const token = new URL(data.resetLink).searchParams.get("token");
-            
-            // Auto switch to reset form
-            setTimeout(() => {
-              showSection('reset-section');
-              document.getElementById('reset-token').value = token;
-              document.getElementById('new-password').focus();
-            }, 1500);
-          }
-        } else {
+       if (res.ok) {
+  if (!data.found) {
+    showToast('error', 'Email Not Found', 'We could not find this email in our system.');
+    return;
+  }
+
+  showToast(
+    'success',
+    'Reset Link Sent',
+    'Check your inbox for the password reset link. It may take up to 10 minutes. If you don’t see it, check spam/junk.'
+  );
+
+  if (data.resetLink) {
+    const token = new URL(data.resetLink).searchParams.get("token");
+    setTimeout(() => {
+      showSection('reset-section');
+      document.getElementById('reset-token').value = token;
+      document.getElementById('new-password').focus();
+    }, 1500);
+  }
+} else {
           showToast('error', 'Request Failed', data.message || "Failed to send reset link.");
         }
       } catch (err) {
