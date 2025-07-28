@@ -655,7 +655,7 @@ document.addEventListener('keydown', function(e) {
                         displayResults(data);
                     }
                 } catch (error) {
-                    errorText.textContent = error.message;
+                    errorText.textContent = 'No results found for this email address or Please try again later.';
                     showNoResults();
                 } finally {
                     loadingIndicator.classList.add('hidden');
