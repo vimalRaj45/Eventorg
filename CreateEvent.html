@@ -416,6 +416,8 @@ async function HandlecreateEvent() {
       imageFiles.length ? ImageUploader.uploadMultiple(imageFiles) : Promise.resolve([]),
       qrFile ? ImageUploader.upload(qrFile) : Promise.resolve('')
     ]);
+   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const organizer_id = typeof user.id === 'number' ? user.id : null;
 
     const eventData = {
       title: document.getElementById('event-title').value,
@@ -431,7 +433,8 @@ async function HandlecreateEvent() {
       max_participants: parseInt(document.getElementById('event-max-participants').value) || null,
       event_fee: parseFloat(document.getElementById('event-fee').value) || 0,
       status: document.getElementById('event-status-create').value,
-      image_urls: imageUrls
+      image_urls: imageUrls,
+      organizer_id
     };
 
     console.log('Creating event with:', eventData); // Debug log
