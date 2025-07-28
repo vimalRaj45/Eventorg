@@ -682,7 +682,6 @@ function renderMyApplications(applications) {
             <th>Company</th>
             <th>Position</th>
             <th>Status</th>
-            <th>Payment</th>
             <th>Applied At</th>
           </tr>
         </thead>
@@ -697,11 +696,6 @@ function renderMyApplications(applications) {
                   <span class="badge ${app.status === 'approved' ? 'bg-success' : 
                                       app.status === 'rejected' ? 'bg-danger' : 'bg-secondary'}">
                     ${app.status}
-                  </span>
-                </td>
-                <td>
-                  <span class="badge ${app.transaction_id ? 'bg-success' : 'bg-secondary'}">
-                    ${app.transaction_id ? 'paid' : 'waiting for approval'}
                   </span>
                 </td>
                 <td>
