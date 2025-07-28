@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -436,7 +437,6 @@ async function HandlecreateEvent() {
     console.log('Creating event with:', eventData); // Debug log
     const response = await makeRequest('POST', '/events', eventData);
     showToast('✅ Event created successfully!', 'success');
-    resetCreateEventForm();
     await populateEventDropdown();
 
   } catch (error) {
