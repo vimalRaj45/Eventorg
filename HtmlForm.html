@@ -1007,7 +1007,7 @@ async function submitQuiz() {
 
     console.log("📤 Sending data to backend:", JSON.stringify(data));
 
-    const res = await fetch('https://script.google.com/macros/s/AKfycbzJL1TzeAtxV4R1kwee2cBneQE_qrjLmFcGFjo22RP5SA_D5d-IT8CjW0F2pX_Fu-B4/exec', {
+    const res = await fetch('https://script.google.com/macros/s/AKfycbzZW6h4lFRXG-P5RNwa_q9JCTkSuOg4Wan79LoNUwaUv8N-9qMn3ow44GjHbfDpKKNS/exec', {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
       body: JSON.stringify(data)
