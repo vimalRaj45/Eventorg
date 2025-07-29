@@ -345,13 +345,17 @@
           showError(data.message || data.error || 'Unable to fetch result.');
           return;
         }
-
+         console.log(data);
         // Update summary
-        document.getElementById("score").textContent = data.score;
-        document.getElementById("percent").textContent = data.percentage;
-        document.getElementById("total-questions").textContent = data.details.length;
-        document.getElementById("score-progress").style.width = `${data.percentage}%`;
-        
+  // Calculate total questions excluding time (last entry)
+    const totalRealQuestions = data.details.length - 1;
+
+    // Update summary (show score out of 21)
+   const scoreOnly = data.score.split("/")[0];
+document.getElementById("score").textContent = scoreOnly;
+    document.getElementById("percent").textContent = data.percentage;
+    document.getElementById("total-questions").textContent = totalRealQuestions;
+    document.getElementById("score-progress").style.width = `${data.percentage}%`;
         // Update details table
         const tbody = document.getElementById("result-table-body");
         tbody.innerHTML = '';
@@ -361,25 +365,39 @@
           return;
         }
         
-        data.details.forEach((item, index) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>
-              <div style="font-weight: 500;">${item.question}</div>
-              <div style="font-size: 0.8rem; color: var(--google-dark-gray);">${item.field}</div>
-            </td>
-            <td>${item.yourAnswer || '-'}</td>
-            <td>${item.correctAnswer || '-'}</td>
-            <td>
-              <span class="${item.isCorrect ? 'correct' : 'wrong'} status-badge ${item.isCorrect ? 'correct-badge' : 'wrong-badge'}">
-                <i class="fas ${item.isCorrect ? 'fa-check' : 'fa-times'}"></i>
-                ${item.isCorrect ? 'Correct' : 'Incorrect'}
-              </span>
-            </td>
-          `;
-          tbody.appendChild(row);
-        });
+       // 1. Calculate total questions (excluding time)
+const totalQuestions = data.details.length - 1; // Subtract 1 to exclude time
+document.getElementById("total-questions").textContent = totalQuestions;
+
+// 2. When rendering the table:
+data.details.forEach((item, index) => {
+  const row = document.createElement("tr");
+  
+  // For time question (last item), show differently
+  if (index === data.details.length - 1) {
+    row.innerHTML = `
+      <td>Time</td>
+      <td colspan="2">Time Taken</td>
+      <td>${item.yourAnswer || '-'} sec</td>
+      <td></td>
+    `;
+  } else {
+    // Normal question rendering
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${item.question}</td>
+      <td>${item.yourAnswer || '-'}</td>
+      <td>${item.correctAnswer || '-'}</td>
+      <td>
+        <span class="${item.isCorrect ? 'correct' : 'wrong'}">
+          ${item.isCorrect ? '✓' : '✗'}
+        </span>
+      </td>
+    `;
+  }
+  
+  tbody.appendChild(row);
+});
         
         // Add search functionality
         setupSearch();
