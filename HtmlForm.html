@@ -422,6 +422,8 @@
  // Add these with your other global variables at the top
 let currentQuestionIndex = 0;
 let questionCards = [];
+let quizStartTime;
+let quizEndTime;
 
   //precations
   const beforeUnloadHandler = function (e) {
@@ -749,6 +751,7 @@ questionCards.forEach((card, i) => {
 
   function buildQuiz(questions) {
     // Show mobile submit button if on small screen
+    quizStartTime = new Date(); // Record exact start time
     if (window.innerWidth <= 576) {
       mobileSubmitBtn.style.display = "flex";
       mobileSubmitBtn.addEventListener("click", () => {
@@ -964,11 +967,29 @@ async function submitQuiz() {
     mobileSubmitBtn.disabled = true;
     mobileSubmitBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i>';
   }
+  quizEndTime = new Date();
+  const timeTakenMs = quizEndTime - quizStartTime; // Milliseconds
+  const timeTakenSec = Math.round(timeTakenMs / 1000); // Convert to seconds
 
+  // Add to submission data
   const formData = new FormData(form);
   const data = {};
   formData.forEach((v, k) => data[k] = v);
   data.quiz = quizName;
+  data.timeTakenSec = timeTakenSec; // Send precise seconds to backend
+
+  // Display to user (in minutes:seconds format)
+  const mins = Math.floor(timeTakenSec / 60);
+  const secs = timeTakenSec % 60;
+  const timeDisplay = `${mins}m ${secs}s`;
+  Swal.fire({
+    title: 'Submitting Quiz',
+    html: `<p>Time taken: <strong>${timeDisplay}</strong></p>`,
+    showConfirmButton: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
 
   console.log("📋 Submitting answers:", data);
 
@@ -984,7 +1005,9 @@ async function submitQuiz() {
       }
     }, 30);
 
-    const res = await fetch('https://script.google.com/macros/s/AKfycbxyHXFnAQqE7tGHTUulI0gFggti69YzNYabVVTahGp5AfLi8SUBwlvZQ_XvkS5EV6BqtA/exec', {
+    console.log("📤 Sending data to backend:", JSON.stringify(data));
+
+    const res = await fetch('https://script.google.com/macros/s/AKfycbx1oEMT7uaMbajSCgRlHi1hN-yszA-w84_F8xD5YiQjALBz494JK5eUVSpG64evmsjd/exec', {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
       body: JSON.stringify(data)
