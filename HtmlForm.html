@@ -36,6 +36,11 @@
       line-height: 1.6;
       -webkit-tap-highlight-color: transparent;
     }
+
+    .toast-body strong {
+  color: var(--primary-color);
+  font-weight: 600;
+}
     
     .quiz-container {
       max-width: 800px;
@@ -419,6 +424,21 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
 <script>
+
+  // Disable right-click context menu
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// Disable specific key shortcuts
+document.addEventListener('keydown', function(e) {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+  ) {
+    e.preventDefault();
+    
+  }
+});
  // Add these with your other global variables at the top
 let currentQuestionIndex = 0;
 let questionCards = [];
@@ -501,37 +521,43 @@ window.addEventListener("beforeunload", beforeUnloadHandler);
   }
 
    let switchCount = 0;
+   const MAX_SWITCHES_ALLOWED = 3; // Add this constant
 
-  window.onblur = () => {
-    switchCount++;
+ window.onblur = () => {
+  switchCount++;
 
-    const container = document.getElementById("toast-container");
+  const container = document.getElementById("toast-container");
 
-    const toastId = `toast-${Date.now()}`;
-    const time = new Date().toLocaleTimeString();
+  const toastId = `toast-${Date.now()}`;
+  const time = new Date().toLocaleTimeString();
 
-    const toastHTML = `
-      <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-          <img src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" class="rounded me-2" alt="B" width="16" height="16">
-          <strong class="me-auto text-danger">Tab Switch Alert</strong>
-          <small class="text-muted">${time}</small>
-          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-          Tab switch detected (${switchCount}). Please stay on the quiz page.
-        </div>
+  const toastHTML = `
+    <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <img src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" class="rounded me-2" alt="B" width="16" height="16">
+        <strong class="me-auto text-danger">Tab Switch Alert</strong>
+        <small class="text-muted">${time}</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
-    `;
+      <div class="toast-body">
+        Tab switch detected (${switchCount}/${MAX_SWITCHES_ALLOWED}). Please stay on the quiz page.
+      </div>
+    </div>
+  `;
 
-    container.insertAdjacentHTML("beforeend", toastHTML);
+  container.insertAdjacentHTML("beforeend", toastHTML);
 
-    const toastElement = document.getElementById(toastId);
-    const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
-    toast.show();
-  };
-  
+  const toastElement = document.getElementById(toastId);
+  const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
+  toast.show();
 
+  // Auto-submit after 3rd switch without showing Swal
+  if (switchCount >= MAX_SWITCHES_ALLOWED) {
+    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+    submitEvent.detail = { isAutoSubmit: true };
+    form.dispatchEvent(submitEvent);
+  }
+};
    
   
   AOS.init();
@@ -574,10 +600,8 @@ async function loadQuiz() {
     }
 
     const questions = data.questions;
-
     questionsCount = questions.length;
       totalTimeout = questions.reduce((total, q) => total + (q.timeout || 0), 0) * 60;
-
     // Show intro screen
     form.innerHTML = `
       <div class="quiz-intro">
