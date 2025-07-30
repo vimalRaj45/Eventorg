@@ -521,42 +521,94 @@ window.addEventListener("beforeunload", beforeUnloadHandler);
   }
 
    let switchCount = 0;
-   const MAX_SWITCHES_ALLOWED = 3; // Add this constant
+const MAX_SWITCHES_ALLOWED = 3;
+const VIOLATION_COOLDOWN = 5 * 60 * 1000; // 5 minutes in milliseconds
 
- window.onblur = () => {
-  switchCount++;
+// Check for existing violations on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const violationData = localStorage.getItem('quizViolations');
+    if (violationData) {
+        const { count, timestamp } = JSON.parse(violationData);
+        
+        // If cooldown period hasn't passed
+        if (Date.now() - timestamp < VIOLATION_COOLDOWN) {
+            blockQuizSubmission();
+        } else {
+            // Clear expired violation
+            localStorage.removeItem('quizViolations');
+        }
+    }
+});
 
-  const container = document.getElementById("toast-container");
+function blockQuizSubmission() {
+    const violationData = JSON.parse(localStorage.getItem('quizViolations'));
+    const minutesLeft = Math.ceil((VIOLATION_COOLDOWN - (Date.now() - violationData.timestamp)) / 60000);
+    
+    // Disable the form
+    document.getElementById('quizForm').style.display = 'none';
+    
+    // Show violation message
+    Swal.fire({
+        icon: 'error',
+        title: 'Quiz Blocked',
+        html: `You are not allowed to submit this quiz for ${minutesLeft} more minutes.<br><br>
+              <small>Reason: Multiple tab switches detected (violation of quiz rules)</small>`,
+        confirmButtonColor: 'var(--primary-color)',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        willClose: () => {
+            window.location.href = 'index.html';
+        }
+    });
+}
 
-  const toastId = `toast-${Date.now()}`;
-  const time = new Date().toLocaleTimeString();
+window.onblur = () => {
+    // Check if already blocked
+    const violationData = localStorage.getItem('quizViolations');
+    if (violationData && Date.now() - JSON.parse(violationData).timestamp < VIOLATION_COOLDOWN) {
+        return;
+    }
 
-  const toastHTML = `
-    <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header">
-        <img src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" class="rounded me-2" alt="B" width="16" height="16">
-        <strong class="me-auto text-danger">Tab Switch Alert</strong>
-        <small class="text-muted">${time}</small>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        Tab switch detected (${switchCount}/${MAX_SWITCHES_ALLOWED}). Please stay on the quiz page.
-      </div>
-    </div>
-  `;
+    switchCount++;
 
-  container.insertAdjacentHTML("beforeend", toastHTML);
+    const container = document.getElementById("toast-container");
+    const toastId = `toast-${Date.now()}`;
+    const time = new Date().toLocaleTimeString();
 
-  const toastElement = document.getElementById(toastId);
-  const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
-  toast.show();
+    const toastHTML = `
+        <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <img src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" class="rounded me-2" alt="B" width="16" height="16">
+                <strong class="me-auto text-danger">Tab Switch Alert</strong>
+                <small class="text-muted">${time}</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Tab switch detected (${switchCount}/${MAX_SWITCHES_ALLOWED}). Please stay on the quiz page.
+            </div>
+        </div>
+    `;
 
-  // Auto-submit after 3rd switch without showing Swal
-  if (switchCount >= MAX_SWITCHES_ALLOWED) {
-    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-    submitEvent.detail = { isAutoSubmit: true };
-    form.dispatchEvent(submitEvent);
-  }
+    container.insertAdjacentHTML("beforeend", toastHTML);
+
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
+    toast.show();
+
+    // Auto-submit after 3rd switch and set cooldown
+    if (switchCount >= MAX_SWITCHES_ALLOWED) {
+        localStorage.setItem('quizViolations', JSON.stringify({
+            count: MAX_SWITCHES_ALLOWED,
+            timestamp: Date.now()
+        }));
+        
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+        submitEvent.detail = { isAutoSubmit: true };
+        form.dispatchEvent(submitEvent);
+        
+        // Show blocking message after submission
+        setTimeout(blockQuizSubmission, 1000);
+    }
 };
    
   
@@ -692,7 +744,7 @@ async function loadQuiz() {
     <div>
       <h6 class="mb-1 text-danger">Tab Switch Warning</h6>
       <p class="mb-0 text-muted">
-        Switching tabs more than 3 times will auto-submit the quiz.
+        Switching tabs more than <strong>3 times</strong> will auto-submit the quiz and block you for 5 minutes.
       </p>
     </div>
   </div>
@@ -1129,6 +1181,7 @@ else {
     text: result.error || "An unknown error occurred",
     confirmButtonColor: 'var(--primary-color)'
   }).then(() => {
+    window.removeEventListener("beforeunload", beforeUnloadHandler);
     window.location.href = 'index.html'; // Redirect to index.html after alert
   });
 }
