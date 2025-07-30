@@ -1123,13 +1123,16 @@ async function submitQuiz() {
   });
 }
 else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Submission Failed',
-        text: result.error || "An unknown error occurred",
-        confirmButtonColor: 'var(--primary-color)'
-      });
-    }
+  Swal.fire({
+    icon: 'error',
+    title: 'Submission Failed',
+    text: result.error || "An unknown error occurred",
+    confirmButtonColor: 'var(--primary-color)'
+  }).then(() => {
+    window.location.href = 'index.html'; // Redirect to index.html after alert
+  });
+}
+
 
   } catch (err) {
     clearInterval(interval);
