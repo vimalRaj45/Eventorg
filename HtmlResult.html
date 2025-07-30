@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -204,8 +203,51 @@
       color: var(--google-dark-gray);
     }
     
+    .input-form {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--google-dark-gray);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--google-light-gray);
+      border-radius: 4px;
+      font-family: inherit;
+    }
+    
+    .form-note {
+      font-size: 0.8rem;
+      color: var(--google-dark-gray);
+      margin-top: 0.25rem;
+    }
+    
+    .btn-submit {
+      background: var(--google-blue);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
     @media print {
-      .action-buttons, .header, .search-box {
+      .action-buttons, .header, .search-box, .input-form {
         display: none;
       }
       
@@ -240,12 +282,32 @@
   </div>
 
   <div class="result-container">
-    <div class="search-box">
+    <div class="input-form" id="input-form">
+      <h2 class="result-title">View Your Quiz Results</h2>
+      
+      <div class="form-group">
+        <label for="quiz-input" class="form-label">Quiz Name</label>
+        <input type="text" id="quiz-input" class="form-control" placeholder="e.g. Science, Maths" required>
+        <div class="form-note">First letter should be capital (e.g. "Science")</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="email-input" class="form-label">Email Address</label>
+        <input type="email" id="email-input" class="form-control" placeholder="your@email.com" required>
+        <div class="form-note">Must match exactly how you registered</div>
+      </div>
+      
+      <button type="button" class="btn-submit" onclick="fetchResult()">
+        <i class="fas fa-search"></i> View Results
+      </button>
+    </div>
+    
+    <div class="search-box" style="display: none;">
       <i class="fas fa-search"></i>
       <input type="text" id="search-input" placeholder="Search in results...">
     </div>
     
-    <div class="result-summary">
+    <div class="result-summary" style="display: none;">
       <h2 class="result-title" id="result-title">Your Quiz Results</h2>
       
       <div class="score-display">
@@ -265,7 +327,7 @@
       </div>
     </div>
     
-    <div class="result-details">
+    <div class="result-details" style="display: none;">
       <h3 style="font-size: 1.1rem; font-weight: 500; margin-bottom: 1rem;">Question Details</h3>
       
       <div class="table-responsive">
@@ -298,9 +360,9 @@
       </div>
     </div>
     
-    <div class="action-buttons">
-      <button class="btn btn-google" onclick="window.location.href='/'">
-        <i class="fas fa-home"></i> Back to Home
+    <div class="action-buttons" style="display: none;">
+      <button class="btn btn-google" onclick="window.location.reload()">
+        <i class="fas fa-redo"></i> Check Another Result
       </button>
       <button class="btn btn-primary-google" onclick="window.print()">
         <i class="fas fa-print"></i> Print Result
@@ -309,33 +371,73 @@
   </div>
 
   <script>
+      // Disable right-click context menu
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// Disable specific key shortcuts
+document.addEventListener('keydown', function(e) {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+  ) {
+    e.preventDefault();
+    
+  }
+});
+
     const API_URL = "https://script.google.com/macros/s/AKfycbwHffa6otHDDuP8qaqYqeFEDL64IPkTzqj4jan8uiLaV2dOUtzkCRXExDfaEl835y0rhA/exec";
 
+    function formatQuizName(quiz) {
+      // Trim whitespace and capitalize first letter
+      quiz = quiz.trim();
+      if (quiz.length > 0) {
+        return quiz.charAt(0).toUpperCase() + quiz.slice(1);
+      }
+      return quiz;
+    }
+
+    function formatEmail(email) {
+      // Trim whitespace and convert to lowercase
+      return email.trim().toLowerCase();
+    }
+
     async function fetchResult() {
-      let quiz = ''
-      let email = ''
-      alert(
-  "⚠️ Please enter details carefully:\n" +
-  "- Quiz name is *case-sensitive* (e.g., 'Maths', 'Science')\n" +
-  "- First letter should be capital\n" +
-  "- No spaces at the start or end\n" +
-  "- Email should match exactly how you registered"
-);
+      const quizInput = document.getElementById("quiz-input");
+      const emailInput = document.getElementById("email-input");
+      
+      // Format inputs
+      const quiz = formatQuizName(quizInput.value);
+      const email = formatEmail(emailInput.value);
+      
+      // Validate inputs
       if (!quiz) {
-        quiz = prompt("Enter quiz name (First letter capital):");
-        if (!quiz) return;
-       
+        alert("Please enter a quiz name");
+        quizInput.focus();
+        return;
       }
-
+      
       if (!email) {
-        email = prompt("Enter your email:");
-        if (!email) return;
-        
+        alert("Please enter your email");
+        emailInput.focus();
+        return;
+      }
+      
+      // Basic email validation
+      if (!email.includes("@") || !email.includes(".")) {
+        alert("Please enter a valid email address");
+        emailInput.focus();
+        return;
       }
 
-      document.getElementById("quiz-name").textContent = quiz.trim();
-
-      document.getElementById("user-email").textContent = email.trim();
+      // Show loading state
+      document.getElementById("input-form").style.display = "none";
+      document.querySelector(".search-box").style.display = "flex";
+      document.querySelector(".result-summary").style.display = "block";
+      document.querySelector(".result-details").style.display = "block";
+      
+      document.getElementById("quiz-name").textContent = quiz;
+      document.getElementById("user-email").textContent = email;
 
       try {
         const res = await fetch(`${API_URL}?action=getUserResult&quiz=${encodeURIComponent(quiz)}&email=${encodeURIComponent(email)}`);
@@ -345,17 +447,22 @@
           showError(data.message || data.error || 'Unable to fetch result.');
           return;
         }
-         console.log(data);
-        // Update summary
-  // Calculate total questions excluding time (last entry)
-    const totalRealQuestions = data.details.length - 1;
+        
+        // Calculate total real questions (excluding time entry)
+        const totalRealQuestions = data.details.length - 1;
+        const correctAnswers = data.details.filter((item, index) => 
+            index < totalRealQuestions && item.isCorrect
+        ).length;
 
-    // Update summary (show score out of 21)
-   const scoreOnly = data.score.split("/")[0];
-document.getElementById("score").textContent = scoreOnly;
-    document.getElementById("percent").textContent = data.percentage;
-    document.getElementById("total-questions").textContent = totalRealQuestions;
-    document.getElementById("score-progress").style.width = `${data.percentage}%`;
+        // Calculate percentage correctly
+        const percentage = Math.round((correctAnswers / totalRealQuestions) * 100);
+
+        // Update summary
+        document.getElementById("score").textContent = correctAnswers;
+        document.getElementById("percent").textContent = percentage;
+        document.getElementById("total-questions").textContent = totalRealQuestions;
+        document.getElementById("score-progress").style.width = `${percentage}%`;
+        
         // Update details table
         const tbody = document.getElementById("result-table-body");
         tbody.innerHTML = '';
@@ -365,39 +472,38 @@ document.getElementById("score").textContent = scoreOnly;
           return;
         }
         
-       // 1. Calculate total questions (excluding time)
-const totalQuestions = data.details.length - 1; // Subtract 1 to exclude time
-document.getElementById("total-questions").textContent = totalQuestions;
-
-// 2. When rendering the table:
-data.details.forEach((item, index) => {
-  const row = document.createElement("tr");
-  
-  // For time question (last item), show differently
-  if (index === data.details.length - 1) {
-    row.innerHTML = `
-      <td>Time</td>
-      <td colspan="2">Time Taken</td>
-      <td>${item.yourAnswer || '-'} sec</td>
-      <td></td>
-    `;
-  } else {
-    // Normal question rendering
-    row.innerHTML = `
-      <td>${index + 1}</td>
-      <td>${item.question}</td>
-      <td>${item.yourAnswer || '-'}</td>
-      <td>${item.correctAnswer || '-'}</td>
-      <td>
-        <span class="${item.isCorrect ? 'correct' : 'wrong'}">
-          ${item.isCorrect ? '✓' : '✗'}
-        </span>
-      </td>
-    `;
-  }
-  
-  tbody.appendChild(row);
-});
+        // Render the table
+        data.details.forEach((item, index) => {
+          const row = document.createElement("tr");
+          
+          // For time question (last item), show differently
+          if (index === data.details.length - 1) {
+            row.innerHTML = `
+              <td>Time</td>
+              <td colspan="2">Time Taken</td>
+              <td>${item.yourAnswer || '-'} sec</td>
+              <td></td>
+            `;
+          } else {
+            // Normal question rendering
+            row.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${item.question}</td>
+              <td>${item.yourAnswer || '-'}</td>
+              <td>${item.correctAnswer || '-'}</td>
+              <td>
+                <span class="${item.isCorrect ? 'correct' : 'wrong'}">
+                  ${item.isCorrect ? '✓' : '✗'}
+                </span>
+              </td>
+            `;
+          }
+          
+          tbody.appendChild(row);
+        });
+        
+        // Show action buttons
+        document.querySelector(".action-buttons").style.display = "flex";
         
         // Add search functionality
         setupSearch();
@@ -443,8 +549,12 @@ data.details.forEach((item, index) => {
       });
     }
 
-    // Initialize
-    document.addEventListener("DOMContentLoaded", fetchResult);
+    // Allow form submission on Enter key
+    document.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        fetchResult();
+      }
+    });
   </script>
 </body>
 </html>
