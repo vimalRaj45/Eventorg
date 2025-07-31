@@ -458,6 +458,53 @@
           </div>
         </div>
       `;
+      if ((user.role === 'user' || user.role === 'student')) {
+  const userAdditionalData = user.additional
+    .split(',')
+    .map(info => info.trim())
+    .filter(info => info !== '');
+
+  if (userAdditionalData.length > 0) {
+    dashboardHTML += `
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card stat-card border-left-secondary">
+            <div class="card-body">
+              <h5 class="card-title text-secondary">
+                <i class="bi bi-info-square-fill"></i> Additional Info
+              </h5>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Detail</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+    `;
+
+    userAdditionalData.forEach((info, index) => {
+      dashboardHTML += `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${info}</td>
+        </tr>
+      `;
+    });
+
+    dashboardHTML += `
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
 
 if (user.role === 'user' || user.role === 'student') {
   dashboardHTML += `
@@ -530,17 +577,25 @@ if (user.role === 'user' || user.role === 'student') {
   `;
 }
 
+
 if (user.role === 'mentor' && user.downline_name && user.downline_name.trim() !== '') {
   console.log('🔍 Mentor Detected');
   console.log('➡️ Raw downline_name:', user.downline_name);
+  console.log('➡️ Raw additional:', user.additional);
 
-  // Split and clean the downline names
+  // Parse downlines
   const downlines = user.downline_name
     .split(',')
     .map(name => name.trim())
     .filter(name => name !== '');
 
+  // Parse additional data (if it's a comma-separated string)
+  const additionalData = user.additional
+    ? user.additional.split(',').map(info => info.trim()).filter(info => info !== '')
+    : [];
+
   console.log('✅ Parsed downlines:', downlines);
+  console.log('✅ Parsed additionalData:', additionalData);
 
   if (downlines.length > 0) {
     dashboardHTML += `
@@ -551,30 +606,23 @@ if (user.role === 'mentor' && user.downline_name && user.downline_name.trim() !=
               <h5 class="card-title text-warning">
                 <i class="bi bi-people"></i> Your Team Members (${downlines.length})
               </h5>
-              
               <div class="table-responsive">
                 <table class="table table-hover">
                   <thead>
                     <tr>
                       <th>#</th>
                       <th>Member Name</th>
-                      
                     </tr>
                   </thead>
                   <tbody>
     `;
 
     downlines.forEach((downline, index) => {
-      console.log(`👤 Downline ${index + 1}:`, downline);
       dashboardHTML += `
-                    <tr>
-                      <td>${index + 1}</td>
-                      <td>
-                        <i class="bi bi-person-fill me-2"></i>
-                        ${downline}
-                      </td>
-                  
-                    </tr>
+        <tr>
+          <td>${index + 1}</td>
+          <td><i class="bi bi-person-fill me-2"></i> ${downline}</td>
+        </tr>
       `;
     });
 
@@ -582,13 +630,47 @@ if (user.role === 'mentor' && user.downline_name && user.downline_name.trim() !=
                   </tbody>
                 </table>
               </div>
-            </div>
-          </div>
+    `;
+
+    // ➕ Add Second Table for Additional Info
+    if (additionalData.length > 0) {
+      dashboardHTML += `
+        <hr>
+        <h6 class="text-secondary mt-4"><i class="bi bi-info-circle"></i> Additional Info (${additionalData.length})</h6>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Detail</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      additionalData.forEach((info, index) => {
+        dashboardHTML += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${info}</td>
+          </tr>
+        `;
+      });
+
+      dashboardHTML += `
+            </tbody>
+          </table>
         </div>
-      </div>
+      `;
+    }
+
+    dashboardHTML += `
+            </div> <!-- card-body -->
+          </div> <!-- card -->
+        </div> <!-- col -->
+      </div> <!-- row -->
     `;
   } else {
-    console.warn('⚠️ No valid downlines found after parsing.');
     dashboardHTML += `
       <div class="alert alert-info">
         <i class="bi bi-info-circle"></i> You don't have any team members yet.
@@ -598,6 +680,9 @@ if (user.role === 'mentor' && user.downline_name && user.downline_name.trim() !=
 } else {
   console.log('ℹ️ User is not a mentor or no downline_name provided.');
 }
+
+
+
 
 if (user.role === 'mentor') {
   dashboardHTML += `
