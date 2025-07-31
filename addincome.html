@@ -295,7 +295,7 @@
                 <input type="number" class="form-control" id="total_invitations">
               </div>
               <div class="col-6 col-md-4">
-                <label class="form-label">Inter Total</label>
+                <label class="form-label">Intern Total</label>
                 <input type="number" class="form-control" id="inter_total">
               </div>
               <div class="col-6 col-md-4">
@@ -344,9 +344,13 @@
                 <label class="form-label">Total Participants include mentor</label>
                 <input type="number" class="form-control" id="total_participants">
               </div>
+              <div class="col-12">
+  <label class="form-label">Additional Information</label>
+  <textarea class="form-control" id="additional" rows="2" placeholder="Any additional notes"></textarea>
+</div>
               <div class="col-6 col-md-3">
-                <label class="form-label">Total Downline</label>
-                <input type="number" class="form-control" id="total_downline_participants">
+               <input type="number" class="form-control" id="total_downline_participants" name="total_downline_participants" value="1" readonly style="display: none;">
+
               </div>
             </div>
           </div>
@@ -435,7 +439,7 @@
   </button>
 
   <script>
-    const api = "https://eventdb.onrender.com/referrals";
+    const api = "http://localhost:4000/referrals";
     let allReferrals = [];
 
 
@@ -583,6 +587,7 @@
                   <p><strong>Role:</strong> ${referral.role || 'Not specified'}</p>
                   <p><strong>Message:</strong> ${referral.msg || 'None'}</p>
                   <p><strong>Refer Code:</strong> ${referral.refer_code || 'Not provided'}</p>
+                  <p><strong>Additional Info:</strong> ${referral.additional || 'None'}</p>
                 </div>
               </div>
             </div>
@@ -597,7 +602,7 @@
                   <p><strong>Total Participants:</strong> ${referral.total_participants || 0}</p>
                   <p><strong>Current Participants:</strong> ${referral.current_participants || 0}</p>
                   <p><strong>Total Invitations:</strong> ${referral.total_invitations || 0}</p>
-                  <p><strong>Inter Total:</strong> ${referral.inter_total || 0}</p>
+                  <p><strong>Intern Total:</strong> ${referral.inter_total || 0}</p>
                 </div>
               </div>
             </div>
@@ -660,6 +665,7 @@
       document.getElementById('inter_total').value = referral.inter_total || '';
       document.getElementById('role').value = referral.role || '';
       document.getElementById('msg').value = referral.msg || '';
+      document.getElementById('additional').value = referral.additional || '';
       
       // Show form section
       toggleFormSection(true);
@@ -850,17 +856,7 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
- const user = JSON.parse(localStorage.getItem('user')) || {};
-const token = localStorage.getItem('jwtToken');
 
-if (user.role !== 'admin' || !token) {
-  document.body.innerHTML = `
-    <div style="height: 100vh; background-color: #111827; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: 'Outfit', sans-serif; text-align: center; padding: 20px;">
-      <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">🚫 Unauthorized Access</h1>
-      <p style="font-size: 1rem; color: #d1d5db;">You do not have permission to view this page.</p>
-    </div>
-  `;
-}
 
   </script>
 </body>
