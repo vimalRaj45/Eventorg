@@ -1,7 +1,7 @@
 {
   "name": "E-Earn",
   "short_name": "E-Earn",
-  "start_url": "/",
+  "start_url": "/loginincome",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0d6efd",
