@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1753,26 +1751,18 @@ async function showEventModal(event) {
     ${paymentVerificationSection}
     
    ${(event.status === 'upcoming' || event.status === 'ongoing') ? `
-  <div class="alert ${
-    event.max_participants != null && event.current_participants >= event.max_participants
-      ? 'alert-danger'
-      : 'alert-info'
-  }">
-    <i class="bi ${
-      event.max_participants != null && event.current_participants >= event.max_participants
-        ? 'bi-exclamation-octagon'
-        : 'bi-info-circle'
-    } me-2"></i>
-    This event is currently <strong>${event.status}</strong>. 
+  <div class="alert ${event.max_participants && event.current_participants >= event.max_participants ? 'alert-danger' : 'alert-info'}">
+    <i class="bi ${event.max_participants && event.current_participants >= event.max_participants ? 'bi-exclamation-octagon' : 'bi-info-circle'} me-2"></i>
+    This event is currently <strong>${event.status}</strong>.
     ${
-      event.max_participants != null && event.current_participants >= event.max_participants
+      event.max_participants && event.current_participants >= event.max_participants
         ? '<strong>Fully booked!</strong> No more registrations accepted.'
         : 'Register now to secure your spot!'
     }
   </div>
 ` : ''}
-
 ${registerButton}
+`;
 
 
   if (hasPaymentLink) {
