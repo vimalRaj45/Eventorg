@@ -266,7 +266,6 @@
         document.getElementById('my-name').value = result.name;
         document.getElementById('my-contact').value = result.contact_no || '';
         document.getElementById('loadingOverlay').style.display = 'none';
-        alert("Profile Updated.");
       } catch (error) {
        alert("You need to login first.");
       }
@@ -282,7 +281,7 @@
 
       try {
         await makeRequest('PUT', `/users/${email}`, data);
-        showToast('✔️ Profile updated successfully', 'success');
+        alert("Profile updated successfully.");
         setTimeout(() => window.location.href = 'index.html', 2100);
       } catch (err) {
         showToast(`❌ Failed to update: ${err.message}`, 'danger');
