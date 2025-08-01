@@ -266,9 +266,9 @@
         document.getElementById('my-name').value = result.name;
         document.getElementById('my-contact').value = result.contact_no || '';
         document.getElementById('loadingOverlay').style.display = 'none';
-        showToast('✔️ Profile loaded successfully', 'success');
+        alert("Profile Updated.");
       } catch (error) {
-        showToast(`❌ Failed to load profile: ${error.message}`, 'danger');
+       alert("You need to login first.");
       }
     }
 
