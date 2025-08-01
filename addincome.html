@@ -775,7 +775,9 @@
     }
 
     showToast(`Referral ${isEdit ? 'updated' : 'added'} successfully`, 'success');
+    window.location.reload();
     console.log("✅ Toast shown: Success");
+    
   } catch (error) {
     console.error("❌ Error saving referral:", error);
     showToast('Failed to save referral', 'danger');
