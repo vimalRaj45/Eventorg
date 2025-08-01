@@ -1106,11 +1106,12 @@ async function showAttendModal(event) {
       </div>
     </div>
 
-  ${event.status === 'upcoming' || event.status === 'ongoing' ? `
+  ${(event.status === 'upcoming' || event.status === 'ongoing') ? `
   <div class="alert alert-info">
     <i class="bi bi-info-circle me-2"></i>This event is currently <strong>${event.status}</strong>.
     ${
-      event.max_participants && event.current_participants >= event.max_participants
+      (typeof event.max_participants === 'number' && event.max_participants > 0 &&
+       event.current_participants >= event.max_participants)
         ? '<strong class="text-danger"> Fully booked!</strong>'
         : ' Register now to secure your spot!'
     }
