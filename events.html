@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1082,11 +1084,11 @@ async function showAttendModal(event) {
     <div class="row">
       <div class="col-md-6 mb-3">
         <h6><i class="bi bi-card-text me-2"></i>Description</h6>
-        <p>${event.detailed_description || 'No detailed description provided'}</p>
+        <p style="white-space: pre-wrap; font-size: 1rem; line-height: 1.5;">${event.detailed_description || 'No detailed description provided'}</p>
       </div>
       <div class="col-md-6 mb-3">
         <h6><i class="bi bi-list-check me-2"></i>Rules</h6>
-        <p>${event.rules || 'No rules specified'}</p>
+        <p style="white-space: pre-wrap; font-size: 1rem; line-height: 1.5;">${event.rules || 'No rules specified'}</p>
       </div>
     </div>
     <div class="row">
@@ -1104,14 +1106,18 @@ async function showAttendModal(event) {
       </div>
     </div>
 
-    ${event.status === 'upcoming' || event.status === 'ongoing' ? `
-      <div class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i>This event is currently <strong>${event.status}</strong>.
-        ${event.current_participants >= event.max_participants ?
-          '<strong class="text-danger"> Fully booked!</strong>' :
-          ' Register now to secure your spot!'}
-      </div>
-    ` : ''}
+  ${event.status === 'upcoming' || event.status === 'ongoing' ? `
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>This event is currently <strong>${event.status}</strong>.
+    ${
+      event.max_participants && event.current_participants >= event.max_participants
+        ? '<strong class="text-danger"> Fully booked!</strong>'
+        : ' Register now to secure your spot!'
+    }
+  </div>
+` : ''}
+
+
 
     <div class="text-center mt-3">
       ${attendContent}
