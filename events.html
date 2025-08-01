@@ -1677,25 +1677,31 @@ async function showEventModal(event) {
     
     <div class="row g-3 mb-4">
       <div class="col-md-6">
-        <div class="card h-100">
-          <div class="card-header">
-            <i class="bi bi-card-text me-2"></i>Description
-          </div>
-          <div class="card-body">
-            <p class="card-text">${event.detailed_description || 'No detailed description provided'}</p>
-          </div>
-        </div>
-      </div>
+  <div class="card h-100">
+    <div class="card-header">
+      <i class="bi bi-card-text me-2"></i>Description
+    </div>
+    <div class="card-body">
+      <p class="card-text" style="white-space: pre-wrap; font-size: 1rem; line-height: 1.5;">
+        ${event.detailed_description || 'No detailed description provided'}
+      </p>
+    </div>
+  </div>
+</div>
+
       <div class="col-md-6">
-        <div class="card h-100">
-          <div class="card-header">
-            <i class="bi bi-list-check me-2"></i>Rules
-          </div>
-          <div class="card-body">
-            <p class="card-text">${event.rules || 'No rules specified'}</p>
-          </div>
-        </div>
-      </div>
+  <div class="card h-100">
+    <div class="card-header">
+      <i class="bi bi-list-check me-2"></i>Rules
+    </div>
+    <div class="card-body">
+      <p class="card-text" style="white-space: pre-wrap; font-size: 1rem; line-height: 1.5;">
+        ${event.rules || 'No rules specified'}
+      </p>
+    </div>
+  </div>
+</div>
+
     </div>
     
     <div class="row g-3 mb-4">
