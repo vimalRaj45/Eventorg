@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -459,10 +460,11 @@
         </div>
       `;
       if ((user.role === 'user' || user.role === 'student')) {
-  const userAdditionalData = user.additional
-    .split(',')
-    .map(info => info.trim())
-    .filter(info => info !== '');
+  const userAdditionalData = (user.additional || '')
+  .split(',')
+  .map(info => info.trim())
+  .filter(info => info !== '');
+
 
   if (userAdditionalData.length > 0) {
     dashboardHTML += `
