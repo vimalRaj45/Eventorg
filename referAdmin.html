@@ -1212,7 +1212,6 @@ async function deleteTarget(targetId) {
                     <th>Mentor Attained</th>
                     <th>Downline Count</th>
                     <th>Downline Attined Total</th>
-                    <th>Actions</th>
                 </tr>
         `;
 
@@ -1229,9 +1228,6 @@ async function deleteTarget(targetId) {
                     <td>${mentor.attained}</td>
                     <td>${mentor.downline_count}</td>
                     <td>${downlineProgress}</td>
-                    <td>
-                        <button onclick="viewMentorDownline(${mentor.user_id})">View Downline</button>
-                    </td>
                 </tr>
             `;
         });
