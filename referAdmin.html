@@ -1755,6 +1755,18 @@ function filterTargets() {
                 alert('Failed to assign students');
             }
         }
+         const user = JSON.parse(localStorage.getItem('user')) || {};
+const token = localStorage.getItem('jwtToken');
+
+if (user.role !== 'admin' || !token) {
+  document.body.innerHTML = `
+    <div style="height: 100vh; background-color: #111827; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: 'Outfit', sans-serif; text-align: center; padding: 20px;">
+      <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">🚫 Unauthorized Access</h1>
+      <p style="font-size: 1rem; color: #d1d5db;">You do not have permission to view this page.</p>
+    </div>
+  `;
+}
+
     </script>
 </body>
 </html>
