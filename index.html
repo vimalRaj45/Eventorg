@@ -1152,13 +1152,13 @@ function toggleNavMenu() {
   });
 
   window.addEventListener('resize', handleResize);
-  const user = localStorage.getItem("jwtToken");
+  const user2 = localStorage.getItem("jwtToken");
 
     const loginItem = document.getElementById("loginItem");
     const logoutItem = document.getElementById("logoutItem");
 
     if (loginItem && logoutItem) {
-      if (user) {
+      if (user2) {
         logoutItem.style.display = "block";
         loginItem.style.display = "none";
       } else {
@@ -1166,6 +1166,57 @@ function toggleNavMenu() {
         loginItem.style.display = "block";
       }
     }
+
+
+  const IDLE_LIMIT = 2 * 60 * 1000; // 2 minutes in milliseconds
+  let logoutTimer;
+
+  // Only activate if user is logged in
+  const user = localStorage.getItem("user");
+
+  if (user) {
+    console.log("👤 User found. Inactivity timer started.");
+    startInactivityTimer();
+
+    // Reset timer on any user interaction
+    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(event => {
+      window.addEventListener(event, resetInactivityTimer);
+    });
+  } else {
+    console.log("🚫 No user in localStorage. Timer not activated.");
+  }
+
+  function startInactivityTimer() {
+    clearTimeout(logoutTimer);
+    logoutTimer = setTimeout(() => {
+      console.log("⛔ Inactive for 2 minutes. Logging out...");
+      localStorage.clear();
+      location.reload(); // or redirect to "login.html"
+    }, IDLE_LIMIT);
+
+    // Optional: console countdown
+    startConsoleCountdown(IDLE_LIMIT / 1000);
+  }
+
+  function resetInactivityTimer() {
+    console.log("🔁 Activity detected. Timer reset.");
+    startInactivityTimer();
+  }
+
+  // Optional: Console countdown display
+  function startConsoleCountdown(seconds) {
+    let remaining = seconds;
+    const interval = setInterval(() => {
+      if (!logoutTimer) return clearInterval(interval); // if timer was cleared
+      if (remaining <= 0) return clearInterval(interval);
+      const min = Math.floor(remaining / 60);
+      const sec = String(remaining % 60).padStart(2, '0');
+      console.log(`⏳ Time left: ${min}:${sec}`);
+      remaining--;
+    }, 1000);
+  }
+
+
 
 </script>
     <script src="script.js"></script>
