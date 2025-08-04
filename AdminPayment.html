@@ -187,7 +187,12 @@
       </button>
     </div>
   </div>
-
+  <!-- Loading Indicator -->
+  <div class="d-flex justify-content-center align-items-center my-2">
+    <div class="spinner-border text-primary loading-spinner" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
   <!-- Filters and Search -->
   <div class="row mb-4">
     <div class="col-md-6">
@@ -212,12 +217,7 @@
     </div>
   </div>
 
-  <!-- Loading Indicator -->
-  <div class="d-flex justify-content-center align-items-center my-5" style="min-height: 200px;">
-    <div class="spinner-border text-primary loading-spinner" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-  </div>
+
 
   <!-- Table Container -->
   <div class="table-container">
@@ -549,12 +549,14 @@
         <td>
           <div class="message-actions">
             ${p.user_contact && p.user_contact !== 'N/A' ? `
-              <a href="https://wa.me/${p.user_contact}?text=${whatsappMessage}" 
-                 class="btn btn-whatsapp" 
-                 target="_blank"
-                 title="Send WhatsApp">
-                <i class="bi bi-whatsapp"></i>
-              </a>
+              <a href="https://wa.me/${p.user_contact && p.user_contact !== 'N/A' ? 
+  `${p.user_contact.startsWith('+91') ? p.user_contact.replace('+', '') : '91' + p.user_contact}` : ''}?text=${whatsappMessage}" 
+   class="btn btn-whatsapp" 
+   target="_blank"
+   title="Send WhatsApp">
+  <i class="bi bi-whatsapp"></i>
+</a>
+
               <a href="sms:${p.user_contact}?body=${smsMessage}" 
                  class="btn btn-sms" 
                  title="Send SMS">
