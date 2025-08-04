@@ -875,8 +875,14 @@ async function deleteTarget(targetId) {
 
 
 
-       async function loadDashboardData() {
+     async function loadDashboardData() {
     try {
+        // First fetch the pending approvals count
+        const approvalsResponse = await fetch(`${BASE_URL}/students`);
+        const allStudents = await approvalsResponse.json();
+        const pendingApprovalsCount = allStudents.filter(student => student.status === 'pending').length;
+
+        // Then fetch the targets data as before
         const res = await fetch(`${BASE_URL}/api/targets/admin/view-all`);
         const result = await res.json();
         const data = result.data || [];
@@ -887,7 +893,12 @@ async function deleteTarget(targetId) {
         const uniqueEvents = new Set(data.map(d => d.event_id));
         const totalAttained = data.reduce((sum, d) => sum + (d.attained || 0), 0);
 
+        // Add pending approvals to the stats cards
         const statsHTML = `
+            <div class="stat-card" onclick="showSection('approvals-section')" style="cursor: pointer;">
+                <div>Pending Approvals</div>
+                <div class="stat-value">${pendingApprovalsCount}</div>
+            </div>
             <div class="stat-card">
                 <div>Total Assigned Targets</div>
                 <div class="stat-value">${totalAssignedTargets}</div>
@@ -956,7 +967,6 @@ async function deleteTarget(targetId) {
         alert('Failed to load dashboard data');
     }
 }
-
 
         // Student management functions
         async function loadAllStudents() {
@@ -1755,7 +1765,7 @@ function filterTargets() {
                 alert('Failed to assign students');
             }
         }
-         const user = JSON.parse(localStorage.getItem('user')) || {};
+          const user = JSON.parse(localStorage.getItem('user')) || {};
 const token = localStorage.getItem('jwtToken');
 
 if (user.role !== 'admin' || !token) {
@@ -1766,7 +1776,7 @@ if (user.role !== 'admin' || !token) {
     </div>
   `;
 }
-
+  
     </script>
 </body>
 </html>
