@@ -700,17 +700,17 @@ async function sendPaymentNotReceived(participantId, userName, userContact, even
   try {
     showLoading();
     
-    // Prepare WhatsApp message
-    const whatsappMessage = encodeURIComponent(
-      `Hi ${userName},\n\n` +
-      `This is a reminder from *edwyna* regarding your payment for the event *${eventTitle}* (₹${eventFee || 0}).\n\n` +
-      `🚨 We haven't received your payment yet. Please complete the payment at your earliest convenience.\n\n` +
-      `📅 Event: ${eventTitle}\n` +
-      `💰 Amount: ₹${eventFee || 0}\n` +
-      `🧾 Transaction ID: ${transactionId || 'Not recorded yet'}\n\n` +
-      `If you've already made the payment, please share the payment details with us.\n\n` +
-      `– Team edwyna`
-    );
+   const whatsappMessage = encodeURIComponent(
+  `Hi ${userName},\n\n` +
+  `We haven't received your payment yet. Please complete the payment at your earliest convenience.\n\n` +
+  `Event: ${eventTitle}\n` +
+  `Amount: ₹${eventFee || 0}\n` +
+  `Transaction ID: ${transactionId || 'Not recorded yet'}\n\n` +
+  `If you've already made the payment, please share the payment details with us.\n\n` +
+  `Support: 6380 398 393 (click to call: +916380398393)\n\n` +
+  `– Team edwyna`
+);
+
     
     // Prepare SMS message
     const smsMessage = encodeURIComponent(
