@@ -469,7 +469,8 @@
       const tr = document.createElement('tr');
       
       // Prepare WhatsApp message
-     const whatsappMessage = encodeURIComponent(
+     // In your renderPaymentTable() function, update the message construction:
+const whatsappMessage = encodeURIComponent(
   `Hi ${p.user_name},\n\n` +
   `This is a confirmation from *edwyna* regarding your payment for the event *${p.event_title}* (₹${p.event_fee || 0}):\n\n` +
   `${p.payment_verified 
@@ -480,7 +481,7 @@
   `💰 Amount: ₹${p.event_fee || 0}\n\n` +
   `🔗 *The event link is now enabled in your event section on our website.*\n\n` +
   `– Team edwyna`
-);
+).replace(/'/g, "%27").replace(/"/g, "%22");
 
       
       // Prepare SMS message
@@ -524,29 +525,28 @@
         </td>
         <td>${p.verified_at ? formatDateTime(p.verified_at) : '-'}</td>
         <td>${formatDateTime(p.registered_at)}</td>
-        <td>
-          <div class="message-actions">
-            ${p.user_contact && p.user_contact !== 'N/A' ? `
-             <a href="https://wa.me/${p.user_contact.startsWith('+') ? p.user_contact : p.user_contact.startsWith('91') ? p.user_contact : '91' + p.user_contact.replace(/\D/g, '')}?text=${whatsappMessage}" 
-         class="btn btn-whatsapp" 
-         target="_blank"
-         title="Send WhatsApp">
-        <i class="bi bi-whatsapp"></i>
-      </a>
-              <a href="sms:${p.user_contact}?body=${smsMessage}" 
-                 class="btn btn-sms" 
-                 title="Send SMS">
-                <i class="bi bi-chat-text"></i>
-              </a>
-              <a href="tel:${p.user_contact}" 
-                 class="btn btn-call" 
-                 title="Call">
-                <i class="bi bi-telephone"></i>
-              </a>
-            ` : '<span class="text-muted">No contact</span>'}
-          </div>
-        </td>
-        <td>
+         <td>
+    <div class="message-actions">
+      ${p.user_contact && p.user_contact !== 'N/A' ? `
+<a href="https://api.whatsapp.com/send?phone=${p.user_contact.startsWith('+') ? p.user_contact : p.user_contact.startsWith('91') ? p.user_contact : '91' + p.user_contact.replace(/\D/g, '')}&text=${whatsappMessage}" 
+   class="btn btn-whatsapp" 
+   target="_blank"
+   title="Send WhatsApp">
+  <i class="bi bi-whatsapp"></i>
+</a>
+        <a href="sms:${p.user_contact}?body=${smsMessage}" 
+           class="btn btn-sms" 
+           title="Send SMS">
+          <i class="bi bi-chat-text"></i>
+        </a>
+        <a href="tel:${p.user_contact}" 
+           class="btn btn-call" 
+           title="Call">
+          <i class="bi bi-telephone"></i>
+        </a>
+      ` : '<span class="text-muted">No contact</span>'}
+    </div>
+  </td>
           <button class="btn btn-sm ${p.payment_verified ? 'btn-outline-danger' : 'btn-outline-success'} btn-verify"
             onclick="showConfirmationModal(${p.participant_id}, ${!p.payment_verified})">
             ${p.payment_verified ? '<i class="bi bi-x-lg me-1"></i> Unverify' : '<i class="bi bi-check-lg me-1"></i> Verify'}
