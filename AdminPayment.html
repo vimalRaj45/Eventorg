@@ -527,12 +527,12 @@
         <td>
           <div class="message-actions">
             ${p.user_contact && p.user_contact !== 'N/A' ? `
-              <a href="https://wa.me/${p.user_contact}?text=${whatsappMessage}" 
-                 class="btn btn-whatsapp" 
-                 target="_blank"
-                 title="Send WhatsApp">
-                <i class="bi bi-whatsapp"></i>
-              </a>
+             <a href="https://wa.me/${p.user_contact.startsWith('+') ? p.user_contact : p.user_contact.startsWith('91') ? p.user_contact : '91' + p.user_contact.replace(/\D/g, '')}?text=${whatsappMessage}" 
+         class="btn btn-whatsapp" 
+         target="_blank"
+         title="Send WhatsApp">
+        <i class="bi bi-whatsapp"></i>
+      </a>
               <a href="sms:${p.user_contact}?body=${smsMessage}" 
                  class="btn btn-sms" 
                  title="Send SMS">
