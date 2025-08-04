@@ -171,6 +171,15 @@
         padding: 1rem;
       }
     }
+    .btn-unverify {
+  min-width: 100px;
+  transition: all 0.2s ease;
+}
+
+.btn-unverify:hover {
+  transform: translateY(-1px);
+  background-color: #fff3cd;
+}
   </style>
 </head>
 <body>
@@ -571,11 +580,28 @@
           </div>
         </td>
         <td>
-          <button class="btn btn-sm ${p.payment_verified ? 'btn-outline-danger' : 'btn-outline-success'} btn-verify"
-            onclick="showConfirmationModal(${p.participant_id}, ${!p.payment_verified})">
-            ${p.payment_verified ? '<i class="bi bi-x-lg me-1"></i> Unverify' : '<i class="bi bi-check-lg me-1"></i> Verify'}
-          </button>
+${!p.payment_verified ? `
+  <button class="btn btn-sm btn-outline-success btn-verify"
+    onclick="showConfirmationModal(${p.participant_id}, true)">
+    <i class="bi bi-check-lg me-1"></i> Verify
+  </button>
+` : ''}
+
         </td>
+        <td>
+  <div class="d-flex gap-2">
+    <button class="btn btn-sm ${p.payment_verified ? 'btn-outline-danger' : 'btn-outline-success'} btn-verify"
+      onclick="showConfirmationModal(${p.participant_id}, ${!p.payment_verified})">
+      ${p.payment_verified ? '<i class="bi bi-x-lg me-1"></i> Unverify' : '<i class="bi bi-check-lg me-1"></i> Verify'}
+    </button>
+    ${!p.payment_verified ? `
+      <button class="btn btn-sm btn-outline-warning btn-unverify"
+        onclick="sendPaymentNotReceived(${p.participant_id}, '${p.user_name}', '${p.user_contact || ''}', '${p.event_title}', ${p.event_fee || 0}, '${p.transaction_id || ''}')">
+        <i class="bi bi-exclamation-triangle me-1"></i> Not Received
+      </button>
+    ` : ''}
+  </div>
+</td>
       `;
       elements.tableBody.appendChild(tr);
     });
@@ -672,6 +698,53 @@
     document.getElementById('modalBody').textContent = modalBody;
     elements.confirmationModal.show();
   }
+
+  // Send payment not received message
+async function sendPaymentNotReceived(participantId, userName, userContact, eventTitle, eventFee, transactionId) {
+  if (!userContact || userContact === 'N/A') {
+    showError('No contact number available for this participant');
+    return;
+  }
+
+  try {
+    showLoading();
+    
+    // Prepare WhatsApp message
+    const whatsappMessage = encodeURIComponent(
+      `Hi ${userName},\n\n` +
+      `This is a reminder from *edwyna* regarding your payment for the event *${eventTitle}* (₹${eventFee || 0}).\n\n` +
+      `🚨 We haven't received your payment yet. Please complete the payment at your earliest convenience.\n\n` +
+      `📅 Event: ${eventTitle}\n` +
+      `💰 Amount: ₹${eventFee || 0}\n` +
+      `🧾 Transaction ID: ${transactionId || 'Not recorded yet'}\n\n` +
+      `If you've already made the payment, please share the payment details with us.\n\n` +
+      `– Team edwyna`
+    );
+    
+    // Prepare SMS message
+    const smsMessage = encodeURIComponent(
+      `Reminder: Payment not received for ${eventTitle} | Amt: ₹${eventFee || 0}. ` +
+      `Please complete payment or share details if already paid. – edwyna`
+    );
+    
+    // Open WhatsApp in new tab
+    const whatsappUrl = `https://wa.me/${userContact.startsWith('+91') ? 
+      userContact.replace('+', '') : '91' + userContact}?text=${whatsappMessage}`;
+    window.open(whatsappUrl, '_blank');
+    
+    // Also provide SMS option
+    if (confirm('WhatsApp opened. Would you also like to send an SMS?')) {
+      window.location.href = `sms:${userContact}?body=${smsMessage}`;
+    }
+    
+    showSuccess('Payment reminder initiated');
+  } catch (error) {
+    console.error('Error sending payment reminder:', error);
+    showError('Failed to initiate payment reminder');
+  } finally {
+    hideLoading();
+  }
+}
 
   // Confirm toggle payment
   async function confirmTogglePayment() {
