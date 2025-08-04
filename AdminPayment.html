@@ -1,15 +1,21 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Admin Payment Verification</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Bootstrap + Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Preconnect to CDNs -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <!-- Preload critical resources -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  </noscript>
   <style>
     :root {
       --primary-color: rgba(94, 10, 0, 1);
@@ -213,14 +219,12 @@
     </div>
   </div>
 
- 
- <!-- Loading Indicator -->
-<div class="d-flex justify-content-center align-items-center my-5" style="min-height: 200px;">
-  <div class="spinner-border text-primary loading-spinner" role="status">
-    <span class="visually-hidden">Loading...</span>
+  <!-- Loading Indicator -->
+  <div class="d-flex justify-content-center align-items-center my-5" style="min-height: 200px;">
+    <div class="spinner-border text-primary loading-spinner" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
-</div>
-
 
   <!-- Table Container -->
   <div class="table-container">
@@ -288,38 +292,52 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Load scripts with defer -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 <script>
-  const API_BASE_URL = 'https://eventdb.onrender.com/api';
-  const BASE = 'https://eventdb.onrender.com';
-  const adminToken = localStorage.getItem('jwtToken');
-  let allPayments = [];
-  let currentPage = 1;
-  const itemsPerPage = 10;
-  let currentFilter = 'all';
-  let currentSearch = '';
-  let currentParticipantId = null;
-  let currentNewStatus = null;
+  // Immediately invoked function to set up constants
+  (function() {
+    window.API_BASE_URL = 'https://eventdb.onrender.com/api';
+    window.BASE = 'https://eventdb.onrender.com';
+    window.adminToken = localStorage.getItem('jwtToken');
+    window.allPayments = [];
+    window.currentPage = 1;
+    window.itemsPerPage = 10;
+    window.currentFilter = 'all';
+    window.currentSearch = '';
+    window.currentParticipantId = null;
+    window.currentNewStatus = null;
+  })();
 
-  // DOM Elements
-  const elements = {
-    tableBody: document.getElementById('payment-table-body'),
-    loadingSpinner: document.querySelector('.loading-spinner'),
-    emptyState: document.getElementById('emptyState'),
-    searchInput: document.getElementById('searchInput'),
-    clearSearch: document.getElementById('clearSearch'),
-    filterButtons: document.querySelectorAll('.filter-btn'),
-    pagination: document.getElementById('pagination'),
-    darkModeToggle: document.getElementById('darkModeToggle'),
-    confirmationModal: new bootstrap.Modal(document.getElementById('confirmationModal')),
-    confirmAction: document.getElementById('confirmAction')
+  // Cache DOM elements
+  const cacheDOM = () => {
+    return {
+      tableBody: document.getElementById('payment-table-body'),
+      loadingSpinner: document.querySelector('.loading-spinner'),
+      emptyState: document.getElementById('emptyState'),
+      searchInput: document.getElementById('searchInput'),
+      clearSearch: document.getElementById('clearSearch'),
+      filterButtons: document.querySelectorAll('.filter-btn'),
+      pagination: document.getElementById('pagination'),
+      darkModeToggle: document.getElementById('darkModeToggle'),
+      confirmationModal: new bootstrap.Modal(document.getElementById('confirmationModal')),
+      confirmAction: document.getElementById('confirmAction')
+    };
   };
 
-  // Initialize the page
+  // Initialize the page when DOM is loaded
   document.addEventListener('DOMContentLoaded', () => {
+    const elements = cacheDOM();
+    
     checkAuth();
-    loadPayments();
-    setupEventListeners();
+    setupEventListeners(elements);
+    loadPayments(elements);
+    
+    // Check for saved dark mode preference
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      document.body.classList.add('dark-mode');
+      elements.darkModeToggle.innerHTML = '<i class="bi bi-sun-fill"></i>';
+    }
   });
 
   // Check authentication
@@ -330,18 +348,19 @@
   }
 
   // Setup event listeners
-  function setupEventListeners() {
-    elements.searchInput.addEventListener('input', (e) => {
+  function setupEventListeners(elements) {
+    // Debounce search input
+    elements.searchInput.addEventListener('input', debounce((e) => {
       currentSearch = e.target.value.toLowerCase();
       currentPage = 1;
-      renderPaymentTable();
-    });
+      renderPaymentTable(elements);
+    }, 300));
 
     elements.clearSearch.addEventListener('click', () => {
       elements.searchInput.value = '';
       currentSearch = '';
       currentPage = 1;
-      renderPaymentTable();
+      renderPaymentTable(elements);
     });
 
     elements.filterButtons.forEach(btn => {
@@ -350,18 +369,22 @@
         btn.classList.add('active');
         currentFilter = btn.dataset.filter;
         currentPage = 1;
-        renderPaymentTable();
+        renderPaymentTable(elements);
       });
     });
 
     elements.darkModeToggle.addEventListener('click', toggleDarkMode);
-    elements.confirmAction.addEventListener('click', confirmTogglePayment);
-    
-    // Check for saved dark mode preference
-    if (localStorage.getItem('darkMode') === 'enabled') {
-      document.body.classList.add('dark-mode');
-      elements.darkModeToggle.innerHTML = '<i class="bi bi-sun-fill"></i>';
-    }
+    elements.confirmAction.addEventListener('click', () => confirmTogglePayment(elements));
+  }
+
+  // Debounce function for search input
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      const context = this;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
   }
 
   // Toggle dark mode
@@ -369,59 +392,57 @@
     document.body.classList.toggle('dark-mode');
     if (document.body.classList.contains('dark-mode')) {
       localStorage.setItem('darkMode', 'enabled');
-      elements.darkModeToggle.innerHTML = '<i class="bi bi-sun-fill"></i>';
+      document.getElementById('darkModeToggle').innerHTML = '<i class="bi bi-sun-fill"></i>';
     } else {
       localStorage.setItem('darkMode', 'disabled');
-      elements.darkModeToggle.innerHTML = '<i class="bi bi-moon-fill"></i>';
+      document.getElementById('darkModeToggle').innerHTML = '<i class="bi bi-moon-fill"></i>';
     }
   }
 
-  // Load all payments
-  async function loadPayments() {
+  // Load all payments with optimized fetching
+  async function loadPayments(elements) {
     try {
-      showLoading();
+      showLoading(elements);
       
-      const response = await fetch(`${API_BASE_URL}/payments`, {
-        headers: { Authorization: `Bearer ${adminToken}` }
+      // Use Promise.all to fetch payments and user details in parallel
+      const [paymentsResponse, usersResponse] = await Promise.all([
+        fetch(`${API_BASE_URL}/payments`, {
+          headers: { Authorization: `Bearer ${adminToken}` }
+        }),
+        fetch(`${BASE}/api/users`, {
+          headers: { Authorization: `Bearer ${adminToken}` }
+        })
+      ]);
+      
+      if (!paymentsResponse.ok) throw new Error('Failed to fetch payments');
+      if (!usersResponse.ok) throw new Error('Failed to fetch users');
+      
+      const [paymentsData, usersData] = await Promise.all([
+        paymentsResponse.json(),
+        usersResponse.json()
+      ]);
+      
+      // Create a map of user details for quick lookup
+      const usersMap = new Map();
+      (usersData.users || []).forEach(user => {
+        usersMap.set(user.user_id, user);
       });
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch payments');
-      }
+      // Merge payment data with user details
+      allPayments = (paymentsData.payments || []).map(payment => {
+        const user = usersMap.get(payment.user_id) || {};
+        return {
+          ...payment,
+          user_contact: user.contact_no || 'N/A'
+        };
+      });
       
-      const data = await response.json();
-      allPayments = data.payments || [];
-      
-      console.log('Payments loaded:', allPayments);
-      // Fetch user details for each payment to get contact numbers
-      const paymentsWithContacts = await Promise.all(allPayments.map(async payment => {
-        try {
-          const userRes = await fetch(`${BASE}/api/users/${payment.user_id}`, {
-            headers: { Authorization: `Bearer ${adminToken}` }
-          });
-          
-          if (userRes.ok) {
-            const userData = await userRes.json();
-            return {
-              ...payment,
-              user_contact: userData.contact_no || 'N/A'
-            };
-          }
-          return payment;
-        } catch (error) {
-          console.error(`Failed to fetch user details for user ${payment.user_id}:`, error);
-          return payment;
-        }
-      }));
-      
-      allPayments = paymentsWithContacts;
-      console.log('Payments loaded:', allPayments);
-      renderPaymentTable();
+      renderPaymentTable(elements);
     } catch (error) {
       console.error('Failed to load payments:', error);
       showError('Unable to load payment records. Please try again later.');
     } finally {
-      hideLoading();
+      hideLoading(elements);
     }
   }
 
@@ -438,54 +459,57 @@
     
     // Apply search filter
     if (currentSearch) {
+      const searchTerm = currentSearch.toLowerCase();
       filtered = filtered.filter(p => 
-        p.user_name.toLowerCase().includes(currentSearch) ||
-        p.user_email.toLowerCase().includes(currentSearch) ||
-        p.event_title.toLowerCase().includes(currentSearch) ||
-        (p.transaction_id && p.transaction_id.toLowerCase().includes(currentSearch)) ||
-        (p.user_contact && p.user_contact.toLowerCase().includes(currentSearch))
+        p.user_name.toLowerCase().includes(searchTerm) ||
+        p.user_email.toLowerCase().includes(searchTerm) ||
+        p.event_title.toLowerCase().includes(searchTerm) ||
+        (p.transaction_id && p.transaction_id.toLowerCase().includes(searchTerm)) ||
+        (p.user_contact && p.user_contact.toLowerCase().includes(searchTerm))
       );
     }
     
     return filtered;
   }
 
-  // Add this function to your script section
-function formatPhoneNumber(contact) {
-  if (!contact || contact === 'N/A') return null;
-  
-  // Remove any non-digit characters
-  const cleaned = contact.replace(/\D/g, '');
-  
-  // If it starts with 91 and is 12 digits, add +
-  if (cleaned.length === 12 && cleaned.startsWith('91')) {
-    return `+${cleaned}`;
+  // Format phone number
+  function formatPhoneNumber(contact) {
+    if (!contact || contact === 'N/A') return null;
+    
+    // Remove any non-digit characters
+    const cleaned = contact.replace(/\D/g, '');
+    
+    // If it starts with 91 and is 12 digits, add +
+    if (cleaned.length === 12 && cleaned.startsWith('91')) {
+      return `+${cleaned}`;
+    }
+    
+    // If it's 10 digits, add +91
+    if (cleaned.length === 10) {
+      return `+91${cleaned}`;
+    }
+    
+    // If it's 11 digits and starts with 0, replace 0 with +91
+    if (cleaned.length === 11 && cleaned.startsWith('0')) {
+      return `+91${cleaned.substring(1)}`;
+    }
+    
+    // Otherwise return as is (might already have country code)
+    return cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
   }
-  
-  // If it's 10 digits, add +91
-  if (cleaned.length === 10) {
-    return `+91${cleaned}`;
-  }
-  
-  // If it's 11 digits and starts with 0, replace 0 with +91
-  if (cleaned.length === 11 && cleaned.startsWith('0')) {
-    return `+91${cleaned.substring(1)}`;
-  }
-  
-  // Otherwise return as is (might already have country code)
-  return cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
-}
 
-  // Render table with filtered and paginated data
-  function renderPaymentTable() {
+  // Render table with optimized DOM manipulation
+  function renderPaymentTable(elements) {
     const filteredPayments = getFilteredPayments();
     const paginatedPayments = paginateData(filteredPayments);
     
-    elements.tableBody.innerHTML = '';
+    // Use document fragment for batch DOM updates
+    const fragment = document.createDocumentFragment();
     
     if (paginatedPayments.length === 0) {
       elements.emptyState.style.display = 'block';
-      renderPagination(filteredPayments.length);
+      elements.tableBody.innerHTML = '';
+      renderPagination(filteredPayments.length, elements);
       return;
     }
     
@@ -494,95 +518,115 @@ function formatPhoneNumber(contact) {
     paginatedPayments.forEach((p, i) => {
       const tr = document.createElement('tr');
       
-      // Prepare WhatsApp message
-     const whatsappMessage = encodeURIComponent(
-  `Hi ${p.user_name},\n\n` +
-  `This is a confirmation from *edwyna* regarding your payment for the event *${p.event_title}* (₹${p.event_fee || 0}):\n\n` +
-  `${p.payment_verified 
-    ? '✅ Your payment has been successfully verified. Thank you for your participation!' 
-    : '⏳ We are currently processing your payment. Please feel free to contact us if you have any questions.'}\n\n` +
-  `🧾 Transaction ID: ${p.transaction_id || 'N/A'}\n` +
-  `📅 Event: ${p.event_title}\n` +
-  `💰 Amount: ₹${p.event_fee || 0}\n\n` +
-  `🔗 *The event link is now enabled in your event section on our website.*\n\n` +
-  `– Team edwyna`
-);
-
+      // Prepare messages
+      const whatsappMessage = getWhatsappMessage(p);
+      const smsMessage = getSMSMessage(p);
       
-      // Prepare SMS message
-      const smsMessage = encodeURIComponent(
-  `${p.payment_verified ? '✅ Payment verified' : '⏳ Payment processing'} for ${p.event_title} | ` +
-  `Txn ID: ${p.transaction_id || 'N/A'}, Amt: ₹${p.event_fee || 0}. ` +
-  `Event link is enabled in your event section on our website. – edwyna`
-);
-
-      
-      tr.innerHTML = `
-        <td>${(currentPage - 1) * itemsPerPage + i + 1}</td>
-        <td>
-          <div class="d-flex align-items-center">
-            <div class="flex-shrink-0 me-2">
-              <i class="bi bi-person-circle" style="font-size: 1.25rem;"></i>
-            </div>
-            <div class="flex-grow-1">
-              ${p.user_name}
-            </div>
-          </div>
-        </td>
-        <td><a href="mailto:${p.user_email}">${p.user_email}</a></td>
-        <td>${p.user_contact || 'N/A'}</td>
-        <td>${p.event_title}</td>
-        <td class="fw-bold">₹${p.event_fee || 0}</td>
-        <td>
-          ${p.transaction_id 
-            ? `<span class="badge bg-light text-dark font-monospace">${p.transaction_id}</span>` 
-            : '-'}
-        </td>
-         <td>
-          ${p.referral_code
-            ? `<span class="badge bg-light text-dark font-monospace">${p.referral_code}</span>` 
-            : '-'}
-        </td>
-        <td>
-          ${p.payment_verified 
-            ? '<span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i> Verified</span>'
-            : '<span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i> Pending</span>'}
-        </td>
-        <td>${p.verified_at ? formatDateTime(p.verified_at) : '-'}</td>
-        <td>${formatDateTime(p.registered_at)}</td>
-        <td>
-          <div class="message-actions">
-            ${p.user_contact && p.user_contact !== 'N/A' ? `
-              <a href="https://wa.me/${formatPhoneNumber(p.user_contact)}?text=${whatsappMessage}" 
-     class="btn btn-whatsapp" 
-     target="_blank"
-     title="Send WhatsApp">
-    <i class="bi bi-whatsapp"></i>
-  </a>
-              <a href="sms:${p.user_contact}?body=${smsMessage}" 
-                 class="btn btn-sms" 
-                 title="Send SMS">
-                <i class="bi bi-chat-text"></i>
-              </a>
-              <a href="tel:${p.user_contact}" 
-                 class="btn btn-call" 
-                 title="Call">
-                <i class="bi bi-telephone"></i>
-              </a>
-            ` : '<span class="text-muted">No contact</span>'}
-          </div>
-        </td>
-        <td>
-          <button class="btn btn-sm ${p.payment_verified ? 'btn-outline-danger' : 'btn-outline-success'} btn-verify"
-            onclick="showConfirmationModal(${p.participant_id}, ${!p.payment_verified})">
-            ${p.payment_verified ? '<i class="bi bi-x-lg me-1"></i> Unverify' : '<i class="bi bi-check-lg me-1"></i> Verify'}
-          </button>
-        </td>
-      `;
-      elements.tableBody.appendChild(tr);
+      tr.innerHTML = getTableRowHTML(p, i, whatsappMessage, smsMessage);
+      fragment.appendChild(tr);
     });
     
-    renderPagination(filteredPayments.length);
+    // Batch update the DOM
+    elements.tableBody.innerHTML = '';
+    elements.tableBody.appendChild(fragment);
+    
+    renderPagination(filteredPayments.length, elements);
+  }
+
+  // Get WhatsApp message template
+  function getWhatsappMessage(p) {
+    return encodeURIComponent(
+      `Hi ${p.user_name},\n\n` +
+      `This is a confirmation from *edwyna* regarding your payment for the event *${p.event_title}* (₹${p.event_fee || 0}):\n\n` +
+      `${p.payment_verified 
+        ? '✅ Your payment has been successfully verified. Thank you for your participation!' 
+        : '⏳ We are currently processing your payment. Please feel free to contact us if you have any questions.'}\n\n` +
+      `🧾 Transaction ID: ${p.transaction_id || 'N/A'}\n` +
+      `📅 Event: ${p.event_title}\n` +
+      `💰 Amount: ₹${p.event_fee || 0}\n\n` +
+      `🔗 *The event link is now enabled in your event section on our website.*\n\n` +
+      `– Team edwyna`
+    );
+  }
+
+  // Get SMS message template
+  function getSMSMessage(p) {
+    return encodeURIComponent(
+      `${p.payment_verified ? '✅ Payment verified' : '⏳ Payment processing'} for ${p.event_title} | ` +
+      `Txn ID: ${p.transaction_id || 'N/A'}, Amt: ₹${p.event_fee || 0}. ` +
+      `Event link is enabled in your event section on our website. – edwyna`
+    );
+  }
+
+  // Get table row HTML
+  function getTableRowHTML(p, index, whatsappMessage, smsMessage) {
+    const rowNumber = (currentPage - 1) * itemsPerPage + index + 1;
+    const formattedContact = p.user_contact || 'N/A';
+    const hasContact = formattedContact !== 'N/A';
+    const phoneNumber = hasContact ? formatPhoneNumber(formattedContact) : null;
+    
+    return `
+      <td>${rowNumber}</td>
+      <td>
+        <div class="d-flex align-items-center">
+          <div class="flex-shrink-0 me-2">
+            <i class="bi bi-person-circle" style="font-size: 1.25rem;"></i>
+          </div>
+          <div class="flex-grow-1">
+            ${p.user_name}
+          </div>
+        </div>
+      </td>
+      <td><a href="mailto:${p.user_email}">${p.user_email}</a></td>
+      <td>${formattedContact}</td>
+      <td>${p.event_title}</td>
+      <td class="fw-bold">₹${p.event_fee || 0}</td>
+      <td>
+        ${p.transaction_id 
+          ? `<span class="badge bg-light text-dark font-monospace">${p.transaction_id}</span>` 
+          : '-'}
+      </td>
+      <td>
+        ${p.referral_code
+          ? `<span class="badge bg-light text-dark font-monospace">${p.referral_code}</span>` 
+          : '-'}
+      </td>
+      <td>
+        ${p.payment_verified 
+          ? '<span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i> Verified</span>'
+          : '<span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i> Pending</span>'}
+      </td>
+      <td>${p.verified_at ? formatDateTime(p.verified_at) : '-'}</td>
+      <td>${formatDateTime(p.registered_at)}</td>
+      <td>
+        <div class="message-actions">
+          ${hasContact ? `
+            <a href="https://wa.me/${phoneNumber}?text=${whatsappMessage}" 
+               class="btn btn-whatsapp" 
+               target="_blank"
+               title="Send WhatsApp">
+              <i class="bi bi-whatsapp"></i>
+            </a>
+            <a href="sms:${formattedContact}?body=${smsMessage}" 
+               class="btn btn-sms" 
+               title="Send SMS">
+              <i class="bi bi-chat-text"></i>
+            </a>
+            <a href="tel:${formattedContact}" 
+               class="btn btn-call" 
+               title="Call">
+              <i class="bi bi-telephone"></i>
+            </a>
+          ` : '<span class="text-muted">No contact</span>'}
+        </div>
+      </td>
+      <td>
+        <button class="btn btn-sm ${p.payment_verified ? 'btn-outline-danger' : 'btn-outline-success'} btn-verify"
+          onclick="showConfirmationModal(${p.participant_id}, ${!p.payment_verified})">
+          ${p.payment_verified ? '<i class="bi bi-x-lg me-1"></i> Unverify' : '<i class="bi bi-check-lg me-1"></i> Verify'}
+        </button>
+      </td>
+    `;
   }
 
   // Paginate data
@@ -591,51 +635,64 @@ function formatPhoneNumber(contact) {
     return data.slice(startIndex, startIndex + itemsPerPage);
   }
 
-  // Render pagination
-  function renderPagination(totalItems) {
+  // Render pagination with optimized DOM updates
+  function renderPagination(totalItems, elements) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-    elements.pagination.innerHTML = '';
+    const pagination = elements.pagination;
     
-    if (totalPages <= 1) return;
+    if (totalPages <= 1) {
+      pagination.innerHTML = '';
+      return;
+    }
+    
+    // Use document fragment for batch DOM updates
+    const fragment = document.createDocumentFragment();
     
     // Previous button
-    elements.pagination.innerHTML += `
-      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Previous" onclick="changePage(${currentPage - 1})">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `
+      <a class="page-link" href="#" aria-label="Previous" onclick="changePage(${currentPage - 1})">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
     `;
+    fragment.appendChild(prevLi);
     
     // Page numbers
     for (let i = 1; i <= totalPages; i++) {
-      elements.pagination.innerHTML += `
-        <li class="page-item ${i === currentPage ? 'active' : ''}">
-          <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
-        </li>
-      `;
+      const pageLi = document.createElement('li');
+      pageLi.className = `page-item ${i === currentPage ? 'active' : ''}`;
+      pageLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+      fragment.appendChild(pageLi);
     }
     
     // Next button
-    elements.pagination.innerHTML += `
-      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Next" onclick="changePage(${currentPage + 1})">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextLi.innerHTML = `
+      <a class="page-link" href="#" aria-label="Next" onclick="changePage(${currentPage + 1})">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
     `;
+    fragment.appendChild(nextLi);
+    
+    // Batch update the DOM
+    pagination.innerHTML = '';
+    pagination.appendChild(fragment);
   }
 
   // Change page
   function changePage(page) {
+    const elements = cacheDOM();
     if (page < 1 || page > Math.ceil(getFilteredPayments().length / itemsPerPage)) return;
     currentPage = page;
-    renderPaymentTable();
+    renderPaymentTable(elements);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // Show confirmation modal
   function showConfirmationModal(participantId, newStatus) {
+    const elements = cacheDOM();
     currentParticipantId = participantId;
     currentNewStatus = newStatus;
     
@@ -649,73 +706,72 @@ function formatPhoneNumber(contact) {
     elements.confirmationModal.show();
   }
 
-  
- // Confirm toggle payment
-async function confirmTogglePayment() {
-  elements.confirmationModal.hide();
-  try {
-    showLoading();
-    
-    // Find the payment in our local data to check for referral code
-    const payment = allPayments.find(p => p.participant_id === currentParticipantId);
-    
-    const res = await fetch(`${API_BASE_URL}/participants/${currentParticipantId}/payment`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${adminToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ payment_verified: currentNewStatus })
-    });
+  // Confirm toggle payment
+  async function confirmTogglePayment(elements) {
+    elements.confirmationModal.hide();
+    try {
+      showLoading(elements);
+      
+      // Find the payment in our local data to check for referral code
+      const payment = allPayments.find(p => p.participant_id === currentParticipantId);
+      
+      const res = await fetch(`${API_BASE_URL}/participants/${currentParticipantId}/payment`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ payment_verified: currentNewStatus })
+      });
 
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || 'Update failed');
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Update failed');
+      }
+
+      // Update local data instead of reloading everything
+      const paymentIndex = allPayments.findIndex(p => p.participant_id === currentParticipantId);
+      if (paymentIndex !== -1) {
+        allPayments[paymentIndex].payment_verified = currentNewStatus;
+        allPayments[paymentIndex].verified_at = currentNewStatus ? new Date().toISOString() : null;
+      }
+      
+      // If we're verifying (not unverifying) and there's a referral code
+      if (currentNewStatus && payment?.referral_code && payment?.event_id) {
+        try {
+          const incrementRes = await fetch(`${BASE}/api/targets/increment-by-referral`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              used_referral_code: payment.referral_code,
+              event_id: payment.event_id
+            })
+          });
+
+          const result = await incrementRes.json();
+
+          if (!incrementRes.ok) {
+            console.warn('Referral progress increment failed:', result.error || 'Unknown error');
+          } else {
+            console.log('Referral progress incremented:', result.data);
+          }
+        } catch (err) {
+          console.error('Error incrementing referral progress:', err.message);
+          // Don't block the rest of the operation
+        }
+      }
+      
+      renderPaymentTable(elements);
+      showSuccess(`Payment ${currentNewStatus ? 'verified' : 'unverified'} successfully!`);
+    } catch (err) {
+      console.error('Update failed:', err.message);
+      showError('Failed to update payment status. Please try again.');
+    } finally {
+      hideLoading(elements);
     }
-
-    // Update local data instead of reloading everything
-    const paymentIndex = allPayments.findIndex(p => p.participant_id === currentParticipantId);
-    if (paymentIndex !== -1) {
-      allPayments[paymentIndex].payment_verified = currentNewStatus;
-      allPayments[paymentIndex].verified_at = currentNewStatus ? new Date().toISOString() : null;
-    }
-    
-    // If we're verifying (not unverifying) and there's a referral code
-   if (currentNewStatus && payment?.referral_code && payment?.event_id) {
-  try {
-    const incrementRes = await fetch(`${BASE}/api/targets/increment-by-referral`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        used_referral_code: payment.referral_code,
-        event_id: payment.event_id
-      })
-    });
-
-    const result = await incrementRes.json();
-
-    if (!incrementRes.ok) {
-      console.warn('Referral progress increment failed:', result.error || 'Unknown error');
-    } else {
-      console.log('Referral progress incremented:', result.data);
-    }
-  } catch (err) {
-    console.error('Error incrementing referral progress:', err.message);
-    // Don't block the rest of the operation
   }
-}
-    
-    renderPaymentTable();
-    showSuccess(`Payment ${currentNewStatus ? 'verified' : 'unverified'} successfully!`);
-  } catch (err) {
-    console.error('Update failed:', err.message);
-    showError('Failed to update payment status. Please try again.');
-  } finally {
-    hideLoading();
-  }
-}
 
   // Format date time
   function formatDateTime(dateString) {
@@ -724,14 +780,14 @@ async function confirmTogglePayment() {
   }
 
   // Show loading spinner
-  function showLoading() {
+  function showLoading(elements) {
     elements.loadingSpinner.style.display = 'block';
     elements.tableBody.innerHTML = '';
     elements.emptyState.style.display = 'none';
   }
 
   // Hide loading spinner
-  function hideLoading() {
+  function hideLoading(elements) {
     elements.loadingSpinner.style.display = 'none';
   }
 
