@@ -492,12 +492,14 @@
         throw new Error(error.message || 'Update failed');
       }
 
+      // Update the local data
       const paymentIndex = allPayments.findIndex(p => p.participant_id === currentParticipantId);
       if (paymentIndex !== -1) {
         allPayments[paymentIndex].payment_verified = currentNewStatus;
         allPayments[paymentIndex].verified_at = currentNewStatus ? new Date().toISOString() : null;
       }
       
+      // Only increment referral count when verifying (not when unverifying)
       if (currentNewStatus && payment?.referral_code && payment?.event_id) {
         try {
           const incrementRes = await fetch(`${BASE}/api/targets/increment-by-referral`, {
