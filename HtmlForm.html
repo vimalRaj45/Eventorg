@@ -714,6 +714,7 @@ async function loadQuiz() {
 
   function showQuizInstructions(questions) {
     violationTrackingActive = true; // Activate violation tracking
+   
     Swal.fire({
       title: 'Quiz Instructions',
       html: `
@@ -768,6 +769,7 @@ async function loadQuiz() {
       // remove email prompt
       form.innerHTML = "";
       buildQuiz(questions);
+     quizStartTime = new Date(); // Record exact start time
       let currentQuestionIndex = 0;
 const questionCards = document.querySelectorAll('.question-card');
 
@@ -861,7 +863,6 @@ questionCards.forEach((card, i) => {
 
   function buildQuiz(questions) {
   // Show mobile submit button if on small screen
-  quizStartTime = new Date(); // Record exact start time
   if (window.innerWidth <= 576) {
     mobileSubmitBtn.style.display = "flex";
     mobileSubmitBtn.addEventListener("click", () => {
