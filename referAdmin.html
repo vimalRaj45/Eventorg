@@ -1082,7 +1082,8 @@ async function deleteTarget(targetId) {
       <p><strong>Role:</strong> ${getRoleBadge(student.role)}</p>
       <p><strong>Referral Code:</strong> ${student.referral_code || 'N/A'}</p>
       <p><strong>Referrer:</strong> ${student.referrer?.first_name || 'N/A'} ${student.referrer?.last_name || ''}</p>
-
+      <p><strong>Payment Method : </strong>${student.payment_method || 'N/A'}</p>
+      <p><strong>Payment Number:</strong> ${student.payment_number || 'N/A'}</p>
       <h4>Uploaded Images</h4>
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
         ${student.clg_id_photo_url ? `<div><p><strong>College ID:</strong></p><img src="${student.clg_id_photo_url}" style="max-width: 150px;"></div>` : ''}
@@ -1765,7 +1766,7 @@ function filterTargets() {
                 alert('Failed to assign students');
             }
         }
-          const user = JSON.parse(localStorage.getItem('user')) || {};
+         const user = JSON.parse(localStorage.getItem('user')) || {};
 const token = localStorage.getItem('jwtToken');
 
 if (user.role !== 'admin' || !token) {
@@ -1776,6 +1777,7 @@ if (user.role !== 'admin' || !token) {
     </div>
   `;
 }
+  
   
     </script>
 </body>
