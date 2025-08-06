@@ -1028,6 +1028,7 @@ function printUserData(dataArray) {
                     </td>
                 </tr>
             `).join('') || '<tr><td colspan="3" class="text-center">No participations</td></tr>';
+            console.log('Participations:', event);
               // ✅ Set participation count using verified endpoint
     fetch(`https://event-db.vercel.app/api/events/${event.id}/verified`)
         .then(res => res.json())
