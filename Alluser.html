@@ -987,7 +987,8 @@ function printUserData(dataArray) {
         function showUserDetails(userId) {
             const user = usersData.find(u => u.id === userId);
             if (!user) return;
-
+    console.log('Full user data:', user); // Log the entire user object
+    console.log('Organized events:', user.organized_events); // Log organized events array
             const userDetailsModal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
             const userImage = document.getElementById('userImage');
             const userName = document.getElementById('userName');
