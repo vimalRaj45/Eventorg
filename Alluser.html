@@ -977,72 +977,78 @@ function printUserData(dataArray) {
         }
 
         // Change page
-        function changePage(page) {
-            currentPage = page;
-            renderUsersTable();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
         // Show user details
-        function showUserDetails(userId) {
-            const user = usersData.find(u => u.id === userId);
-            if (!user) return;
+function showUserDetails(userId) {
+    const user = usersData.find(u => u.id === userId);
+    if (!user) return;
 
-            const userDetailsModal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
-            const userImage = document.getElementById('userImage');
-            const userName = document.getElementById('userName');
-            const userRoleBadge = document.getElementById('userRoleBadge');
-            const userEmail = document.getElementById('userEmail');
-            const userPhone = document.getElementById('userPhone');
-            const userCreated = document.getElementById('userCreated');
-            const userLastLogin = document.getElementById('userLastLogin');
-            const participationCount = document.getElementById('participationCount');
-            const organizedEventsCount = document.getElementById('organizedEventsCount');
-            const galleryImagesCount = document.getElementById('galleryImagesCount');
-            const participationsTable = document.getElementById('participationsTable').querySelector('tbody');
-            const organizedEventsTable = document.getElementById('organizedEventsTable').querySelector('tbody');
-            const galleryImages = document.getElementById('galleryImages');
+    const userDetailsModal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+    const userImage = document.getElementById('userImage');
+    const userName = document.getElementById('userName');
+    const userRoleBadge = document.getElementById('userRoleBadge');
+    const userEmail = document.getElementById('userEmail');
+    const userPhone = document.getElementById('userPhone');
+    const userCreated = document.getElementById('userCreated');
+    const userLastLogin = document.getElementById('userLastLogin');
+    const participationCount = document.getElementById('participationCount');
+    const organizedEventsCount = document.getElementById('organizedEventsCount');
+    const galleryImagesCount = document.getElementById('galleryImagesCount');
+    const participationsTable = document.getElementById('participationsTable').querySelector('tbody');
+    const organizedEventsTable = document.getElementById('organizedEventsTable').querySelector('tbody');
+    const galleryImages = document.getElementById('galleryImages');
 
-            // Set basic user info
-            userImage.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`;
-            userName.textContent = user.name;
-            userRoleBadge.textContent = user.role;
-            userRoleBadge.className = `badge ${user.role === 'admin' ? 'badge-admin' : 'badge-participant'}`;
-            userEmail.textContent = user.email;
-            userPhone.textContent = user.contact_no || 'N/A';
-            userCreated.textContent = formatDateTime(user.created_at);
-            userLastLogin.textContent = user.last_login ? formatDateTime(user.last_login) : 'Never';
+    // Set basic user info
+    userImage.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`;
+    userName.textContent = user.name;
+    userRoleBadge.textContent = user.role;
+    userRoleBadge.className = `badge ${user.role === 'admin' ? 'badge-admin' : 'badge-participant'}`;
+    userEmail.textContent = user.email;
+    userPhone.textContent = user.contact_no || 'N/A';
+    userCreated.textContent = formatDateTime(user.created_at);
+    userLastLogin.textContent = user.last_login ? formatDateTime(user.last_login) : 'Never';
 
-            // Set participations
-            participationCount.textContent = user.participations.length;
-            participationsTable.innerHTML = user.participations.map(part => `
-                <tr>
-                    <td>${part.event_title}</td>
-                    <td><span class="badge bg-${getStatusBadgeColor(part.status)}">${part.status}</span></td>
-                    <td>
-                        ${part.result ? `
-                            Score: ${part.result.score}<br>
-                            Rank: ${part.result.rank}<br>
-                            Remarks: ${part.result.remarks}
-                        ` : 'N/A'}
-                    </td>
-                </tr>
-            `).join('') || '<tr><td colspan="3" class="text-center">No participations</td></tr>';
-            console.log('Participations:', json.stringify(part.event_id, null, 2));
-              // ✅ Set participation count using verified endpoint
-    fetch(`https://event-db.vercel.app/api/events/${part.id}/verified`)
-        .then(res => res.json())
-        .then(data => {
-            const userVerifiedParticipations = data.filter(p => p.user_id === userId);
-            participationCount.textContent = userVerifiedParticipations.length;
-            console.log('Verified participations:', userVerifiedParticipations);
-        })
-        .catch(err => {
-            console.error('Error fetching verified participations:', err);
-            participationCount.textContent = '0';
-        });
+    // Set participations
+    participationCount.textContent = user.participations.length;
+    participationsTable.innerHTML = user.participations.map(part => `
+        <tr>
+            <td>${part.event_title}</td>
+            <td><span class="badge bg-${getStatusBadgeColor(part.status)}">${part.status}</span></td>
+            <td>
+                ${part.result ? `
+                    Score: ${part.result.score}<br>
+                    Rank: ${part.result.rank}<br>
+                    Remarks: ${part.result.remarks}
+                ` : 'N/A'}
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="3" class="text-center">No participations</td></tr>';
 
-    // ✅ Set organized events
+    // For each participation, fetch verified count for that event
+    user.participations.forEach(participation => {
+        const eventId = participation.event_id; // Assuming this is available in participation data
+        
+        fetch(`https://event-db.vercel.app/api/events/${eventId}/verified`)
+            .then(res => res.json())
+            .then(data => {
+                // Filter verified participations for this specific user
+                const userVerifiedParticipations = data.filter(p => p.user_id === userId);
+                
+                // Find the table row for this event and update it
+                const rows = participationsTable.querySelectorAll('tr');
+                rows.forEach(row => {
+                    if (row.cells[0].textContent === participation.event_title) {
+                        // Add verified count to the status cell
+                        const statusCell = row.cells[1];
+                        statusCell.innerHTML += `<br><small>Verified: ${userVerifiedParticipations.length}</small>`;
+                    }
+                });
+            })
+            .catch(err => {
+                console.error('Error fetching verified participations:', err);
+            });
+    });
+
+    // Set organized events
     organizedEventsCount.textContent = user.organized_events.length;
     organizedEventsTable.innerHTML = user.organized_events.map(event => `
         <tr>
@@ -1052,12 +1058,12 @@ function printUserData(dataArray) {
         </tr>
     `).join('') || '<tr><td colspan="3" class="text-center">No organized events</td></tr>';
 
-            // Set gallery images
-            galleryImagesCount.textContent = '';
-            galleryImages.innerHTML = '';
+    // Set gallery images
+    galleryImagesCount.textContent = '';
+    galleryImages.innerHTML = '';
 
-            userDetailsModal.show();
-        }
+    userDetailsModal.show();
+}
 
         // Helper function to format date/time
         function formatDateTime(dateTimeString) {
