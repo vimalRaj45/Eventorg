@@ -1031,37 +1031,38 @@ function printUserData(dataArray) {
             `).join('') || '<tr><td colspan="3" class="text-center">No participations</td></tr>';
 
             // Set organized events
-    organizedEventsCount.textContent = user.organized_events.length;
-    organizedEventsTable.innerHTML = user.organized_events.map(event => `
-        <tr>
-            <td>${event.title}</td>
-            <td>${event.type}</td>
-            <td class="participant-count" data-event-id="${event.id}">Loading...</td>
-        </tr>
-    `).join('') || '<tr><td colspan="3" class="text-center">No organized events</td></tr>';
+organizedEventsCount.textContent = user.organized_events.length;
+organizedEventsTable.innerHTML = user.organized_events.map(event => `
+    <tr>
+        <td>${event.title}</td>
+        <td>${event.type}</td>
+        <td class="participant-count" data-event-id="${event.id}">Loading...</td>
+    </tr>
+`).join('') || '<tr><td colspan="3" class="text-center">No organized events</td></tr>';
 
-    // Fetch verified counts for each organized event
-    user.organized_events.forEach(event => {
-      const eventId = event.event_id; // Use event.event_id here
-      console.log('Fetching verified count for event:', eventId);
-        fetch(`https://event-db.vercel.app/api/events/${eventId}/verified`)
-            .then(res => res.json())
-            .then(data => {
-                // Find the cell for this event and update it
-                const countCell = organizedEventsTable.querySelector(`td.participant-count[data-event-id="${event.id}"]`);
-                if (countCell) {
-                    countCell.textContent = data.length;
-                }
-                console.log('Verified count for event:', event.id, 'is', data.length);
-            })
-            .catch(err => {
-                console.error('Error fetching verified count for event:', event.id, err);
-                const countCell = organizedEventsTable.querySelector(`td.participant-count[data-event-id="${event.id}"]`);
-                if (countCell) {
-                    countCell.textContent = 'Error';
-                }
-            });
-    });
+// Fetch verified and pending counts for each organized event
+user.organized_events.forEach(event => {
+    const eventId = event.id; // Correct property
+    console.log('Fetching verified count for event:', eventId);
+
+    fetch(`https://event-db.vercel.app/api/events/${eventId}/verified`)
+        .then(res => res.json())
+        .then(data => {
+            const countCell = organizedEventsTable.querySelector(`td.participant-count[data-event-id="${eventId}"]`);
+            if (countCell) {
+                countCell.textContent = `✔ ${data.verified_count} / ⏳ ${data.pending_count}`;
+            }
+            console.log(`Event ${eventId} - Verified: ${data.verified_count}, Pending: ${data.pending_count}`);
+        })
+        .catch(err => {
+            console.error(`Error fetching counts for event ${eventId}:`, err);
+            const countCell = organizedEventsTable.querySelector(`td.participant-count[data-event-id="${eventId}"]`);
+            if (countCell) {
+                countCell.textContent = 'Error';
+            }
+        });
+});
+
 
             // Set gallery images
             galleryImagesCount.textContent = '';
