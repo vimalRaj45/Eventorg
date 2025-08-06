@@ -1042,7 +1042,9 @@ function printUserData(dataArray) {
 
     // Fetch verified counts for each organized event
     user.organized_events.forEach(event => {
-        fetch(`https://event-db.vercel.app/api/events/${event.id}/verified`)
+      const eventId = event.event_id; // Use event.event_id here
+      console.log('Fetching verified count for event:', eventId);
+        fetch(`https://event-db.vercel.app/api/events/${eventId}/verified`)
             .then(res => res.json())
             .then(data => {
                 // Find the cell for this event and update it
