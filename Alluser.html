@@ -1042,7 +1042,7 @@ organizedEventsTable.innerHTML = user.organized_events.map(event => `
 
 // Fetch verified and pending counts for each organized event
 user.organized_events.forEach(event => {
-    const eventId = event.id; // Correct property
+     const eventId = event.event_id; // Use event.event_id here
     console.log('Fetching verified count for event:', eventId);
 
     fetch(`https://event-db.vercel.app/api/events/${eventId}/verified`)
@@ -1094,4 +1094,5 @@ user.organized_events.forEach(event => {
     </script>
 </body>
 </html>
+
 
