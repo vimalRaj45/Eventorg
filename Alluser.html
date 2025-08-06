@@ -1030,8 +1030,7 @@ function printUserData(dataArray) {
                 </tr>
             `).join('') || '<tr><td colspan="3" class="text-center">No participations</td></tr>';
 
-            // Set organized events
-organizedEventsCount.textContent = user.organized_events.length;
+            organizedEventsCount.textContent = user.organized_events.length;
 organizedEventsTable.innerHTML = user.organized_events.map(event => `
     <tr>
         <td>${event.title}</td>
@@ -1042,13 +1041,13 @@ organizedEventsTable.innerHTML = user.organized_events.map(event => `
 
 // Fetch verified and pending counts for each organized event
 user.organized_events.forEach(event => {
-     const eventId = event.event_id; // Use event.event_id here
+    const eventId = event.id;
     console.log('Fetching verified count for event:', eventId);
 
     fetch(`https://event-db.vercel.app/api/events/${eventId}/verified`)
         .then(res => res.json())
         .then(data => {
-            const countCell = organizedEventsTable.querySelector(`td.participant-count[data-event-id="${eventId}"]`);
+            const countCell = document.querySelector(`td.participant-count[data-event-id="${eventId}"]`);
             if (countCell) {
                 countCell.textContent = `✔ ${data.verified_count} / ⏳ ${data.pending_count}`;
             }
@@ -1056,7 +1055,7 @@ user.organized_events.forEach(event => {
         })
         .catch(err => {
             console.error(`Error fetching counts for event ${eventId}:`, err);
-            const countCell = organizedEventsTable.querySelector(`td.participant-count[data-event-id="${eventId}"]`);
+            const countCell = document.querySelector(`td.participant-count[data-event-id="${eventId}"]`);
             if (countCell) {
                 countCell.textContent = 'Error';
             }
@@ -1094,5 +1093,4 @@ user.organized_events.forEach(event => {
     </script>
 </body>
 </html>
-
 
