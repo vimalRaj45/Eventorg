@@ -1030,18 +1030,19 @@ function printUserData(dataArray) {
                 </tr>
             `).join('') || '<tr><td colspan="3" class="text-center">No participations</td></tr>';
 
-            organizedEventsCount.textContent = user.organized_events.length;
+        // Set organized events
+organizedEventsCount.textContent = user.organized_events.length;
 organizedEventsTable.innerHTML = user.organized_events.map(event => `
     <tr>
         <td>${event.title}</td>
         <td>${event.type}</td>
-        <td class="participant-count" data-event-id="${event.id}">Loading...</td>
+        <td class="participant-count" data-event-id="${event.event_id}">Loading...</td>
     </tr>
 `).join('') || '<tr><td colspan="3" class="text-center">No organized events</td></tr>';
 
-// Fetch verified and pending counts for each organized event
+// Fetch verified counts for each organized event
 user.organized_events.forEach(event => {
-    const eventId = event.event_id;
+    const eventId = event.event_id; // ✅ Use event.event_id consistently
     console.log('Fetching verified count for event:', eventId);
 
     fetch(`https://event-db.vercel.app/api/events/${eventId}/verified`)
@@ -1093,5 +1094,4 @@ user.organized_events.forEach(event => {
     </script>
 </body>
 </html>
-
 
