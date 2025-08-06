@@ -1028,16 +1028,28 @@ function printUserData(dataArray) {
                     </td>
                 </tr>
             `).join('') || '<tr><td colspan="3" class="text-center">No participations</td></tr>';
+              // ✅ Set participation count using verified endpoint
+    fetch(`https://event-db.vercel.app/api/events/${event.id}/verified`)
+        .then(res => res.json())
+        .then(data => {
+            const userVerifiedParticipations = data.filter(p => p.user_id === userId);
+            participationCount.textContent = userVerifiedParticipations.length;
+            console.log('Verified participations:', userVerifiedParticipations);
+        })
+        .catch(err => {
+            console.error('Error fetching verified participations:', err);
+            participationCount.textContent = '0';
+        });
 
-            // Set organized events
-            organizedEventsCount.textContent = user.organized_events.length;
-            organizedEventsTable.innerHTML = user.organized_events.map(event => `
-                <tr>
-                    <td>${event.title}</td>
-                    <td>${event.type}</td>
-                    <td>${event.participants}</td>
-                </tr>
-            `).join('') || '<tr><td colspan="3" class="text-center">No organized events</td></tr>';
+    // ✅ Set organized events
+    organizedEventsCount.textContent = user.organized_events.length;
+    organizedEventsTable.innerHTML = user.organized_events.map(event => `
+        <tr>
+            <td>${event.title}</td>
+            <td>${event.type}</td>
+            <td>${event.participants}</td>
+        </tr>
+    `).join('') || '<tr><td colspan="3" class="text-center">No organized events</td></tr>';
 
             // Set gallery images
             galleryImagesCount.textContent = '';
@@ -1069,5 +1081,4 @@ function printUserData(dataArray) {
     </script>
 </body>
 </html>
-
 
