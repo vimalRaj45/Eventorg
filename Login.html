@@ -296,6 +296,26 @@
   letter-spacing: 1px;
 }
 
+ .form-check:hover {
+    background-color: #f8f9fa;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.1rem rgba(13, 110, 253, 0.25);
+  }
+
+  .auth-link {
+    color: #0d6efd;
+    transition: color 0.2s ease;
+  }
+
+  .auth-link:hover {
+    color: #084298;
+    text-decoration: none;
+  }
+
+  .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
   </style>
 </head>
 <body>
@@ -484,14 +504,18 @@
   
   <small class="text-muted">Minimum 8 characters with at least one number and special character</small>
 </div>
-          <div class="mb-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="termsAgree">
-              <label class="form-check-label" for="termsAgree">
-                I agree to the <a href="#" class="auth-link">Terms of Service</a> and <a href="#" class="auth-link">Privacy Policy</a>
-              </label>
-            </div>
-          </div>
+          <!-- Highlighted Terms Checkbox -->
+<div class="mb-4">
+  <div class="form-check p-3 border rounded bg-light shadow-sm position-relative" style="transition: 0.3s;">
+    <input class="form-check-input" type="checkbox" id="termsAgree" required>
+    <label class="form-check-label ms-2" for="termsAgree">
+      I agree to the 
+      <a href="#" class="auth-link fw-semibold text-decoration-underline">Terms of Service</a> and 
+      <a href="#" class="auth-link fw-semibold text-decoration-underline">Privacy Policy</a>
+    </label>
+  </div>
+</div>
+
           
           <button class="btn btn-primary w-100 mb-3" onclick="registerUser()" id="register-btn">
             <span id="register-btn-text">Create Account</span>
