@@ -1,307 +1,111 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Find Certificate — Event DB</title>
-
-  <!-- Outfit font -->
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get Certificate Link</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#0f1724;
-      --card:#0b1220;
-      --muted:#94a3b8;
-      --accent:#7c3aed;
-      --success:#10b981;
-      --danger:#ef4444;
-      --glass: rgba(255,255,255,0.03);
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      background:linear-gradient(180deg,#071023 0%, #081426 60%);
-      font-family: "Outfit", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      color:#e6eef8;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:32px;
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 320px;
+      text-align: center;
     }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-family: 'Outfit', sans-serif;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+    }
+    .loading {
+      display: none;
+      margin: 10px 0;
+    }
+    .loading div {
+      width: 8px;
+      height: 8px;
+      margin: 3px;
+      background: #4CAF50;
+      border-radius: 50%;
+      display: inline-block;
+      animation: bounce 0.6s infinite alternate;
+    }
+    .loading div:nth-child(2) { animation-delay: 0.2s; }
+    .loading div:nth-child(3) { animation-delay: 0.4s; }
 
-    .card{
-      width:100%;
-      max-width:720px;
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:12px;
-      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
-      padding:28px;
-      border:1px solid rgba(255,255,255,0.03);
+    @keyframes bounce {
+      to { transform: translateY(-8px); }
     }
-
-    h1{
-      margin:0 0 10px 0;
-      font-size:20px;
-      font-weight:700;
-      letter-spacing:-0.2px;
-    }
-    p.lead{
-      margin:0 0 18px 0;
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    form.row{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      margin-bottom:18px;
-    }
-
-    input[type="email"]{
-      flex:1;
-      background:var(--glass);
-      border:1px solid rgba(255,255,255,0.04);
-      padding:12px 14px;
-      border-radius:10px;
-      color:inherit;
-      font-size:15px;
-      outline:none;
-      transition: box-shadow .12s;
-    }
-    input[type="email"]:focus{
-      box-shadow: 0 4px 18px rgba(124,58,237,0.12);
-      border-color: rgba(124,58,237,0.9);
-    }
-
-    button.btn{
-      background:linear-gradient(180deg,var(--accent), #5b21b6);
-      color:white;
-      border:none;
-      padding:11px 16px;
-      border-radius:10px;
-      cursor:pointer;
-      font-weight:600;
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      font-size:14px;
-    }
-    button.btn:disabled{
-      opacity:0.6;
-      cursor:default;
-      filter:grayscale(.1);
-    }
-
-    /* spinner */
-    .spinner{
-      width:20px;height:20px;border-radius:50%;
-      border:3px solid rgba(255,255,255,0.12);
-      border-top-color: white;
-      animation:spin 0.9s linear infinite;
-      display:inline-block;
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    /* result */
-    .result{
-      margin-top:16px;
-      padding:16px;
-      background: rgba(255,255,255,0.02);
-      border-radius:10px;
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      border:1px solid rgba(255,255,255,0.02);
-    }
-    .result .left{
-      display:flex;
-      gap:12px;
-      align-items:center;
-    }
-    .result .label{
-      font-size:13px;color:var(--muted);
-    }
-    .link{
-      color:#cfe9ff;
-      font-weight:600;
-      word-break:break-all;
-    }
-
-    .actions{
-      display:flex;
-      gap:8px;
-    }
-    .small-btn{
-      background:transparent;
-      border:1px solid rgba(255,255,255,0.06);
-      padding:8px 10px;
-      border-radius:8px;
-      color:inherit;
-      cursor:pointer;
-      font-size:13px;
-    }
-
-    .msg{
-      margin-top:12px;
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .error{
-      color:var(--danger);
-      font-weight:600;
-    }
-
-    footer.note{
-      margin-top:18px;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    /* responsive */
-    @media (max-width:520px){
-      .card{padding:18px}
-      form.row{flex-direction:column;align-items:stretch}
-      button.btn{width:100%}
+    .result {
+      margin-top: 15px;
+      word-break: break-all;
     }
   </style>
 </head>
 <body>
-  <div class="card" role="main" aria-labelledby="title">
-    <div>
-      <h1 id="title">Find your certificate</h1>
-      <p class="lead">Enter the email used for registration — we'll fetch the certificate link (if available).</p>
+  <div class="container">
+    <h2>Find Your Certificate</h2>
+    <input type="email" id="email" placeholder="Enter your email" required />
+    <button onclick="fetchLink()">Get Link</button>
+    <div class="loading" id="loading">
+      <div></div><div></div><div></div>
     </div>
-
-    <form id="finder" class="row" onsubmit="return false;">
-      <input id="email" type="email" placeholder="participant@example.com" aria-label="Email" required />
-      <button id="go" class="btn" type="submit" aria-label="Find certificate">
-        <span id="btn-text">Find</span>
-        <span id="btn-spinner" style="display:none" class="spinner" aria-hidden="true"></span>
-      </button>
-    </form>
-
-    <div id="output" aria-live="polite"></div>
-
-    <footer class="note">Powered by Event DB • Outfit font</footer>
+    <div class="result" id="result"></div>
   </div>
 
   <script>
-    const BASE = 'https://event-db.vercel.app';
-    const finder = document.getElementById('finder');
-    const emailInput = document.getElementById('email');
-    const btn = document.getElementById('go');
-    const btnText = document.getElementById('btn-text');
-    const spinner = document.getElementById('btn-spinner');
-    const output = document.getElementById('output');
+    async function fetchLink() {
+      const email = document.getElementById("email").value;
+      const resultDiv = document.getElementById("result");
+      const loading = document.getElementById("loading");
+      
+      resultDiv.innerHTML = "";
+      loading.style.display = "block";
 
-    function setLoading(loading){
-      if(loading){
-        spinner.style.display='inline-block';
-        btnText.textContent='Searching';
-        btn.disabled = true;
-      } else {
-        spinner.style.display='none';
-        btnText.textContent='Find';
-        btn.disabled = false;
-      }
-    }
-
-    function showError(msg){
-      output.innerHTML = `<div class="result"><div class="left"><div class="label error">Error</div><div>${escapeHtml(msg)}</div></div></div>`;
-    }
-
-    function showLink(email, link){
-      output.innerHTML = `
-        <div class="result">
-          <div class="left">
-            <div>
-              <div class="label">Certificate for</div>
-              <div class="link">${escapeHtml(email)}</div>
-              <div class="label" style="margin-top:6px">Link</div>
-              <div style="max-width:440px"><a class="link" href="${escapeAttr(link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link)}</a></div>
-            </div>
-          </div>
-          <div class="actions">
-            <button class="small-btn" id="copyBtn" title="Copy link">Copy</button>
-            <button class="small-btn" id="openBtn" title="Open link" onclick="window.open('${escapeAttr(link)}','_blank')">Open</button>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('copyBtn').addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(link);
-          const txt = document.getElementById('copyBtn');
-          const prev = txt.textContent;
-          txt.textContent = 'Copied!';
-          setTimeout(()=> txt.textContent = prev, 1200);
-        } catch (e){
-          alert('Copy failed — please copy manually.');
-        }
-      });
-    }
-
-    function escapeHtml(s){
-      if(!s) return '';
-      return s.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-    function escapeAttr(s){
-      return escapeHtml(s).replace(/"/g, '&quot;');
-    }
-
-    async function lookupByEmail(email){
-      setLoading(true);
-      output.innerHTML = '';
       try {
-        const url = `${BASE}/api/certificates/link?email=${encodeURIComponent(email)}`;
-        const resp = await fetch(url, { cache: 'no-store' });
-        if(!resp.ok){
-          if(resp.status === 404){
-            const body = await resp.json().catch(()=>({message:'Not found'}));
-            setLoading(false);
-            showError(body.message || 'No certificate found for this email');
-            return;
-          }
-          const errText = await resp.text().catch(()=>resp.statusText);
-          setLoading(false);
-          showError(`Server error: ${errText}`);
-          return;
-        }
+        const res = await fetch("https://event-db.vercel.app/api/certificates/link", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
 
-        const data = await resp.json();
-        if(!data || !data.certificate_link){
-          setLoading(false);
-          showError('No certificate link returned by server.');
-          return;
-        }
+        const data = await res.json();
+        loading.style.display = "none";
 
-        showLink(data.email || email, data.certificate_link);
-      } catch (err){
-        showError('Network error — check your connection or CORS settings.');
-      } finally {
-        setLoading(false);
+        if (data.success) {
+          resultDiv.innerHTML = `<a href="${data.certificate_link}" target="_blank">📄 View Certificate</a>`;
+        } else {
+          resultDiv.innerHTML = `<span style="color:red;">${data.message}</span>`;
+        }
+      } catch (err) {
+        loading.style.display = "none";
+        resultDiv.innerHTML = `<span style="color:red;">Error: ${err.message}</span>`;
       }
     }
-
-    finder.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const email = emailInput.value.trim();
-      if(!email) return;
-      lookupByEmail(email);
-    });
-
-    // Extra: allow Enter to search from anywhere
-    emailInput.addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter'){
-        e.preventDefault();
-        finder.dispatchEvent(new Event('submit'));
-      }
-    });
   </script>
 </body>
 </html>
