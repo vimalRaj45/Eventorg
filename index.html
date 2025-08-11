@@ -601,6 +601,8 @@
   </div>
 </nav>
 
+  
+
     <!-- Announcement bar below navbar -->
   <div class="announcement-bar">
     <div class="announcement-container">
@@ -925,6 +927,121 @@
     </div>
   </div>
 </footer>
+<div class="professional-floating-btn">
+  <a href="https://edwyna.org/quizresults" class="executive-link">
+    <span class="btn-icon">↗</span>
+    <span class="btn-text">Results</span>
+  </a>
+</div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+  
+  :root {
+    --deep-plum: #1E0F2C;
+    --rich-burgundy: #4A1D3F;
+    --gold-accent: #C6A972;
+    --pale-gold: #E8D9B5;
+    --cool-gray: #D1D5DB;
+    --border-light: rgba(209, 213, 219, 0.1);
+  }
+  
+  .professional-floating-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 9999;
+    user-select: none;
+    /* Ensures it stays top-left on all devices */
+    right: auto;
+    bottom: auto;
+    transform: none;
+  }
+  
+  .executive-link {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--cool-gray);
+    background: var(--deep-plum);
+    padding: 10px 16px 10px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .executive-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(30, 15, 44, 0.9), rgba(74, 29, 63, 0.9));
+    z-index: -1;
+    transition: all 0.4s ease;
+  }
+  
+  .executive-link:hover {
+    color: var(--pale-gold);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .executive-link:hover::before {
+    background: linear-gradient(135deg, rgba(74, 29, 63, 0.9), rgba(30, 15, 44, 0.9));
+  }
+  
+  .btn-text {
+    transition: all 0.3s ease;
+    letter-spacing: 0.03em;
+  }
+  
+  .btn-icon {
+    color: var(--gold-accent);
+    transition: all 0.4s ease;
+    font-size: 1rem;
+    display: inline-block;
+    transform: rotate(0deg);
+  }
+  
+  .executive-link:hover .btn-icon {
+    transform: rotate(45deg) scale(1.1);
+    color: var(--pale-gold);
+  }
+  
+  /* Ultra-subtle glow animation */
+  @keyframes professionalGlow {
+    0%, 100% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }
+    50% { box-shadow: 0 2px 12px rgba(198, 169, 114, 0.15); }
+  }
+  
+  .professional-floating-btn:hover .executive-link {
+    animation: professionalGlow 3s ease-in-out infinite;
+  }
+  
+  /* Mobile responsive adjustments */
+  @media (max-width: 768px) {
+    .professional-floating-btn {
+      top: 95px;
+      left: 15px;
+      /* Reset any transforms that might interfere */
+      transform: none !important;
+    }
+    
+    .executive-link {
+      font-size: 0.9rem;
+      padding: 8px 14px 8px 12px;
+    }
+  }
+</style>
 
     <script>
       const splashShownAt = localStorage.getItem("splash-shown-at");
