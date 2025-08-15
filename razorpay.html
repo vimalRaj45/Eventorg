@@ -2,81 +2,449 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Razorpay Dynamic Payment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Payment Gateway</title>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <style>
-body { font-family: Arial; padding: 20px; }
-input, button { padding: 10px; margin: 5px 0; width: 100%; }
+:root {
+  --primary-color: #1A73E8;      /* GPay blue */
+  --primary-light: #E8F0FE;      /* light blue background */
+  --success-color: #00C853;      /* green for success */
+  --error-color: #FF3B30;        /* red for errors */
+  --warning-color: #FF9500;      /* orange for warnings */
+  --text-primary: #202124;       /* main text color */
+  --text-secondary: #5F6368;     /* secondary text color */
+  --border-color: #DADCE0;       /* border lines */
+  --bg-color: #F8F9FA;           /* overall page background */
+  --card-bg: #FFFFFF;             /* card/section background */
+  --shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15); /* subtle shadow */
+}
+
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Google Sans', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  line-height: 1.5;
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  padding: 24px 0;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.logo .material-icons {
+  font-size: 24px;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.card {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.card-title .material-icons {
+  margin-right: 8px;
+  color: var(--primary-color);
+  font-size: 22px;
+}
+
+.input-group {
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.input-label {
+  display: block;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: border 0.2s;
+  font-family: 'Google Sans', sans-serif;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.btn {
+  width: 100%;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'Google Sans', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #4A1FA8;
+  box-shadow: 0 2px 6px rgba(95, 39, 205, 0.3);
+}
+
+.btn-icon {
+  margin-right: 8px;
+}
+
+.status {
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  font-size: 14px;
+  display: none;
+}
+
+.status.success {
+  background-color: rgba(0, 200, 83, 0.1);
+  color: var(--success-color);
+  display: block;
+}
+
+.status.error {
+  background-color: rgba(255, 59, 48, 0.1);
+  color: var(--error-color);
+  display: block;
+}
+
+.status.warning {
+  background-color: rgba(255, 149, 0, 0.1);
+  color: var(--warning-color);
+  display: block;
+}
+
+.payment-details {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.divider::before, .divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.divider::before {
+  margin-right: 16px;
+}
+
+.divider::after {
+  margin-left: 16px;
+}
+
+.loader {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .card {
+    padding: 20px;
+  }
+}
 </style>
 </head>
 <body>
-<h1>Pay Securely</h1>
+<div class="container">
+  <div class="header">
+    <div class="logo">
+      <span class="material-icons">payments</span>
+    </div>
+    <h1>Secure Payment</h1>
+    <p class="subtitle">Fast and secure payment processing</p>
+  </div>
 
-<input type="text" id="name" placeholder="Enter your full name" required />
-<input type="email" id="email" placeholder="Enter your email" required />
-<input type="tel" id="contact" placeholder="Enter your contact number" required />
-<input type="number" id="amount" placeholder="Enter amount" required />
-<button id="payBtn">Pay Now</button>
+  <div class="card">
+    <h2 class="card-title">
+      <span class="material-icons">payment</span>
+      Payment Details
+    </h2>
+    
+    <div class="input-group">
+      <label class="input-label">Full Name</label>
+      <input type="text" id="name" class="input-field" placeholder="Enter your name" required>
+    </div>
+    
+    <div class="input-group">
+      <label class="input-label">Email Address</label>
+      <input type="email" id="email" class="input-field" placeholder="your@email.com" required>
+    </div>
+    
+    <div class="input-group">
+      <label class="input-label">Phone Number</label>
+      <input type="tel" id="contact" class="input-field" placeholder="+91 9876543210" required>
+    </div>
+    
+    <div class="input-group">
+      <label class="input-label">Amount (INR)</label>
+      <input type="number" id="amount" class="input-field" placeholder="Enter amount" required>
+    </div>
+    
+    <button id="payBtn" class="btn btn-primary">
+      <span class="material-icons btn-icon">lock</span>
+      Pay Securely
+    </button>
+    
+    <div id="status" class="status"></div>
+  </div>
 
-<div id="status"></div>
+  <div class="divider">or</div>
+
+  <div class="card">
+    <h2 class="card-title">
+      <span class="material-icons">verified</span>
+      Verify Payment
+    </h2>
+    
+    <div class="input-group">
+      <label class="input-label">Transaction ID</label>
+      <input type="text" id="txnId" class="input-field" placeholder="Enter Razorpay Transaction ID">
+    </div>
+    
+    <button id="verifyBtn" class="btn btn-primary">
+      <span class="material-icons btn-icon">search</span>
+      Verify Payment
+    </button>
+    
+    <div id="manualStatus" class="status"></div>
+  </div>
+</div>
 
 <script>
 document.getElementById("payBtn").onclick = async () => {
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const contact = document.getElementById("contact").value.trim();
-  const amount = document.getElementById("amount").value.trim();
+  const amount = parseFloat(document.getElementById("amount").value.trim());
 
   if (!name || !email || !contact || !amount || amount <= 0) {
-    alert("Please fill all fields correctly");
+    showStatus("Please fill all fields correctly", "error");
     return;
   }
 
-  // 1️⃣ Create order on server
-  const orderRes = await fetch("https://razorpay-live.vercel.app/create-order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount })
-  });
+  try {
+    // Show loading state
+    const payBtn = document.getElementById("payBtn");
+    payBtn.innerHTML = `<span class="loader"></span> Processing...`;
+    payBtn.disabled = true;
 
-  const order = await orderRes.json();
+    // Create order
+    const orderRes = await fetch("https://razorpay-live.vercel.app/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount })
+    });
 
-  // 2️⃣ Open Razorpay checkout
-  const options = {
-    key: "rzp_live_R5hlTuJJg2PACA",  // Your test key
-    amount: order.amount,
-    currency: order.currency,
-    name: "Secure Shop",
-    description: "Payment Transaction",
-    order_id: order.id,
-    prefill: { name, email, contact },
-    theme: { color: "#3399cc" },
-    handler: async function (response) {
-      document.getElementById("status").innerText = "Verifying payment...";
-      
-      // 3️⃣ Verify payment on server
-      const verifyRes = await fetch("https://razorpay-live.vercel.app/verify-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(response)
-      });
+    if (!orderRes.ok) throw new Error("Failed to create order");
+    const order = await orderRes.json();
 
-      const result = await verifyRes.json();
-      if(result.status === "success"){
-        document.getElementById("status").innerHTML = `<span style="color:green">${result.message}<br>Payment ID: ${response.razorpay_payment_id}</span>`;
-      } else {
-        document.getElementById("status").innerHTML = `<span style="color:red">${result.message}</span>`;
+    // Reset button state
+    payBtn.innerHTML = `<span class="material-icons btn-icon">lock</span> Pay Securely`;
+    payBtn.disabled = false;
+
+    // Open Razorpay checkout
+    const options = {
+      key: "rzp_live_R5hlTuJJg2PACA",
+      amount: order.amount,
+      currency: order.currency,
+      name: "Edwyna",
+      description: "Payment Transaction",
+      order_id: order.id,
+      prefill: { name, email, contact },
+      theme: { color: "#5F27CD" },
+      handler: async function (response) {
+        showStatus("Verifying payment...", "warning");
+        
+        try {
+          const verifyRes = await fetch("https://razorpay-live.vercel.app/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(response)
+          });
+
+          const result = await verifyRes.json();
+          if(result.status === "success"){
+            const successMsg = `${result.message}<br><br>
+                              <div class="payment-details">
+                                <strong>Payment ID:</strong> ${response.razorpay_payment_id}<br>
+                                <strong>Amount:</strong> ₹${amount}<br>
+                                <strong>Date:</strong> ${new Date().toLocaleString()}
+                              </div>`;
+            showStatus(successMsg, "success");
+          } else {
+            showStatus(result.message, "error");
+          }
+        } catch (err) {
+          showStatus("Verification failed: " + err.message, "error");
+        }
+      },
+      modal: {
+        ondismiss: function(){
+          showStatus("Payment cancelled by user", "warning");
+        }
       }
-    },
-    modal: {
-      ondismiss: function(){
-        document.getElementById("status").innerText = "Payment cancelled by user";
-      }
-    }
-  };
+    };
+    
+    new Razorpay(options).open();
 
-  new Razorpay(options).open();
+  } catch (err) {
+    showStatus("Error: " + err.message, "error");
+    // Reset button state if error occurs
+    const payBtn = document.getElementById("payBtn");
+    payBtn.innerHTML = `<span class="material-icons btn-icon">lock</span> Pay Securely`;
+    payBtn.disabled = false;
+  }
 };
+
+// Manual verification section
+document.getElementById("verifyBtn").onclick = async () => {
+  const paymentId = document.getElementById("txnId").value.trim();
+  if (!paymentId) {
+    showManualStatus("Please enter transaction ID", "error");
+    return;
+  }
+
+  try {
+    // Show loading state
+    const verifyBtn = document.getElementById("verifyBtn");
+    verifyBtn.innerHTML = `<span class="loader"></span> Verifying...`;
+    verifyBtn.disabled = true;
+
+    const res = await fetch("https://razorpay-live.vercel.app/verify-transaction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paymentId })
+    });
+
+    const data = await res.json();
+    if(data.success){
+      const successMsg = `${data.message}<br><br>
+                        <div class="payment-details">
+                          <strong>Amount:</strong> ₹${data.amount/100}<br>
+                          <strong>Currency:</strong> ${data.currency}<br>
+                          <strong>Order ID:</strong> ${data.order_id}<br>
+                          <strong>Status:</strong> Captured
+                        </div>`;
+      showManualStatus(successMsg, "success");
+    } else {
+      showManualStatus(data.message, "error");
+    }
+  } catch(err) {
+    showManualStatus("Error: " + err.message, "error");
+  } finally {
+    // Reset button state
+    const verifyBtn = document.getElementById("verifyBtn");
+    verifyBtn.innerHTML = `<span class="material-icons btn-icon">search</span> Verify Payment`;
+    verifyBtn.disabled = false;
+  }
+};
+
+// Helper functions for showing status messages
+function showStatus(message, type) {
+  const statusEl = document.getElementById("status");
+  statusEl.innerHTML = message;
+  statusEl.className = "status " + type;
+}
+
+function showManualStatus(message, type) {
+  const statusEl = document.getElementById("manualStatus");
+  statusEl.innerHTML = message;
+  statusEl.className = "status " + type;
+}
 </script>
 </body>
 </html>
