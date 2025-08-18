@@ -1,326 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Q-MASTERS Certificate Retrieval | Edwyna</title>
-  <meta name="description" content="Retrieve your Q-MASTERS event certificate by entering your email address">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Result</title>
   <style>
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --success: #10b981;
-      --error: #ef4444;
-      --text: #1f2937;
-      --text-light: #6b7280;
-      --bg: #f9fafb;
-      --card: #ffffff;
-      --border: #e5e7eb;
-    }
-    
-    * {
+    body {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-      line-height: 1.5;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
     }
-    
-    .container {
-      background: var(--card);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-      width: 100%;
-      max-width: 420px;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-    
-    .logo {
-      width: 80px;
-      height: auto;
-      margin-bottom: 1rem;
-    }
-    
     h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--primary);
+      font-size: 3rem;
+      color: #2c3e50;
+      margin: 0;
     }
-    
-    .subtitle {
-      font-size: 0.9rem;
-      color: var(--text-light);
-      margin-bottom: 1.5rem;
-    }
-    
-    .input-group {
-      margin-bottom: 1.5rem;
-      text-align: left;
-    }
-    
-    label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-    }
-    
-    input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.95rem;
-      transition: all 0.2s ease;
-    }
-    
-    input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-    
-    input::placeholder {
-      color: #9ca3af;
-    }
-    
-    button {
-      width: 100%;
-      padding: 0.75rem;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-    
-    button:hover {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-    }
-    
-    button:active {
-      transform: translateY(0);
-    }
-    
-    button:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: none;
-    }
-    
-    .loading {
-      display: none;
-      margin: 1.5rem 0;
-    }
-    
-    .loading div {
-      width: 10px;
-      height: 10px;
-      margin: 0 4px;
-      background: var(--primary);
-      border-radius: 50%;
-      display: inline-block;
-      animation: bounce 0.6s infinite alternate;
-    }
-    
-    .loading div:nth-child(2) { animation-delay: 0.2s; }
-    .loading div:nth-child(3) { animation-delay: 0.4s; }
-    
-    @keyframes bounce {
-      to { transform: translateY(-10px); }
-    }
-    
-    .result {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      display: none;
-    }
-    
-    .success {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      color: var(--success);
-    }
-    
-    .error {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.2);
-      color: var(--error);
-    }
-    
-    .certificate-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--primary);
-      font-weight: 500;
-      text-decoration: none;
-      margin-top: 1rem;
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      background: rgba(37, 99, 235, 0.1);
-      transition: all 0.2s ease;
-    }
-    
-    .certificate-link:hover {
-      background: rgba(37, 99, 235, 0.2);
-      transform: translateY(-1px);
-    }
-    
-    .footer {
-      margin-top: 2rem;
-      font-size: 0.8rem;
-      color: var(--text-light);
-    }
-    
-    @media (max-width: 480px) {
-      .container {
-        padding: 1.5rem;
-      }
-      
-      h1 {
-        font-size: 1.3rem;
-      }
+    p {
+      position: absolute;
+      bottom: 20px;
+      font-size: 1.2rem;
+      color: #e74c3c;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Replace with your actual logo or event logo -->
-    <div class="logo">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--primary)">
-        <path d="M11.7 2.805a.75.75 0 01.6 0A60.65 60.65 0 0122.83 8.72a.75.75 0 01-.231 1.337 49.949 49.949 0 00-9.902 3.912l-.003.002-.34.18a.75.75 0 01-.707 0A50.009 50.009 0 007.5 12.174v-.224c0-.131.067-.248.172-.311a54.614 54.614 0 014.653-2.52.75.75 0 00-.65-1.352 56.129 56.129 0 00-4.78 2.589 1.5 1.5 0 00-.82 1.338v.214a50.44 50.44 0 00-5.012 2.839.75.75 0 00-.122 1.33A60.617 60.617 0 007.5 16.11v.256a48.367 48.367 0 00-4.744-1.766.75.75 0 00-.372 1.364 60.085 60.085 0 005.616 2.123.75.75 0 00.565 0A60.18 60.18 0 0016.5 15.786v-.238a48.53 48.53 0 00-4.743 1.765.75.75 0 00-.372-1.363 48.344 48.344 0 00-4.742 1.766v-.215c0-.968.528-1.81 1.308-2.268a48.01 48.01 0 015.192-2.347.75.75 0 00.636-1.357 49.48 49.48 0 00-5.4 2.464.75.75 0 00-.167 1.327l.169.07c.332.137.664.274.995.411l.003.001a49.963 49.963 0 018.35-3.088.75.75 0 00.23-1.335A60.653 60.653 0 0011.7 2.805z" />
-        <path d="M13.06 15.473a48.45 48.45 0 017.666-3.282c.134 1.414.22 2.843.255 4.285a.75.75 0 01-.46.71 47.878 47.878 0 00-8.105 4.342.75.75 0 01-.832 0 47.877 47.877 0 00-8.104-4.342.75.75 0 01-.461-.71c.035-1.442.121-2.87.255-4.286A48.4 48.4 0 016 13.18v1.27a1.5 1.5 0 00-.14 2.508c-.09.38-.222.753-.397 1.11.452.213.901.434 1.346.661a6.729 6.729 0 00.551-1.608 1.5 1.5 0 00.14-2.67v-.645a48.549 48.549 0 013.44 1.668 2.25 2.25 0 002.12 0z" />
-        <path d="M4.462 19.462c.42-.419.753-.89.991-1.394a.75.75 0 10-1.349-.672c-.218.437-.49.836-.813 1.18a.75.75 0 001.171.936z" />
-      </svg>
-    </div>
-    
-    <h1>Retrieve Your Q-MASTERS Certificate</h1>
-    <p class="subtitle">Enter your email address to access your event certificate</p>
-    
-    <div class="input-group">
-      <label for="email">Email Address</label>
-      <input type="email" id="email" placeholder="participant@example.com" required />
-    </div>
-    
-    <button id="submit-btn" onclick="fetchLink()">
-      <i class="fas fa-certificate"></i> Get Certificate
-    </button>
-    
-    <div class="loading" id="loading">
-      <div></div><div></div><div></div>
-    </div>
-    
-    <div class="result" id="success-result">
-      <i class="fas fa-check-circle"></i> Certificate found successfully!
-      <a href="#" id="certificate-link" class="certificate-link" target="_blank">
-        <i class="fas fa-external-link-alt"></i> View Certificate
-      </a>
-    </div>
-    
-    <div class="result error" id="error-result">
-      <i class="fas fa-exclamation-circle"></i> <span id="error-message"></span>
-    </div>
-  </div>
-  
-  <p class="footer">Q-MASTERS Event by Edwyna © 2025 Aug</p>
-
-  <script>
-    async function fetchLink() {
-      const email = document.getElementById("email").value.trim();
-      const submitBtn = document.getElementById("submit-btn");
-      const loading = document.getElementById("loading");
-      const successResult = document.getElementById("success-result");
-      const errorResult = document.getElementById("error-result");
-      const errorMessage = document.getElementById("error-message");
-      const certificateLink = document.getElementById("certificate-link");
-      
-      // Validate email
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        errorMessage.textContent = "Please enter a valid email address";
-        errorResult.style.display = "block";
-        successResult.style.display = "none";
-        return;
-      }
-      
-      // Hide previous results
-      successResult.style.display = "none";
-      errorResult.style.display = "none";
-      
-      // Show loading state
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing...';
-      loading.style.display = "block";
-      
-      try {
-        const response = await fetch("https://event-db.vercel.app/api/certificates/link", {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({ email })
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch certificate");
-        }
-        
-        if (data.success && data.certificate_link) {
-          certificateLink.href = data.certificate_link;
-          successResult.style.display = "block";
-        } else {
-          throw new Error(data.message || "Certificate not found for this email");
-        }
-      } catch (err) {
-        errorMessage.textContent = err.message;
-        errorResult.style.display = "block";
-      } finally {
-        loading.style.display = "none";
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-certificate"></i> Get Certificate';
-      }
-    }
-    
-    // Add keyboard support (Enter key)
-    document.getElementById("email").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") {
-        fetchLink();
-      }
-    });
-  </script>
+  <h1>Result Published</h1>
+  <p>Oops! Ended</p>
 </body>
 </html>
