@@ -646,12 +646,13 @@ window.onblur = () => {
     </div>
   `;
 
+// ✅ Load quiz + show intro screen
 async function loadQuiz() {
   try {
+    console.log(`📡 Fetching quiz data from: ${API_URL}?quiz=${quizName}`);
     const res = await fetch(`${API_URL}?quiz=${quizName}`);
     const data = await res.json();
 
-    // ✅ Gracefully handle backend errors
     if (!data || !data.questions || !Array.isArray(data.questions)) {
       const errorMsg = data?.message || data?.error || "Quiz is not available at the moment.";
       throw new Error(errorMsg);
@@ -659,8 +660,9 @@ async function loadQuiz() {
 
     const questions = data.questions;
     questionsCount = questions.length;
-      totalTimeout = questions.reduce((total, q) => total + (q.timeout || 0), 0) * 60;
-    // Show intro screen
+    totalTimeout = questions.reduce((total, q) => total + (q.timeout || 0), 0) * 60;
+
+    // ✅ Render intro form
     form.innerHTML = `
       <div class="quiz-intro">
         <div class="quiz-intro-icon">
@@ -679,26 +681,11 @@ async function loadQuiz() {
       </div>
     `;
 
-    document.getElementById("startQuizBtn").addEventListener("click", () => {
-      const emailInput = document.getElementById("userEmail");
-      enableFullscreen();
-      if (!emailInput.value.trim() || !emailInput.checkValidity()) {
-        emailInput.classList.add("is-invalid");
-        Swal.fire({
-          icon: 'error',
-          title: 'Email Required',
-          text: 'Please enter a valid email address to continue',
-          confirmButtonColor: 'var(--primary-color)'
-        });
-        return;
-      }
-
-      userEmail = emailInput.value.trim();
-      referralCode = document.getElementById("referralCode").value.trim(); // ✅ Save it here
-      showQuizInstructions(questions);
-    });
+    // ✅ Attach handler
+    document.getElementById("startQuizBtn").addEventListener("click", () => handleStartQuiz(questions));
 
   } catch (err) {
+    console.error("❌ Quiz loading failed:", err.message);
     quizTitle.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i> Quiz Loading Error`;
     form.innerHTML = '';
     Swal.fire({
@@ -710,6 +697,68 @@ async function loadQuiz() {
   }
 }
 
+// ✅ Handle Start Quiz button click
+async function handleStartQuiz(questions) {
+  const emailInput = document.getElementById("userEmail");
+  const startBtn = document.getElementById("startQuizBtn");
+
+  // Validate email
+  if (!emailInput.value.trim() || !emailInput.checkValidity()) {
+    emailInput.classList.add("is-invalid");
+    Swal.fire({
+      icon: 'error',
+      title: 'Email Required',
+      text: 'Please enter a valid email address to continue',
+      confirmButtonColor: 'var(--primary-color)'
+    });
+    return;
+  }
+
+  try {
+    // 🔄 Show loading
+    startBtn.disabled = true;
+    const originalHtml = startBtn.innerHTML;
+    startBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Checking eligibility...`;
+
+    console.log("📡 Checking eligibility for:", emailInput.value.trim());
+    const checkRes = await fetch(`https://script.google.com/macros/s/AKfycbzF0lhzDN7ITFmwetzR_6n_UbFWjDJGLJ0dh5GyIGczqOf19v0ftdpREavyAv0NrBcC/exec?quiz=${quizName}&email=${encodeURIComponent(emailInput.value.trim())}`);
+    const checkData = await checkRes.json();
+    console.log("✅ Eligibility response:", checkData);
+
+    if (!checkData.success) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Not Eligible',
+        text: checkData.message || "You are not authorized to attend this quiz.",
+        confirmButtonColor: 'var(--primary-color)'
+      });
+      return;
+    }
+
+    // ✅ Passed eligibility
+    console.log("🎉 Eligible! Starting quiz...");
+    enableFullscreen();
+
+    userEmail = emailInput.value.trim();
+    const referralInput = document.getElementById("referralCode");
+    referralCode = referralInput ? referralInput.value.trim() : "";
+
+    showQuizInstructions(questions);
+
+  } catch (err) {
+    console.error("❌ Eligibility verification failed:", err.message);
+    Swal.fire({
+      icon: 'error',
+      title: 'Verification Failed',
+      text: "Could not verify your eligibility. Try again later.",
+      confirmButtonColor: 'var(--primary-color)'
+    });
+  } finally {
+    // 🔄 Restore button
+    startBtn.disabled = false;
+    startBtn.innerHTML = `<i class="bi bi-play-fill me-2"></i> Start Quiz`;
+  }
+}
 
 
   function showQuizInstructions(questions) {
