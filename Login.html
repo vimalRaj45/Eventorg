@@ -368,7 +368,7 @@
           <h4 class="auth-title">Welcome back</h4>
           
          <div class="mb-3">
-  <label for="email" class="form-label">Email (or Contact Number)</label>
+  <label for="email" class="form-label">Email or Contact Number</label>
   <input type="text" class="form-control" id="emailOrContact" name="emailOrContact" placeholder="Enter email or contact number">
 </div>
 
@@ -780,8 +780,8 @@ async function registerUser() {
   let details = {};
   if (user_type === "school") {
     details = {
-      first_name: document.getElementById('school-first-name')?.value.trim() || '',
-      last_name: document.getElementById('school-last-name')?.value.trim() || '',
+      first_name: document.getElementById('school-first-name')?.value.trim() || 'SAMPLE',
+      last_name: document.getElementById('school-last-name')?.value.trim() || 'NAME',
       date_of_birth: document.getElementById('school-dob')?.value || '',
       gender: document.getElementById('school-gender')?.value || '',
       school_name: document.getElementById('school-name')?.value.trim() || '',
@@ -792,8 +792,8 @@ async function registerUser() {
     };
   } else if (user_type === "college") {
     details = {
-      first_name: document.getElementById('college-first-name')?.value.trim() || '',
-      last_name: document.getElementById('college-last-name')?.value.trim() || '',
+      first_name: document.getElementById('college-first-name')?.value.trim() || 'SAMPLE',
+      last_name: document.getElementById('college-last-name')?.value.trim() || 'NAME',
       date_of_birth: document.getElementById('college-dob')?.value || '',
       gender: document.getElementById('college-gender')?.value || '',
       college_name: document.getElementById('college-name')?.value.trim() || '',
@@ -805,8 +805,8 @@ async function registerUser() {
     };
   } else if (user_type === "passout") {
     details = {
-      first_name: document.getElementById('passout-first-name')?.value.trim() || '',
-      last_name: document.getElementById('passout-last-name')?.value.trim() || '',
+      first_name: document.getElementById('passout-first-name')?.value.trim() || 'SAMEPLE',
+      last_name: document.getElementById('passout-last-name')?.value.trim() || 'NAME',
       date_of_birth: document.getElementById('passout-dob')?.value || '',
       gender: document.getElementById('passout-gender')?.value || '',
       college_name: document.getElementById('passout-college-name')?.value.trim() || '',
