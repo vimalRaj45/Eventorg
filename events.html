@@ -960,7 +960,7 @@ async function getMyProfile() {
   try {
     const result = await makeRequest('GET', '/profile');
     currentUserProfile = result;
-    
+    console.log('User Profile:', result);
     document.getElementById('verified-name').value = result.name;
     document.getElementById('verified-email').value = result.email;
     document.getElementById('userid').value = result.user_id || 'Not provided';
