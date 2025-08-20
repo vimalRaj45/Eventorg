@@ -792,6 +792,17 @@ document.addEventListener('keydown', function(e) {
     
   }
 });
+
+// After getting result from API
+const email = result.email;
+const emailField = document.getElementById('verified-email').closest('div');
+
+if (email && email !== 'N/A' && email.trim() !== '') {
+  document.getElementById('verified-email').value = email;
+  emailField.style.display = 'flex'; // Show inline
+} else {
+  emailField.style.display = 'none'; // Hide completely
+}
    
 
 function logout() {
