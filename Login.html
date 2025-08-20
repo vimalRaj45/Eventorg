@@ -367,10 +367,11 @@
         <div id="login-section">
           <h4 class="auth-title">Welcome back</h4>
           
-          <div class="mb-4">
-            <label for="login-email" class="form-label">Email Address</label>
-            <input type="email" class="form-control" id="login-email" placeholder="john@example.com" required />
-          </div>
+         <div class="mb-3">
+  <label for="email" class="form-label">Email (or Contact Number)</label>
+  <input type="text" class="form-control" id="emailOrContact" name="emailOrContact" placeholder="Enter email or contact number">
+</div>
+
           
           <!-- Password Input with Show/Hide Toggle -->
 <div class="mb-4 position-relative">
@@ -467,19 +468,32 @@
         </div>
 
         <!-- Register Section -->
-        <div id="register-section" class="d-none">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="auth-title mb-0">Create Account</h4>
-            <button type="button" class="btn-close" aria-label="Close" onclick="showSection('login-section')"></button>
-          </div>
+       <div id="register-section" class="d-none">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="auth-title mb-0">Create Account</h4>
+    <button type="button" class="btn-close" aria-label="Close" onclick="showSection('login-section')"></button>
+  </div>
+  
+  <div class="mb-4">
+    <label for="register-user-type" class="form-label">User Type</label>
+    <select id="register-user-type" class="form-control" onchange="renderUserFields()">
+      <option value="" disabled selected>Select user type</option>
+      <option value="school">School Student</option>
+      <option value="college">College Student</option>
+      <option value="passout">Passout</option>
+    </select>
+  </div>
+  
+  <!-- Dynamic fields will appear here -->
+  <div id="user-fields"></div>
+  
+  <div class="mb-4">
+    <label for="register-name" class="form-label">Full Name</label>
+    <input type="text" id="register-name" class="form-control" placeholder="John Doe" />
+  </div>
           
           <div class="mb-4">
-            <label for="register-name" class="form-label">Full Name</label>
-            <input type="text" id="register-name" class="form-control" placeholder="John Doe" />
-          </div>
-          
-          <div class="mb-4">
-            <label for="register-email" class="form-label">Email Address</label>
+            <label for="register-email" class="form-label">Email Address(if school std skip this..)</label>
             <input type="email" id="register-email" class="form-control" placeholder="john@example.com" />
           </div>
 
@@ -617,20 +631,7 @@ document.addEventListener('DOMContentLoaded', function() {
       strengthBar.style.backgroundColor = strength.color;
     }
 
-    // Disable right-click context menu
-document.addEventListener('contextmenu', e => e.preventDefault());
-
-// Disable specific key shortcuts
-document.addEventListener('keydown', function(e) {
-  if (
-    e.key === 'F12' ||
-    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
-    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
-  ) {
-    e.preventDefault();
-    
-  }
-});
+  
     
     function calculatePasswordStrength(password) {
       let strength = 0;
@@ -666,22 +667,53 @@ document.addEventListener('keydown', function(e) {
         setTimeout(() => firstInput.focus(), 100);
       }
     }
+
+
+      // Disable right-click context menu
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// Disable specific key shortcuts
+document.addEventListener('keydown', function(e) {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+  ) {
+    e.preventDefault();
+    
+  }
+});
+    
     
     const API_BASE_URL = 'https://eventdb.onrender.com/api';
     let currentToken = localStorage.getItem('jwtToken') || '';
 
-   // LOGIN
+  // LOGIN
+// LOGIN
 async function loginUser() {
-  const email = document.getElementById('login-email').value.trim();
+  const input = document.getElementById("emailOrContact").value.trim(); // ✅ match HTML id
   const password = document.getElementById('login-password').value.trim();
   const loginBtn = document.getElementById('login-btn');
   const loginBtnText = document.getElementById('login-btn-text');
   const loginSpinner = document.getElementById('login-spinner');
 
-  if (!email || !password) {
-    showToast('error', 'Validation Error', 'Please enter both email and password.');
+  if (!input || !password) {
+    showToast('error', 'Validation Error', 'Please enter email/contact and password.');
     return;
   }
+
+  // Determine if input is email or contact
+let data = { password };
+
+if (/^\d{10}$/.test(input)) {
+  data.contact = input;   // 10-digit phone number
+} else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input)) {
+  data.email = input;     // valid email
+} else {
+  showToast('error', 'Invalid Input', 'Please enter a valid email or 10-digit contact number.');
+  return;
+}
+
 
   // Show loading state
   loginBtn.disabled = true;
@@ -689,36 +721,33 @@ async function loginUser() {
   loginSpinner.classList.remove('d-none');
 
   try {
-    const data = { email, password };
     const result = await makeRequest('POST', '/auth/login', data, false);
 
     // Store token and user
     setToken(result.token);
-    localStorage.setItem("user", JSON.stringify(result.user)); // Store user info
+    localStorage.setItem("user", JSON.stringify(result.user));
 
     showToast('success', 'Login Successful', `Welcome back, ${result.user.name || 'User'}!`);
 
-    // Redirect after 2 sec based on role
+    // Redirect after 2 sec
     setTimeout(() => {
-      if (result.user.role === 'admin') {
+      if (result.user.user_type === 'admin') {
         window.location.href = "Alluser.html";
       } else {
-        window.location.href = "events.html"; // Adjust as needed
+        window.location.href = "events.html";
       }
     }, 2000);
 
   } catch (error) {
-  const msg = error.message || '';
-  
-  if (msg.includes('Email not found')) {
-    showToast('error', 'No Account Found', 'This email is not registered. Please sign up first.');
-  } else if (msg.includes('Incorrect password')) {
-    showToast('error', 'Wrong Password', 'The password you entered is incorrect.');
-  } else {
-    showToast('error', 'Login Failed', 'Invalid credentials. Please try again.');
-  }
-}
- finally {
+    const msg = error.message || '';
+    if (msg.includes('not found')) {
+      showToast('error', 'No Account Found', 'This email/contact is not registered. Please sign up first.');
+    } else if (msg.includes('Incorrect password')) {
+      showToast('error', 'Wrong Password', 'The password you entered is incorrect.');
+    } else {
+      showToast('error', 'Login Failed', 'Invalid credentials. Please try again.');
+    }
+  } finally {
     // Reset button state
     loginBtn.disabled = false;
     loginBtnText.textContent = 'Sign In';
@@ -726,56 +755,108 @@ async function loginUser() {
   }
 }
 
-    // REGISTER
-    async function registerUser() {
-      const name = document.getElementById('register-name').value.trim();
-      const email = document.getElementById('register-email').value.trim();
-      const contact_no = document.getElementById('register-contact').value.trim();
-      const password = document.getElementById('register-password').value.trim();
-      const termsAgreed = document.getElementById('termsAgree').checked;
-      const registerBtn = document.getElementById('register-btn');
-      const registerBtnText = document.getElementById('register-btn-text');
-      const registerSpinner = document.getElementById('register-spinner');
 
-      if (!name || !email || !password) {
-        showToast('error', 'Validation Error', 'Please fill in all fields.');
-        return;
-      }
+  // REGISTER
+async function registerUser() {
+  const name = document.getElementById('register-name').value.trim();
+  const email = document.getElementById('register-email').value.trim();
+  const contact_no = document.getElementById('register-contact').value.trim();
+  const password = document.getElementById('register-password').value.trim();
+  const termsAgreed = document.getElementById('termsAgree').checked;
+  const user_type = document.getElementById('register-user-type').value;
 
-      if (!termsAgreed) {
-        showToast('error', 'Terms Not Accepted', 'You must agree to the terms and conditions.');
-        return;
-      }
+  // Validation
+  if (!name || !contact_no || !password || !user_type) {
+    showToast('error', 'Validation Error', 'Please fill in all required fields.');
+    return;
+  }
 
-     
+  if (!termsAgreed) {
+    showToast('error', 'Terms Not Accepted', 'You must agree to the terms and conditions.');
+    return;
+  }
 
-      // Show loading state
-      registerBtn.disabled = true;
-      registerBtnText.textContent = 'Creating Account...';
-      registerSpinner.classList.remove('d-none');
+  // Collect student details based on user_type
+  let details = {};
+  if (user_type === "school") {
+    details = {
+      first_name: document.getElementById('school-first-name')?.value.trim() || '',
+      last_name: document.getElementById('school-last-name')?.value.trim() || '',
+      date_of_birth: document.getElementById('school-dob')?.value || '',
+      gender: document.getElementById('school-gender')?.value || '',
+      school_name: document.getElementById('school-name')?.value.trim() || '',
+      class_grade: document.getElementById('school-class')?.value.trim() || '',
+      city: document.getElementById('school-city')?.value.trim() || '',
+      state: document.getElementById('school-state')?.value.trim() || '',
+      pincode: document.getElementById('school-pincode')?.value.trim() || ''
+    };
+  } else if (user_type === "college") {
+    details = {
+      first_name: document.getElementById('college-first-name')?.value.trim() || '',
+      last_name: document.getElementById('college-last-name')?.value.trim() || '',
+      date_of_birth: document.getElementById('college-dob')?.value || '',
+      gender: document.getElementById('college-gender')?.value || '',
+      college_name: document.getElementById('college-name')?.value.trim() || '',
+      course_degree: document.getElementById('college-degree')?.value.trim() || '',
+      year_of_study: document.getElementById('college-year')?.value.trim() || '',
+      city: document.getElementById('college-city')?.value.trim() || '',
+      state: document.getElementById('college-state')?.value.trim() || '',
+      pincode: document.getElementById('college-pincode')?.value.trim() || ''
+    };
+  } else if (user_type === "passout") {
+    details = {
+      first_name: document.getElementById('passout-first-name')?.value.trim() || '',
+      last_name: document.getElementById('passout-last-name')?.value.trim() || '',
+      date_of_birth: document.getElementById('passout-dob')?.value || '',
+      gender: document.getElementById('passout-gender')?.value || '',
+      college_name: document.getElementById('passout-college-name')?.value.trim() || '',
+      degree_completed: document.getElementById('passout-degree')?.value.trim() || '',
+      year_of_passing: document.getElementById('passout-year')?.value.trim() || '',
+      current_status: document.getElementById('passout-status')?.value.trim() || '',
+      city: document.getElementById('passout-city')?.value.trim() || '',
+      state: document.getElementById('passout-state')?.value.trim() || '',
+      pincode: document.getElementById('passout-pincode')?.value.trim() || ''
+    };
+  }
 
-      try {
-       const data = { name, email, password, role: 'participant', contact_no };
-        const result = await makeRequest('POST', '/auth/register', data, false);
+  // Show loading state
+  const registerBtn = document.getElementById('register-btn');
+  const registerBtnText = document.getElementById('register-btn-text');
+  const registerSpinner = document.getElementById('register-spinner');
+  
+  registerBtn.disabled = true;
+  registerBtnText.textContent = 'Creating Account...';
+  registerSpinner.classList.remove('d-none');
 
-        showToast('success', 'Account Created', 'Your account has been created successfully!');
-        
-        // Auto switch to login after success
-        setTimeout(() => {
-          showSection('login-section');
-          document.getElementById('login-email').value = email;
-          document.getElementById('login-password').focus();
-        }, 2000);
+  try {
+    // Merge common + extra data
+    const data = {
+      name, email, password, contact_no, user_type,
+      ...details
+    };
 
-      } catch (error) {
-        showToast('error', 'Registration Failed', error.message || 'Could not create account. Please try again.');
-      } finally {
-        // Reset button state
-        registerBtn.disabled = false;
-        registerBtnText.textContent = 'Create Account';
-        registerSpinner.classList.add('d-none');
-      }
-    }
+    const result = await makeRequest('POST', '/auth/register', data, false);
+
+    showToast('success', 'Account Created', 'Your account has been created successfully!');
+    
+    // Auto switch to login after success
+    setTimeout(() => {
+      showSection('login-section');
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-password').focus();
+    }, 2000);
+
+  } catch (error) {
+    showToast('error', 'Registration Failed', error.message || 'Could not create account. Please try again.');
+  } finally {
+    // Reset button state
+    registerBtn.disabled = false;
+    registerBtnText.textContent = 'Create Account';
+    registerSpinner.classList.add('d-none');
+  }
+}
+
+
 
     // SET JWT
     function setToken(token) {
@@ -935,6 +1016,165 @@ async function loginUser() {
     registerPasswordInput.type = isPassword ? 'text' : 'password';
     registerToggleIcon.className = isPassword ? 'bi bi-eye' : 'bi bi-eye-slash';
   });
+  function renderUserFields() {
+  const type = document.getElementById("register-user-type").value;
+  const container = document.getElementById("user-fields");
+
+  let html = "";
+
+  if (type === "school") {
+    html = `
+      <div class="mb-4">
+        <label class="form-label">First Name</label>
+        <input type="text" id="school-first-name" class="form-control" placeholder="First Name" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Last Name</label>
+        <input type="text" id="school-last-name" class="form-control" placeholder="Last Name" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Date of Birth</label>
+        <input type="date" id="school-dob" class="form-control" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Gender</label>
+        <select id="school-gender" class="form-control">
+          <option value="">Select</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">School Name</label>
+        <input type="text" id="school-name" class="form-control" placeholder="School Name" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Class/Grade</label>
+        <input type="text" id="school-class" class="form-control" placeholder="9th, 10th, 11th, 12th" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">City</label>
+        <input type="text" id="school-city" class="form-control" placeholder="City" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">State</label>
+        <input type="text" id="school-state" class="form-control" placeholder="State" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Pincode</label>
+        <input type="text" id="school-pincode" class="form-control" placeholder="Pincode" />
+      </div>
+    `;
+  }
+
+  else if (type === "college") {
+  html = `
+    <div class="mb-4">
+      <label class="form-label">First Name</label>
+      <input type="text" id="college-first-name" class="form-control" placeholder="First Name" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Last Name</label>
+      <input type="text" id="college-last-name" class="form-control" placeholder="Last Name" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Date of Birth</label>
+      <input type="date" id="college-dob" class="form-control" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Gender</label>
+      <select id="college-gender" class="form-control">
+        <option value="">Select</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="mb-4">
+      <label class="form-label">College Name</label>
+      <input type="text" id="college-name" class="form-control" placeholder="College Name" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Course/Degree</label>
+      <input type="text" id="college-degree" class="form-control" placeholder="Course/Degree" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Year of Study</label>
+      <input type="text" id="college-year" class="form-control" placeholder="1st, 2nd, 3rd, 4th" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">City</label>
+      <input type="text" id="college-city" class="form-control" placeholder="City" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">State</label>
+      <input type="text" id="college-state" class="form-control" placeholder="State" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Pincode</label>
+      <input type="text" id="college-pincode" class="form-control" placeholder="Pincode" />
+    </div>
+  `;
+}
+
+else if (type === "passout") {
+  html = `
+    <div class="mb-4">
+      <label class="form-label">First Name</label>
+      <input type="text" id="passout-first-name" class="form-control" placeholder="First Name" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Last Name</label>
+      <input type="text" id="passout-last-name" class="form-control" placeholder="Last Name" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Date of Birth</label>
+      <input type="date" id="passout-dob" class="form-control" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Gender</label>
+      <select id="passout-gender" class="form-control">
+        <option value="">Select</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="mb-4">
+      <label class="form-label">College Name (Graduated)</label>
+      <input type="text" id="passout-college-name" class="form-control" placeholder="College Name" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Degree Completed</label>
+      <input type="text" id="passout-degree" class="form-control" placeholder="Degree" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Year of Passing</label>
+      <input type="text" id="passout-year" class="form-control" placeholder="YYYY" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Current Status</label>
+      <input type="text" id="passout-status" class="form-control" placeholder="Working, Studying, etc." />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">City</label>
+      <input type="text" id="passout-city" class="form-control" placeholder="City" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">State</label>
+      <input type="text" id="passout-state" class="form-control" placeholder="State" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Pincode</label>
+      <input type="text" id="passout-pincode" class="form-control" placeholder="Pincode" />
+    </div>
+  `;
+}
+
+  container.innerHTML = html;
+}
+
   </script>
 </body>
 </html>
