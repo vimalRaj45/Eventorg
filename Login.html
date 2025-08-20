@@ -728,7 +728,8 @@ if (/^\d{10}$/.test(input)) {
     localStorage.setItem("user", JSON.stringify(result.user));
 
     showToast('success', 'Login Successful', `Welcome back, ${result.user.name || 'User'}!`);
-
+    alert(result);
+    alert(`Welcome back, ${result.user.role || 'User'}!`);
     // Redirect after 2 sec
     setTimeout(() => {
       if (result.user.user_type === 'admin') {
