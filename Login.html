@@ -834,7 +834,7 @@ async function registerUser() {
       name, email, password, contact_no, user_type,
       ...details
     };
-
+    console.log(data);
     const result = await makeRequest('POST', '/auth/register', data, false);
 
     showToast('success', 'Account Created', 'Your account has been created successfully!');
