@@ -525,17 +525,19 @@
   <div class="form-check pro-checkbox-handwritten">
     <input type="checkbox" id="termsAgreeHand" required>
     <label for="termsAgreeHand">
-      <!-- Custom checkbox square -->
+      <!-- Custom checkbox box -->
       <span class="checkbox-box">
         <svg class="checkmark-svg" viewBox="0 0 52 52">
-          <path d="M14 27 L22 35 L38 17" fill="none" stroke="#28a745" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 27 L22 35 L38 17" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
 
       <!-- Label text -->
-      I agree to the 
-      <a href="#" class="link">Terms of Service</a> and 
-      <a href="#" class="link">Privacy Policy</a>
+      <span class="checkbox-text">
+        I agree to the 
+        <a href="#" class="link">Terms of Service</a> and 
+        <a href="#" class="link">Privacy Policy</a>
+      </span>
     </label>
   </div>
 </div>
@@ -545,11 +547,11 @@
 .pro-checkbox-handwritten {
   display: flex;
   align-items: center;
-  padding: 18px 20px;
-  border-radius: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
   border: 2px solid #e9ecef;
   background: #fff;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
@@ -557,7 +559,7 @@
 
 .pro-checkbox-handwritten:hover {
   border-color: #0d6efd;
-  box-shadow: 0 8px 20px rgba(13,110,253,0.15);
+  box-shadow: 0 6px 15px rgba(13,110,253,0.15);
 }
 
 /* Hide native checkbox */
@@ -570,11 +572,12 @@
 .pro-checkbox-handwritten label {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 1rem;
+  gap: 10px;
+  font-size: 0.95rem;
   font-weight: 500;
   color: #212529;
   cursor: pointer;
+  flex-wrap: wrap;
 }
 
 /* Links styling */
@@ -582,7 +585,7 @@
   color: #0d6efd;
   font-weight: 600;
   text-decoration: none;
-  border-bottom: 2px solid rgba(13,110,253,0.3);
+  border-bottom: 1.5px solid rgba(13,110,253,0.3);
   transition: all 0.2s ease;
 }
 
@@ -593,10 +596,10 @@
 
 /* Custom checkbox box */
 .checkbox-box {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border: 2px solid #dee2e6;
-  border-radius: 8px;
+  border-radius: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -608,8 +611,8 @@
 
 /* SVG tick animation */
 .checkmark-svg {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
 }
 
 .checkmark-svg path {
@@ -618,7 +621,7 @@
   transition: stroke-dashoffset 0.35s ease;
 }
 
-/* Show tick when checked */
+/* Show tick and change box color when checked */
 .pro-checkbox-handwritten input:checked + label .checkbox-box {
   border-color: #28a745;
   background-color: #28a745;
@@ -626,7 +629,27 @@
 
 .pro-checkbox-handwritten input:checked + label .checkbox-box .checkmark-svg path {
   stroke-dashoffset: 0;
-  stroke: #fff;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 480px) {
+  .pro-checkbox-handwritten {
+    padding: 12px 14px;
+  }
+
+  .checkbox-box {
+    width: 22px;
+    height: 22px;
+  }
+
+  .checkmark-svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .pro-checkbox-handwritten label {
+    font-size: 0.9rem;
+  }
 }
 </style>
 
