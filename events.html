@@ -550,6 +550,11 @@
                  style="background-color: #f9f4f0; border: 1px solid #c97d30;">
         </div>
         <div class="col-md-4 mb-3">
+          <label class="form-label" style="color: #3b2f2f;">USER ID</label>
+          <input type="text" class="form-control" id="userid" readonly 
+                 style="background-color: #f9f4f0; border: 1px solid #c97d30;">
+        </div>
+        <div class="col-md-4 mb-3">
           <label class="form-label" style="color: #3b2f2f;">Contact Number</label>
           <input type="text" class="form-control" id="verified-contact" readonly 
                  style="background-color: #f9f4f0; border: 1px solid #c97d30;">
@@ -958,6 +963,7 @@ async function getMyProfile() {
     
     document.getElementById('verified-name').value = result.name;
     document.getElementById('verified-email').value = result.email;
+    document.getElementById('userid').value = result.user_id || 'Not provided';
     document.getElementById('verified-contact').value = result.contact_no || 'Not provided';
     document.getElementById('profileVerificationSection').style.display = 'block';
     
