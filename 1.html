@@ -1,360 +1,1059 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Update Profile</title>
-
-  <!-- Google Fonts & Bootstrap CSS -->
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-
-  <style>
-    body {
-      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-      font-family: 'Outfit', sans-serif;
-      color: #1f2937;
-    }
-
-    .profile-container {
-      max-width: 500px;
-      margin: 80px auto;
-      background: #ffffff;
-      padding: 2.5rem 2rem;
-      border-radius: 20px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.05);
-      transition: all 0.3s ease-in-out;
-    }
-
-    .profile-container:hover {
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
-    }
-
-    h3 {
-      font-weight: 600;
-      font-size: 1.75rem;
-      margin-bottom: 1.5rem;
-      color: #111827;
-    }
-
-    label.form-label {
-      font-weight: 500;
-      margin-bottom: 0.4rem;
-    }
-
-    .form-control {
-      height: 44px;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      background-color: #f9fafb;
-      border: 1px solid #d1d5db;
-      transition: all 0.2s ease;
-    }
-
-    .form-control:focus {
-      background-color: #ffffff;
-      border-color: rgba(94, 10, 0, 1);
-      box-shadow: 0 0 0 0.15rem rgba(59, 130, 246, 0.25);
-    }
-
-    .btn-primary {
-      font-weight: 600;
-      font-size: 1rem;
-      padding: 12px 16px;
-      border-radius: 12px;
-      background-color: rgba(94, 10, 0, 1);
-      border: none;
-      transition: background-color 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      background-color: #2563eb;
-    }
-
-    .toast-container {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      z-index: 1055;
-    }
-
-    .loading-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(255, 255, 255, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-
-    @media (max-width: 576px) {
-      .profile-container {
-        margin: 40px 20px;
-        padding: 2rem 1.5rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile Management</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #6f42c1;
+            --success: #1cc88a;
+            --info: #36b9cc;
+            --warning: #f6c23e;
+            --danger: #e74a3b;
+            --light: #f8f9fc;
+            --dark: #5a5c69;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fc;
+            color: #444;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+            padding: 1rem 1.35rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .user-info-card {
+            border-left: 4px solid var(--primary);
+        }
+        
+        .school-info-card {
+            border-left: 4px solid var(--success);
+        }
+        
+        .college-info-card {
+            border-left: 4px solid var(--info);
+        }
+        
+        .passout-info-card {
+            border-left: 4px solid var(--warning);
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #000;
+        }
+        
+        .section-title {
+            border-bottom: 2px solid #e3e6f0;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a5fc8;
+            border-color: #3a5fc8;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            border-color: var(--danger);
+        }
+        
+        .alert-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        }
+        
+        .tab-pane {
+            padding: 1.5rem 0;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            font-weight: 600;
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .user-avatar {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        .convert-section {
+            background-color: #f8f9fc;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .user-avatar {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
 </head>
 <body>
- <!-- Add Bootstrap CSS in <head> if not already included -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Navigation -->
-<nav style="
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background: white;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-  z-index: 9999;
-  padding: 0 20px;
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-family: 'Outfit', sans-serif;
-">
-
-
-  <!-- Logo -->
-  <div style="
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #6366f1;
-  "> <img src="https://i.ibb.co/spyHywtx/Event-Hub-Logo45-1.jpg" alt="Logo" style="height: 55px; margin-top: 2%;"></div>
-
-  <!-- Hamburger -->
-  <div id="hamburgerBtn" style="
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
-  " onclick="toggleNavMenu()">
-    <div style="width: 25px; height: 3px; background: #1f2937; margin: 3px 0;"></div>
-    <div style="width: 25px; height: 3px; background: #1f2937; margin: 3px 0;"></div>
-    <div style="width: 25px; height: 3px; background: #1f2937; margin: 3px 0;"></div>
-  </div>
-
-  <!-- Nav Menu -->
-  <div id="navMenu" style="
-    display: flex;
-    gap: 2rem;
-    list-style: none;
-    align-items: center;
-  ">
-    <a href='/' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Home</a>
-    <a href='/events' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Events</a>
-    <a href='/certificates' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Certificates</a>
-    <a href='/results' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Results</a>
-    <a href='/intern' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Internships</a>
-    <a href='/refer' style='text-decoration: none; color: #1f2937; font-weight: 500;'>Referral</a>
-    <a href='/1' style='text-decoration: none; color: #1f2937; font-weight: 650;'>Profile</a>
-    <a href='/help' style='text-decoration: none; color: #1f2937; font-weight: 650;'>Help</a>
-    <!-- Login and Logout -->
-    <a href='/login' id='loginItem' style='
-      text-decoration: none;
-      background: rgba(94,10,0,255);
-      color: white;
-      padding: 0.5rem 1.2rem;
-      border-radius: 8px;
-      font-weight: 600;
-    '>Login</a>
-
-    <a id="logoutItem" href="#" onclick="logoutUser()" style="
-      text-decoration: none;
-      background: #f46721;
-      color: white;
-      padding: 0.5rem 1.2rem;
-      border-radius: 8px;
-      font-weight: 600;
-      display: none;
-    ">Logout</a>
-  </div>
-  </div>
-</nav>
-
-
-<!-- Bootstrap JS bundle at end of body -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-
-  <!-- Loading Spinner -->
-  <div id="loadingOverlay" class="loading-overlay">
-    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-  </div>
-
-
- <div class="profile-container" style="padding-top: 18%;">
-  
-    <h3><i class="bi bi-person-circle me-2"></i>Update Profile</h3>
-
-    <div class="mb-3">
-      <label for="my-email" class="form-label">Email (read-only)</label>
-      <input type="email" class="form-control" id="my-email" readonly>
-    </div>
-
-    <div class="mb-3">
-      <label for="my-name" class="form-label">Name</label>
-      <input type="text" class="form-control" id="my-name" placeholder="Enter your name">
-    </div>
-
-    <div class="mb-3">
-      <label for="my-contact" class="form-label">Contact Number</label>
-      <input type="text" class="form-control" id="my-contact" placeholder="Enter contact number">
-    </div>
-
-    <div class="mb-3 d-none">
-      <label for="my-role" class="form-label">Role (optional)</label>
-      <select id="my-role" class="form-select">
-        <option value="">(Keep same)</option>
-        <option value="participant">Participant</option>
-        <option value="admin">Admin</option>
-      </select>
-    </div>
-
-    <button onclick="updateMyProfile()" class="btn btn-primary w-100 mt-2">
-      <i class="bi bi-save me-1"></i>Update Profile
-    </button>
-  </div>
-
-  <!-- Toast -->
-  <div class="toast-container">
-    <div id="toast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body" id="toast-msg">Success message</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    const API_BASE_URL = 'https://eventdb.onrender.com/api';
-    let currentToken = localStorage.getItem('jwtToken') || '';
-
-    function showToast(message, type = 'success') {
-      const toastEl = document.getElementById('toast');
-      const toastMsg = document.getElementById('toast-msg');
-      toastEl.className = `toast align-items-center text-bg-${type} border-0`;
-      toastMsg.textContent = message;
-      new bootstrap.Toast(toastEl).show();
-    }
-
-    async function makeRequest(method, endpoint, data = null, requiresAuth = true) {
-      const headers = { 'Content-Type': 'application/json' };
-      if (requiresAuth && currentToken) headers['Authorization'] = `Bearer ${currentToken}`;
-      const options = { method, headers };
-      if (data) options.body = JSON.stringify(data);
-
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-      const result = response.headers.get('content-type')?.includes('application/json') ? await response.json() : await response.text();
-
-      if (!response.ok) throw new Error(result.error || result.message || 'Request failed');
-      return result;
-    }
-
-    async function getMyProfile() {
-      try {
-        const result = await makeRequest('GET', '/profile');
-        document.getElementById('my-email').value = result.email;
-        document.getElementById('my-name').value = result.name;
-        document.getElementById('my-contact').value = result.contact_no || '';
-        document.getElementById('loadingOverlay').style.display = 'none';
-      } catch (error) {
-       alert("You need to login first. (relogin)");
-      }
-    }
-
-    async function updateMyProfile() {
-      const email = document.getElementById('my-email').value;
-      const name = document.getElementById('my-name').value;
-      const contact_no = document.getElementById('my-contact').value;
-      const role = document.getElementById('my-role').value || null;
-
-      const data = { name, contact_no, role };
-
-      try {
-        await makeRequest('PUT', `/users/${email}`, data);
-        alert("Profile updated successfully.");
-        setTimeout(() => window.location.href = 'index.html', 2100);
-      } catch (err) {
-        showToast(`❌ Failed to update: ${err.message}`, 'danger');
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', getMyProfile);
-    // Disable right-click context menu
-document.addEventListener('contextmenu', e => e.preventDefault());
-
-// Disable specific key shortcuts
-document.addEventListener('keydown', function(e) {
-  if (
-    e.key === 'F12' ||
-    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
-    (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
-  ) {
-    e.preventDefault();
    
-  }
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12">
+                
+                
+                <!-- User Lookup Card -->
+                <div class="card mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold">User Lookup</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="userId" class="form-label">User ID</label>
+                                    <input type="text" class="form-control form-control-lg" id="userId" placeholder="Enter user ID" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button id="fetchUserBtn" class="btn btn-primary btn-lg w-100">
+                                    <i class="bi bi-search me-2"></i> Fetch User
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Details Section (Initially Hidden) -->
+                <div id="userDetails" class="d-none">
+                    <!-- User Profile Header -->
+                    <div class="card mb-4 user-info-card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                
+                                <div class="col-md-10">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="info-label">User ID</div>
+                                            <div class="info-value" id="display-id"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="info-label">Name</div>
+                                            <div class="info-value" id="display-name"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="info-label">Email</div>
+                                            <div class="info-value" id="display-email"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="info-label">Contact</div>
+                                            <div class="info-value" id="display-contact"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="info-label">User Type</div>
+                                            <div class="info-value" id="display-type"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="info-label">Created At</div>
+                                            <div class="info-value" id="display-created"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="info-label">Last Login</div>
+                                            <div class="info-value" id="display-login"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabs Navigation -->
+                    <ul class="nav nav-tabs mb-4" id="userTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">
+                                <i class="bi bi-person me-1"></i> Profile Details
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="update-tab" data-bs-toggle="tab" data-bs-target="#update" type="button" role="tab">
+                                <i class="bi bi-pencil me-1"></i> Update User
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="convert-tab" data-bs-toggle="tab" data-bs-target="#convert" type="button" role="tab">
+                                <i class="bi bi-arrow-repeat me-1"></i> Convert User Type
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="userTabsContent">
+                        <!-- Profile Details Tab -->
+                        <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold">Basic Information</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="info-label">First Name</div>
+                                            <div class="info-value" id="profile-firstname"></div>
+                                            
+                                            <div class="info-label">Last Name</div>
+                                            <div class="info-value" id="profile-lastname"></div>
+                                            
+                                            <div class="info-label">Date of Birth</div>
+                                            <div class="info-value" id="profile-dob"></div>
+                                            
+                                            <div class="info-label">Gender</div>
+                                            <div class="info-value" id="profile-gender"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- School Info Card -->
+                                    <div class="card h-100 school-info-card d-none" id="profile-school-card">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold">School Information</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="info-label">School Name</div>
+                                            <div class="info-value" id="profile-school"></div>
+                                            
+                                            <div class="info-label">Class Grade</div>
+                                            <div class="info-value" id="profile-grade"></div>
+                                            
+                                            <div class="info-label">City</div>
+                                            <div class="info-value" id="profile-city"></div>
+                                            
+                                            <div class="info-label">State</div>
+                                            <div class="info-value" id="profile-state"></div>
+                                            
+                                            <div class="info-label">Pincode</div>
+                                            <div class="info-value" id="profile-pincode"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- College Info Card -->
+                                    <div class="card h-100 college-info-card d-none" id="profile-college-card">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold">College Information</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="info-label">College Name</div>
+                                            <div class="info-value" id="profile-college-name"></div>
+                                            
+                                            <div class="info-label">Course/Degree</div>
+                                            <div class="info-value" id="profile-course-degree"></div>
+                                            
+                                            <div class="info-label">Year of Study</div>
+                                            <div class="info-value" id="profile-year-study"></div>
+                                            
+                                            <div class="info-label">City</div>
+                                            <div class="info-value" id="profile-college-city"></div>
+                                            
+                                            <div class="info-label">State</div>
+                                            <div class="info-value" id="profile-college-state"></div>
+                                            
+                                            <div class="info-label">Pincode</div>
+                                            <div class="info-value" id="profile-college-pincode"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Passout Info Card -->
+                                    <div class="card h-100 passout-info-card d-none" id="profile-passout-card">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold">Passout Information</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="info-label">College Name</div>
+                                            <div class="info-value" id="profile-passout-college"></div>
+                                            
+                                            <div class="info-label">Degree Completed</div>
+                                            <div class="info-value" id="profile-degree-completed"></div>
+                                            
+                                            <div class="info-label">Year of Passing</div>
+                                            <div class="info-value" id="profile-year-passing"></div>
+                                            
+                                            <div class="info-label">Current Status</div>
+                                            <div class="info-value" id="profile-current-status"></div>
+                                            
+                                            <div class="info-label">City</div>
+                                            <div class="info-value" id="profile-passout-city"></div>
+                                            
+                                            <div class="info-label">State</div>
+                                            <div class="info-value" id="profile-passout-state"></div>
+                                            
+                                            <div class="info-label">Pincode</div>
+                                            <div class="info-value" id="profile-passout-pincode"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Update User Tab -->
+                        <div class="tab-pane fade" id="update" role="tabpanel">
+                            <div class="card">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold">Update User Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form id="updateForm">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h5 class="section-title">Account Information</h5>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="password" class="form-label">New Password (leave blank to keep current)</label>
+                                                    <input type="password" class="form-control" id="password">
+                                                </div>
+                                                
+                                                <div class="mb-3" ">
+                                                    <label for="userType" class="form-label">User Type</label>
+                                                    <select class="form-select" id="userType" disabled>
+                                                        <option value="school">School Student</option>
+                                                        <option value="college">College Student</option>
+                                                        <option value="passout">Passout Student</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h5 class="section-title">Personal Information</h5>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="firstName" class="form-label">First Name</label>
+                                                    <input type="text" class="form-control" id="firstName">
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="lastName" class="form-label">Last Name</label>
+                                                    <input type="text" class="form-control" id="lastName">
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                                                    <input type="date" class="form-control" id="dateOfBirth">
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="gender" class="form-label">Gender</label>
+                                                    <select class="form-select" id="gender">
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mt-3">
+                                            <div class="col-12">
+                                                <h5 class="section-title">Address Information</h5>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="city" class="form-label">City</label>
+                                                    <input type="text" class="form-control" id="city">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="state" class="form-label">State</label>
+                                                    <input type="text" class="form-control" id="state">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="pincode" class="form-label">Pincode</label>
+                                                    <input type="text" class="form-control" id="pincode">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- School Fields -->
+                                        <div class="row mt-3 d-none" id="schoolFields">
+                                            <div class="col-12">
+                                                <h5 class="section-title">School Information</h5>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="schoolName" class="form-label">School Name</label>
+                                                    <input type="text" class="form-control" id="schoolName">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="classGrade" class="form-label">Class Grade</label>
+                                                    <input type="text" class="form-control" id="classGrade">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- College Fields -->
+                                        <div class="row mt-3 d-none" id="collegeFields">
+                                            <div class="col-12">
+                                                <h5 class="section-title">College Information</h5>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="collegeName" class="form-label">College Name</label>
+                                                    <input type="text" class="form-control" id="collegeName">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="courseDegree" class="form-label">Course/Degree</label>
+                                                    <input type="text" class="form-control" id="courseDegree">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="yearOfStudy" class="form-label">Year of Study</label>
+                                                    <input type="number" class="form-control" id="yearOfStudy" min="1">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Passout Fields -->
+                                        <div class="row mt-3 d-none" id="passoutFields">
+                                            <div class="col-12">
+                                                <h5 class="section-title">Passout Information</h5>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="passoutCollegeName" class="form-label">College Name</label>
+                                                    <input type="text" class="form-control" id="passoutCollegeName">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="degreeCompleted" class="form-label">Degree Completed</label>
+                                                    <input type="text" class="form-control" id="degreeCompleted">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="yearOfPassing" class="form-label">Year of Passing</label>
+                                                    <input type="number" class="form-control" id="yearOfPassing">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="currentStatus" class="form-label">Current Status</label>
+                                                    <input type="text" class="form-control" id="currentStatus">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4">
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="bi bi-check-circle me-1"></i> Update User
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Convert User Type Tab -->
+                        <div class="tab-pane fade" id="convert" role="tabpanel">
+                            <div class="card">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold">Convert User Type</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-warning">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        <strong>Warning:</strong> This action cannot be undone. Converting will migrate data to the appropriate table.
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="convertTo" class="form-label">Convert To</label>
+                                                <select class="form-select" id="convertTo">
+                                                    <option value="college">College Student</option>
+                                                    <option value="passout">Passout Student</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="convertCollegeFields">
+                                        <h5 class="section-title">College Information</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="convertCollegeName" class="form-label">College Name</label>
+                                                    <input type="text" class="form-control" id="convertCollegeName">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="convertCourseDegree" class="form-label">Course/Degree</label>
+                                                    <input type="text" class="form-control" id="convertCourseDegree">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="convertYearOfStudy" class="form-label">Year of Study</label>
+                                                    <input type="number" class="form-control" id="convertYearOfStudy" min="1">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="convertPassoutFields" class="d-none">
+                                        <h5 class="section-title">Passout Information</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="convertDegreeCompleted" class="form-label">Degree Completed</label>
+                                                    <input type="text" class="form-control" id="convertDegreeCompleted">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="convertYearOfPassing" class="form-label">Year of Passing</label>
+                                                    <input type="number" class="form-control" id="convertYearOfPassing">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="convertCurrentStatus" class="form-label">Current Status</label>
+                                                    <input type="text" class="form-control" id="convertCurrentStatus">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <h5 class="section-title">Address Information</h5>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="convertCity" class="form-label">City</label>
+                                                <input type="text" class="form-control" id="convertCity">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="convertState" class="form-label">State</label>
+                                                <input type="text" class="form-control" id="convertState">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="convertPincode" class="form-label">Pincode</label>
+                                                <input type="text" class="form-control" id="convertPincode">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <button id="convertBtn" class="btn btn-danger">
+                                            <i class="bi bi-arrow-repeat me-1"></i> Convert User Type
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Box -->
+    <div class="alert-box"></div>
+
+    <!-- Bootstrap & jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    // Disable right-click context menu
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Disable specific key shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
+        ) {
+            e.preventDefault();
+        }
+    });
+    
+    const BASE_URL = 'https://eventdb.onrender.com';
+    let currentUserData = null;
+    
+    // DOM Elements
+    const userIdInput = document.getElementById('userId');
+    const fetchUserBtn = document.getElementById('fetchUserBtn');
+    const userDetails = document.getElementById('userDetails');
+    const updateForm = document.getElementById('updateForm');
+    const userTypeSelect = document.getElementById('userType');
+    const convertToSelect = document.getElementById('convertTo');
+    const convertBtn = document.getElementById('convertBtn');
+    const alertBox = document.querySelector('.alert-box');
+    
+   document.addEventListener('DOMContentLoaded', function () {
+    const userIdInput = document.getElementById('userId'); // Assumes you have this input
+    const savedUser = localStorage.getItem('user');
+
+    if (savedUser) {
+        let userId;
+
+        // Try to parse as JSON (if full user object), otherwise treat as plain ID
+        try {
+            const parsed = JSON.parse(savedUser);
+            userId = parsed.id || parsed;
+        } catch (e) {
+            userId = savedUser; // Not JSON, so assume it's just the ID string
+        }
+
+        userIdInput.value = userId;
+        fetchUserData(userId);
+    }
 });
-
-    function toggleNavMenu() {
-    const navMenu = document.getElementById('navMenu');
-    navMenu.style.left = navMenu.style.left === '0px' ? '-100%' : '0px';
-  }
-
-  function handleResize() {
-    const hamburger = document.getElementById('hamburgerBtn');
-    const navMenu = document.getElementById('navMenu');
-    if (window.innerWidth <= 768) {
-      hamburger.style.display = 'flex';
-      navMenu.style.position = 'fixed';
-      navMenu.style.left = '-100%';
-      navMenu.style.top = '70px';
-      navMenu.style.width = '100%';
-      navMenu.style.background = 'white';
-      navMenu.style.flexDirection = 'column';
-      navMenu.style.textAlign = 'center';
-      navMenu.style.padding = '2rem 0';
-      navMenu.style.transition = 'left 0.3s ease';
-      navMenu.style.boxShadow = '0 10px 27px rgba(0, 0, 0, 0.05)';
-    } else {
-      hamburger.style.display = 'none';
-      navMenu.removeAttribute('style');
-      navMenu.style.display = 'flex';
-      navMenu.style.gap = '2rem';
-      navMenu.style.listStyle = 'none';
-      navMenu.style.alignItems = 'center';
+    
+    // Toggle form fields based on user type
+    userTypeSelect.addEventListener('change', toggleFormFields);
+    convertToSelect.addEventListener('change', toggleConvertFields);
+    
+    function toggleFormFields() {
+        const userType = userTypeSelect.value;
+        
+        // Hide all fields first
+        document.getElementById('schoolFields').classList.add('d-none');
+        document.getElementById('collegeFields').classList.add('d-none');
+        document.getElementById('passoutFields').classList.add('d-none');
+        
+        // Show appropriate fields
+        if (userType === 'school') {
+            document.getElementById('schoolFields').classList.remove('d-none');
+        } else if (userType === 'college') {
+            document.getElementById('collegeFields').classList.remove('d-none');
+        } else if (userType === 'passout') {
+            document.getElementById('passoutFields').classList.remove('d-none');
+        }
     }
-  }
-
-  function logoutUser() {
-    localStorage.clear(); // Clear all localStorage keys
-    window.location.href = "Login.html";
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      document.getElementById("logoutItem").style.display = "block";
-      document.getElementById("loginItem").style.display = "none";
-    } else {
-      document.getElementById("logoutItem").style.display = "none";
-      document.getElementById("loginItem").style.display = "block";
+    
+    function toggleConvertFields() {
+        const convertTo = convertToSelect.value;
+        
+        if (convertTo === 'college') {
+            document.getElementById('convertCollegeFields').classList.remove('d-none');
+            document.getElementById('convertPassoutFields').classList.add('d-none');
+        } else if (convertTo === 'passout') {
+            document.getElementById('convertCollegeFields').classList.add('d-none');
+            document.getElementById('convertPassoutFields').classList.remove('d-none');
+        }
     }
-    handleResize();
-  });
-
-  window.addEventListener('resize', handleResize);
-  </script>
+    
+    // Format date for display
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'Invalid Date';
+        
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+    
+    // Format datetime for display
+    function formatDateTime(dateString) {
+        if (!dateString) return 'N/A';
+        
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'Invalid Date';
+        
+        return date.toLocaleString('en-US');
+    }
+    
+    // Fetch user data function (reusable)
+    async function fetchUserData(userId) {
+        if (!userId) {
+            showAlert('Please enter a user ID', 'danger');
+            return;
+        }
+        
+        try {
+            // Show loading state
+            const originalText = fetchUserBtn.innerHTML;
+            fetchUserBtn.disabled = true;
+            fetchUserBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading...';
+            
+            const response = await fetch(`${BASE_URL}/api/users/${userId}`);
+            const data = await response.json();
+            
+            // Restore button state
+            fetchUserBtn.disabled = false;
+            fetchUserBtn.innerHTML = originalText;
+            
+            if (response.ok) {
+                currentUserData = data;
+                displayUserData(data);
+                populateForm(data);
+                userDetails.classList.remove('d-none');
+                
+                // Save user ID to localStorage for future automatic loading
+                localStorage.setItem('userId', userId);
+                
+                // Scroll to user details
+                userDetails.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                showAlert(data.message || 'Error fetching user data', 'danger');
+            }
+        } catch (error) {
+            // Restore button state
+            fetchUserBtn.disabled = false;
+            fetchUserBtn.innerHTML = '<i class="bi bi-search me-2"></i> Fetch User';
+            
+            showAlert('Failed to fetch user data', 'danger');
+            console.error('Error:', error);
+        }
+    }
+    
+    // Fetch user data on button click
+    fetchUserBtn.addEventListener('click', () => {
+        const userId = userIdInput.value.trim();
+        fetchUserData(userId);
+    });
+    
+    // Display user data
+    function displayUserData(user) {
+        // Update profile header
+        document.getElementById('display-id').textContent = user.id;
+        document.getElementById('display-name').textContent = user.name;
+        document.getElementById('display-email').textContent = user.email || 'N/A';
+        document.getElementById('display-contact').textContent = user.contact_no;
+        document.getElementById('display-type').textContent = user.user_type;
+        document.getElementById('display-created').textContent = formatDateTime(user.created_at);
+        document.getElementById('display-login').textContent = formatDateTime(user.last_login);
+        
+        // Hide all profile cards first
+        document.getElementById('profile-school-card').classList.add('d-none');
+        document.getElementById('profile-college-card').classList.add('d-none');
+        document.getElementById('profile-passout-card').classList.add('d-none');
+        
+        // Update profile details based on user type
+        if (user.user_type === 'school' && user.schoolData) {
+            document.getElementById('profile-school-card').classList.remove('d-none');
+            
+            document.getElementById('profile-firstname').textContent = user.schoolData.first_name;
+            document.getElementById('profile-lastname').textContent = user.schoolData.last_name;
+            document.getElementById('profile-dob').textContent = formatDate(user.schoolData.date_of_birth);
+            document.getElementById('profile-gender').textContent = user.schoolData.gender;
+            document.getElementById('profile-school').textContent = user.schoolData.school_name;
+            document.getElementById('profile-grade').textContent = user.schoolData.class_grade;
+            document.getElementById('profile-city').textContent = user.schoolData.city;
+            document.getElementById('profile-state').textContent = user.schoolData.state;
+            document.getElementById('profile-pincode').textContent = user.schoolData.pincode;
+        } else if (user.user_type === 'college' && user.collegeData) {
+            document.getElementById('profile-college-card').classList.remove('d-none');
+            
+            document.getElementById('profile-firstname').textContent = user.collegeData.first_name;
+            document.getElementById('profile-lastname').textContent = user.collegeData.last_name;
+            document.getElementById('profile-dob').textContent = formatDate(user.collegeData.date_of_birth);
+            document.getElementById('profile-gender').textContent = user.collegeData.gender;
+            document.getElementById('profile-college-name').textContent = user.collegeData.college_name;
+            document.getElementById('profile-course-degree').textContent = user.collegeData.course_degree;
+            document.getElementById('profile-year-study').textContent = user.collegeData.year_of_study;
+            document.getElementById('profile-college-city').textContent = user.collegeData.city;
+            document.getElementById('profile-college-state').textContent = user.collegeData.state;
+            document.getElementById('profile-college-pincode').textContent = user.collegeData.pincode;
+        } else if (user.user_type === 'passout' && user.passoutData) {
+            document.getElementById('profile-passout-card').classList.remove('d-none');
+            
+            document.getElementById('profile-firstname').textContent = user.passoutData.first_name;
+            document.getElementById('profile-lastname').textContent = user.passoutData.last_name;
+            document.getElementById('profile-dob').textContent = formatDate(user.passoutData.date_of_birth);
+            document.getElementById('profile-gender').textContent = user.passoutData.gender;
+            document.getElementById('profile-passout-college').textContent = user.passoutData.college_name;
+            document.getElementById('profile-degree-completed').textContent = user.passoutData.degree_completed;
+            document.getElementById('profile-year-passing').textContent = user.passoutData.year_of_passing;
+            document.getElementById('profile-current-status').textContent = user.passoutData.current_status;
+            document.getElementById('profile-passout-city').textContent = user.passoutData.city;
+            document.getElementById('profile-passout-state').textContent = user.passoutData.state;
+            document.getElementById('profile-passout-pincode').textContent = user.passoutData.pincode;
+        }
+    }
+    
+    // Populate form with user data
+    function populateForm(user) {
+        userTypeSelect.value = user.user_type;
+        toggleFormFields();
+        
+        let roleData = {};
+        if (user.user_type === 'school' && user.schoolData) {
+            roleData = user.schoolData;
+        } else if (user.user_type === 'college' && user.collegeData) {
+            roleData = user.collegeData;
+        } else if (user.user_type === 'passout' && user.passoutData) {
+            roleData = user.passoutData;
+        }
+        
+        // Populate common fields
+        document.getElementById('firstName').value = roleData.first_name || '';
+        document.getElementById('lastName').value = roleData.last_name || '';
+        
+        // Format date for the date input (YYYY-MM-DD)
+        if (roleData.date_of_birth) {
+            const dob = new Date(roleData.date_of_birth);
+            document.getElementById('dateOfBirth').value = dob.toISOString().split('T')[0];
+        }
+        
+        document.getElementById('gender').value = roleData.gender || '';
+        document.getElementById('city').value = roleData.city || '';
+        document.getElementById('state').value = roleData.state || '';
+        document.getElementById('pincode').value = roleData.pincode || '';
+        
+        // Populate role-specific fields
+        if (user.user_type === 'school') {
+            document.getElementById('schoolName').value = roleData.school_name || '';
+            document.getElementById('classGrade').value = roleData.class_grade || '';
+        } else if (user.user_type === 'college') {
+            document.getElementById('collegeName').value = roleData.college_name || '';
+            document.getElementById('courseDegree').value = roleData.course_degree || '';
+            document.getElementById('yearOfStudy').value = roleData.year_of_study || '';
+        } else if (user.user_type === 'passout') {
+            document.getElementById('passoutCollegeName').value = roleData.college_name || '';
+            document.getElementById('degreeCompleted').value = roleData.degree_completed || '';
+            document.getElementById('yearOfPassing').value = roleData.year_of_passing || '';
+            document.getElementById('currentStatus').value = roleData.current_status || '';
+        }
+    }
+    
+    // Update user
+    updateForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const userId = userIdInput.value.trim();
+        const password = document.getElementById('password').value;
+        const userType = document.getElementById('userType').value;
+        
+        // Prepare the request body based on user type
+        const requestBody = {
+            password: password || undefined,
+            user_type: userType,
+            first_name: document.getElementById('firstName').value,
+            last_name: document.getElementById('lastName').value,
+            date_of_birth: document.getElementById('dateOfBirth').value,
+            gender: document.getElementById('gender').value,
+            city: document.getElementById('city').value,
+            state: document.getElementById('state').value,
+            pincode: document.getElementById('pincode').value
+        };
+        
+        // Add role-specific fields
+        if (userType === 'school') {
+            requestBody.school_name = document.getElementById('schoolName').value;
+            requestBody.class_grade = document.getElementById('classGrade').value;
+        } else if (userType === 'college') {
+            requestBody.college_name = document.getElementById('collegeName').value;
+            requestBody.course_degree = document.getElementById('courseDegree').value;
+            requestBody.year_of_study = document.getElementById('yearOfStudy').value;
+        } else if (userType === 'passout') {
+            requestBody.college_name = document.getElementById('passoutCollegeName').value;
+            requestBody.degree_completed = document.getElementById('degreeCompleted').value;
+            requestBody.year_of_passing = document.getElementById('yearOfPassing').value;
+            requestBody.current_status = document.getElementById('currentStatus').value;
+        }
+        
+        try {
+            // Show loading state
+            const submitBtn = updateForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Updating...';
+            
+            const response = await fetch(`${BASE_URL}/api/auth/update/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            
+            const data = await response.json();
+            
+            // Restore button state
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+            
+            if (response.ok) {
+                showAlert('User updated successfully', 'success');
+                // Refresh user data
+                fetchUserData(userId);
+            } else {
+                showAlert(data.error || 'Error updating user', 'danger');
+            }
+        } catch (error) {
+            // Restore button state
+            const submitBtn = updateForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i> Update User';
+            
+            showAlert('Failed to update user', 'danger');
+            console.error('Error:', error);
+        }
+    });
+    
+    // Convert user type
+    convertBtn.addEventListener('click', async () => {
+        const userId = userIdInput.value.trim();
+        const convertTo = convertToSelect.value;
+        
+        if (!confirm(`Are you sure you want to convert this user to ${convertTo}? This action cannot be undone.`)) {
+            return;
+        }
+        
+        // Prepare the request body based on conversion type
+        const requestBody = {
+            city: document.getElementById('convertCity').value,
+            state: document.getElementById('convertState').value,
+            pincode: document.getElementById('convertPincode').value
+        };
+        
+        if (convertTo === 'college') {
+            requestBody.college_name = document.getElementById('convertCollegeName').value;
+            requestBody.course_degree = document.getElementById('convertCourseDegree').value;
+            requestBody.year_of_study = document.getElementById('convertYearOfStudy').value;
+        } else if (convertTo === 'passout') {
+            requestBody.degree_completed = document.getElementById('convertDegreeCompleted').value;
+            requestBody.year_of_passing = document.getElementById('convertYearOfPassing').value;
+            requestBody.current_status = document.getElementById('convertCurrentStatus').value;
+        }
+        
+        try {
+            // Show loading state
+            convertBtn.disabled = true;
+            const originalText = convertBtn.innerHTML;
+            convertBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Converting...';
+            
+            const response = await fetch(`${BASE_URL}/api/auth/convert/${userId}?to=${convertTo}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            
+            const data = await response.json();
+            
+            // Restore button state
+            convertBtn.disabled = false;
+            convertBtn.innerHTML = originalText;
+            
+            if (response.ok) {
+                showAlert(`User converted to ${convertTo} successfully`, 'success');
+                // Refresh user data
+                fetchUserData(userId);
+            } else {
+                showAlert(data.error || 'Error converting user', 'danger');
+            }
+        } catch (error) {
+            // Restore button state
+            convertBtn.disabled = false;
+            convertBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i> Convert User Type';
+            
+            showAlert('Failed to convert user', 'danger');
+            console.error('Error:', error);
+        }
+    });
+    
+    // Show alert message
+    function showAlert(message, type) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        alertBox.appendChild(alert);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.remove();
+            }
+        }, 5000);
+    }
+    
+    // Initialize
+    toggleFormFields();
+    toggleConvertFields();
+</script>
 </body>
 </html>
-
-
