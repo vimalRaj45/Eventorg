@@ -759,7 +759,7 @@ if (/^\d{10}$/.test(input)) {
   // REGISTER
 async function registerUser() {
   const name = document.getElementById('register-name').value.trim();
-  const email = document.getElementById('register-email').value.trim();
+  const email = document.getElementById('register-email').value.trim() || 'N/A';
   const contact_no = document.getElementById('register-contact').value.trim();
   const password = document.getElementById('register-password').value.trim();
   const termsAgreed = document.getElementById('termsAgree').checked;
