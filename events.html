@@ -963,7 +963,7 @@ async function getMyProfile() {
     console.log('User Profile:', result);
     document.getElementById('verified-name').value = result.name;
     document.getElementById('verified-email').value = result.email;
-    document.getElementById('userid').value = result.user_id || 'Not provided';
+    document.getElementById('userid').value = result.id || 'Not provided';
     document.getElementById('verified-contact').value = result.contact_no || 'Not provided';
     document.getElementById('profileVerificationSection').style.display = 'block';
     
