@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -960,7 +958,10 @@ async function makeRequest(method, endpoint, data = null, requiresAuth = true) {
 
 async function getMyProfile() {
   try {
-    // After getting result from API
+    const result = await makeRequest('GET', '/profile');
+    currentUserProfile = result;
+    console.log('User Profile:', result);
+     // After getting result from API
 const email = result.email;
 const emailField = document.getElementById('verified-email').closest('div');
 
@@ -970,11 +971,7 @@ if (email && email !== 'N/A' && email.trim() !== '') {
 } else {
   emailField.style.display = 'none'; // Hide completely
 }
-    const result = await makeRequest('GET', '/profile');
-    currentUserProfile = result;
-    console.log('User Profile:', result);
     document.getElementById('verified-name').value = result.name;
-    document.getElementById('verified-email').value = result.email;
     document.getElementById('userid').value = result.id || 'Not provided';
     document.getElementById('verified-contact').value = result.contact_no || 'Not provided';
     document.getElementById('profileVerificationSection').style.display = 'block';
