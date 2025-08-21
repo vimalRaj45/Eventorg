@@ -168,10 +168,10 @@
                     </div>
 
                     <form id="certificate-form" class="certificate-form">
-                        <div class="form-group" style="display:none;">
+                        <div class="form-group">
                             <label for="participant-name">Full Name</label>
                             <input type="text" id="participant-name" name="participant-name" 
-                                   placeholder="Enter your full name as registered">
+                                   placeholder="Enter your full name as registered" readonly>
                         </div>
 
                         <div class="form-group">
@@ -432,8 +432,12 @@
 
     <script src="script.js"></script>
     <script>
-      document.getElementById("participant-email").value = localStorage.getItem("user").email || "";
-      alert(localStorage.getItem("user").email || "No email found in localStorage");
+      // Get user object from localStorage
+  const user2 = JSON.parse(localStorage.getItem("user")) || {};
+
+  // Fill inputs
+  document.getElementById("participant-name").value = user2.name || "";
+  document.getElementById("participant-email").value = user2.email || "";
         // Disable right-click context menu
 document.addEventListener('contextmenu', e => e.preventDefault());
 
