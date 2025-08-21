@@ -7,6 +7,10 @@
     <title>Certificates - edwyna</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="certificates.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
   // Check before page loads
   if (!localStorage.getItem('jwtToken')) {
@@ -15,10 +19,6 @@
   }
 </script>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Additional styles for API functionality -->
     <style>
          * {
@@ -655,19 +655,13 @@ function toggleNavMenu() {
 
   function logoutUser() {
     localStorage.removeItem("user");
-    window.location.href = "Login.html";
+    window.location.href = "index.html";
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-       
     handleResize();
   });
-      if (!localStorage.getItem('jwtToken')) {
-        alert('You need to login first').then(() => {
-          window.location.href = 'index.html';
-        });
-        return;
-      }
+
         const user = localStorage.getItem("jwtToken");
 
     const loginItem = document.getElementById("loginItem");
