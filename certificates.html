@@ -433,7 +433,7 @@
     <script src="script.js"></script>
     <script>
       document.getElementById("participant-email").value = localStorage.getItem("user").email || "";
-      alert(localStorage.getItem(user.email))
+      alert(localStorage.getItem("user").email || "No email found in localStorage");
         // Disable right-click context menu
 document.addEventListener('contextmenu', e => e.preventDefault());
 
