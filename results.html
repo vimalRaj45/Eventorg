@@ -306,7 +306,7 @@
                         <div class="form-group">
                             <label for="participant-email">Email Address</label>
                             <input type="email" id="participant-email" name="participant-email" required 
-                                   placeholder="Enter your registered email address">
+                                   placeholder="Enter your registered email address" readonly>
                         </div>
 
                         <button type="submit" id="trigger" class="btn btn-primary search-btn">
@@ -549,6 +549,12 @@
 
     
     <script>
+
+         // Get user object from localStorage
+  const user45 = JSON.parse(localStorage.getItem("user")) || {};
+
+
+  document.getElementById("participant-email").value = user45.email || "";
         // Disable right-click context menu
 document.addEventListener('contextmenu', e => e.preventDefault());
 
