@@ -391,7 +391,10 @@
 </div>
           
           <div class="d-flex justify-content-between align-items-center mb-4">
-            
+            <div class="form-check">
+    <input type="checkbox" class="form-check-input" id="rememberMe">
+    <label class="form-check-label" for="rememberMe">Remember me</label>
+  </div>
             <a href="#" class="auth-link" onclick="showSection('forgot-section')">Forgot password?</a>
           </div>
           
@@ -651,6 +654,16 @@
     font-size: 0.9rem;
   }
 }
+
+.form-check-label {
+  font-size: 0.95rem;
+  color: var(--dark-color);
+}
+
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
 </style>
 
 
@@ -691,18 +704,49 @@ function getUrlParameter(name) {
 }
 
     // Check for reset token in URL on page load
+// Auto-login on page load
 document.addEventListener('DOMContentLoaded', function() {
+  // Check for reset token in URL
   const resetToken = getUrlParameter('resttoken');
   if (resetToken) {
     showSection('reset-section');
     document.getElementById('reset-token').value = resetToken;
     document.getElementById('new-password').focus();
-    
-    // Show a message to the user
     showToast('info', 'Password Reset', 'Please enter your new password below');
-    
-    // Clean up the URL (optional)
     window.history.replaceState({}, document.title, window.location.pathname);
+    return;
+  }
+  
+  // Check if user should be auto-logged in
+  const rememberMe = localStorage.getItem("rememberMe") === "true";
+  const token = rememberMe ? localStorage.getItem('jwtToken') : sessionStorage.getItem('jwtToken');
+  
+  if (token && !window.location.pathname.includes('edwynahome.html') && !window.location.pathname.includes('Alluser.html')) {
+    currentToken = token;
+    
+    // Verify token is still valid
+    makeRequest('GET', '/auth/verify', null, true)
+      .then(user => {
+        localStorage.setItem("user", JSON.stringify(user));
+        showToast('success', 'Auto Login', `Welcome back, ${user.name || 'User'}!`);
+        
+        setTimeout(() => {
+          if (user.role === 'admin') {
+            window.location.href = "Alluser.html";
+          } else {
+            window.location.href = "edwynahome.html";
+          }
+        }, 1000);
+      })
+      .catch(error => {
+        // Token is invalid, clear it
+        if (rememberMe) {
+          localStorage.removeItem('jwtToken');
+        } else {
+          sessionStorage.removeItem('jwtToken');
+        }
+        currentToken = '';
+      });
   }
 });
     
@@ -814,44 +858,45 @@ document.addEventListener('keydown', function(e) {
     let currentToken = localStorage.getItem('jwtToken') || '';
 
   // LOGIN
-// LOGIN
 async function loginUser() {
-  const input = document.getElementById("emailOrContact").value.trim(); // ✅ match HTML id
+  const input = document.getElementById("emailOrContact").value.trim();
   const password = document.getElementById('login-password').value.trim();
+  const rememberMe = document.getElementById('rememberMe').checked;
   const loginBtn = document.getElementById('login-btn');
   const loginBtnText = document.getElementById('login-btn-text');
   const loginSpinner = document.getElementById('login-spinner');
-
+  
   if (!input || !password) {
     showToast('error', 'Validation Error', 'Please enter email/contact and password.');
     return;
   }
-
+  
   // Determine if input is email or contact
-let data = { password };
-
-if (/^\d{10}$/.test(input)) {
-  data.contact = input;   // 10-digit phone number
-} else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input)) {
-  data.email = input;     // valid email
-} else {
-  showToast('error', 'Invalid Input', 'Please enter a valid email or 10-digit contact number.');
-  return;
-}
-
-
+  let data = { password };
+  if (/^\d{10}$/.test(input)) {
+    data.contact = input;
+  } else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input)) {
+    data.email = input;
+  } else {
+    showToast('error', 'Invalid Input', 'Please enter a valid email or 10-digit contact number.');
+    return;
+  }
+  
   // Show loading state
   loginBtn.disabled = true;
   loginBtnText.textContent = 'Authenticating...';
   loginSpinner.classList.remove('d-none');
-
+  
   try {
     const result = await makeRequest('POST', '/auth/login', data, false);
-
+    
     // Store token and user
-    setToken(result.token);
+    setToken(result.token, rememberMe);
     localStorage.setItem("user", JSON.stringify(result.user));
-
+    
+    // Store remember me preference
+    localStorage.setItem("rememberMe", rememberMe);
+    
     showToast('success', 'Login Successful', `Welcome back, ${result.user.name || 'User'}!`);
     
     // Redirect after 2 sec
@@ -862,7 +907,6 @@ if (/^\d{10}$/.test(input)) {
         window.location.href = "edwynahome.html";
       }
     }, 2000);
-
   } catch (error) {
     const msg = error.message || '';
     if (msg.includes('not found')) {
@@ -879,7 +923,6 @@ if (/^\d{10}$/.test(input)) {
     loginSpinner.classList.add('d-none');
   }
 }
-
 
   // REGISTER
 async function registerUser() {
@@ -984,10 +1027,20 @@ async function registerUser() {
 
 
     // SET JWT
-    function setToken(token) {
-      currentToken = token;
-      localStorage.setItem('jwtToken', token);
-    }
+   // SET JWT
+function setToken(token, rememberMe = false) {
+  currentToken = token;
+  
+  if (rememberMe) {
+    // Store for longer period (30 days)
+    localStorage.setItem('jwtToken', token);
+  } else {
+    // Store in sessionStorage (cleared when tab is closed)
+    sessionStorage.setItem('jwtToken', token);
+    // Also remove from localStorage if it exists
+    localStorage.removeItem('jwtToken');
+  }
+}
 
     // MAKE REQUEST
     async function makeRequest(method, endpoint, data = null, requiresAuth = true) {
