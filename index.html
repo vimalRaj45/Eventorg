@@ -679,6 +679,7 @@
   <!-- AOS JS -->
   <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
   <script>
+    document.getElementById("rememberMe").checked = true;
     // Initialize AOS
     AOS.init({
       once: true,
@@ -694,7 +695,7 @@ function getUrlParameter(name) {
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
-const rememberMe = document.getElementById('rememberMe').checked; // ✅ default true
+
     
     
     // Check for reset token in URL on page load
