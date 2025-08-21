@@ -596,6 +596,12 @@ certificates = response.events
 
         // Load certificates on page load if token exists
         document.addEventListener('DOMContentLoaded', async function() {
+            if (!localStorage.getItem('jwtToken')) {
+        Swal.fire('Error', 'You need to login first', 'error').then(() => {
+          window.location.href = 'index.html';
+        });
+        return;
+      }
             if (currentToken) {
                 try {
                     console.log('Loading certificates for token:', currentToken);
