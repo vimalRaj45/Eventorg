@@ -717,7 +717,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   if (user && autoLogin === "true") {
     const parsedUser = JSON.parse(user);
-    showToast('info', 'Auto Login', `Welcome back, ${parsedUser.name || 'User'}! Redirecting...`);
+    showToast('success', 'Auto Login', `Welcome back, ${parsedUser.name || 'User'}! Redirecting...`);
     setTimeout(() => {
       if (parsedUser.role === 'admin') {
         window.location.href = "Alluser.html";
