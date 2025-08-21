@@ -1267,6 +1267,12 @@ function toggleNavMenu() {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+     if (!localStorage.getItem('jwtToken')) {
+        Swal.fire('Error', 'You need to login first', 'error').then(() => {
+          window.location.href = 'index.html';
+        });
+        return;
+      }
     handleResize();
   });
 
