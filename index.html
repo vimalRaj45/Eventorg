@@ -694,6 +694,9 @@ function getUrlParameter(name) {
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
+const rememberMe = document.getElementById('rememberMe').checked; // ✅ default true
+    
+    
     // Check for reset token in URL on page load
 document.addEventListener('DOMContentLoaded', function() {
   const resetToken = getUrlParameter('resttoken');
