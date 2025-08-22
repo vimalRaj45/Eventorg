@@ -375,7 +375,7 @@
 <div class="container py-3 py-md-4 mt-5">
 
   <!-- 🔐 Login Section -->
-  <div id="loginSection" class="mt-3">
+  <div id="loginSection" class="mt-3" style="display:none">
     <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-6">
         <div class="text-center mb-4 mb-md-5">
@@ -678,51 +678,47 @@ async function deleteTarget(targetId) {
     // In a real implementation, you would show a signup form or redirect to a signup page
   }
 
-  // Main login function
-  async function userLogin() {
-    const contact_number = document.getElementById('loginContact').value.trim();
-    const email = document.getElementById('loginEmail').value.trim();
-
-    if (!contact_number || !email) {
-      alert('Please fill in all fields');
-      return;
-    }
-
-    // Show loading state
-    document.getElementById('loginBtnText').classList.add('hidden');
-    document.getElementById('loginSpinner').classList.remove('hidden');
-    document.getElementById('loginBtn').disabled = true;
-
-    try {
-      const response = await fetch(`${BASE_URL}/stdlogin`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contact_number, email })
-      });
-
-      if (!response.ok) {
-        throw new Error('Login failed. Please check your credentials.');
-      }
-
-      const user = await response.json();
-      
-      if (user.status !== 'approved') {
-        throw new Error('Your account is not yet approved. pls wait for admin approval.');
-      }
-
-      // Store user data
-      localStorage.setItem('eventHubUser', JSON.stringify(user));
-      routeUserToDashboard(user);
-
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      // Reset login button
-      document.getElementById('loginBtnText').classList.remove('hidden');
-      document.getElementById('loginSpinner').classList.add('hidden');
-      document.getElementById('loginBtn').disabled = false;
-    }
+  // Main login function - Updated to use userid only
+async function userLogin() {
+  const userid = document.getElementById('loginUserid').value.trim();
+  if (!userid) {
+    alert('Please enter your User ID');
+    return;
   }
+
+  // Show loading state
+  document.getElementById('loginBtnText').classList.add('hidden');
+  document.getElementById('loginSpinner').classList.remove('hidden');
+  document.getElementById('loginBtn').disabled = true;
+
+  try {
+    const response = await fetch(`${BASE_URL}/stdlogin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userid })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Login failed');
+    }
+
+    const user = await response.json();
+
+    // Store user in localStorage
+    localStorage.setItem('eventHubUser', JSON.stringify(user));
+
+    // Route to dashboard
+    routeUserToDashboard(user);
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    // Reset login button
+    document.getElementById('loginBtnText').classList.remove('hidden');
+    document.getElementById('loginSpinner').classList.add('hidden');
+    document.getElementById('loginBtn').disabled = false;
+  }
+}
 
   // Route user to appropriate dashboard based on role
   function routeUserToDashboard(user) {
@@ -1273,7 +1269,29 @@ function toggleNavMenu() {
 
 });
 
+// 🚀 Auto-load user from localStorage on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const storedUser = localStorage.getItem('user');
+  
+  if (!storedUser) {
+    alert('You need to Register first');
+    window.location.href = 'referregister.html'; // or your login page
+    return;
+  }
 
+  const user = JSON.parse(storedUser);
+
+  // Optional: Validate required fields
+  if (!user || !user.id) {
+    localStorage.removeItem('user');
+    alert('Session corrupted. Please login again.');
+    window.location.href = 'referregister.html';
+    return;
+  }
+
+  // Proceed to dashboard
+  routeUserToDashboard(user);
+});
 </script>
 
 </body>
