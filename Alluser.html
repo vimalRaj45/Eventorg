@@ -1098,8 +1098,8 @@ user.organized_events.forEach(event => {
         window.showUserDetails = showUserDetails;
         window.changePage = changePage;
 
-async function showUserDetails(userId) {
-    const jwtToken = localStorage.getItem('Edwyna_jwt') || localStorage.getItem('jwtToken');
+async function showFullDetails(userId) {
+    const jwtToken =localStorage.getItem('jwtToken');
     if (!jwtToken) {
         Swal.fire('Error', 'Authentication required. Please log in again.', 'error');
         window.location.href = "Login.html";
@@ -1330,9 +1330,10 @@ async function showUserDetails(userId) {
 }
 
 // Make globally available
-window.showUserDetails = showUserDetails;
+window.showUserDetails = showFullDetails;
     </script>
 </body>
 </html>
+
 
 
