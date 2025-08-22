@@ -864,6 +864,9 @@ function renderUsersTable() {
                 <button class="btn btn-sm btn-outline-success" onclick="event.stopPropagation(); exportUser(${user.id})">
                     <i class="fas fa-print"></i>
                 </button>
+                <button class="btn btn-sm btn-outline-info text-white" onclick="event.stopPropagation(); showFullDetails(${user.id})">
+        <i class="fas fa-external-link-alt"></i> Full
+    </button>
             </td>
         </tr>
     `).join('');
@@ -1091,8 +1094,287 @@ user.organized_events.forEach(event => {
         // Make functions available globally
         window.showUserDetails = showUserDetails;
         window.changePage = changePage;
+
+        // Show full user details by fetching fresh data from API
+function showFullDetails(userId) {
+    // Get JWT token
+    const jwtToken = localStorage.getItem('jwtToken');
+    if (!jwtToken) {
+        alert('Authentication required. Please log in again.');
+        window.location.href = "Login.html";
+        return;
+    }
+
+    // Show loading popup first
+    const loadingHTML = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loading...</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 40px; text-align: center; background: #f8f9fa; color: #333; }
+        .spinner { width: 60px; height: 60px; margin: 30px auto; border: 5px solid #f3f3f3; border-top: 5px solid #7b3f00; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <h3>Fetching user details...</h3>
+    <div class="spinner"></div>
+</body>
+</html>
+    `;
+
+    const popup = window.open('', '_blank', 'width=900,height=800,top=50,left=50');
+    popup.document.write(loadingHTML);
+    popup.document.close();
+
+    // Now fetch from API
+    fetch(`https://eventdb.onrender.com/api/admin/users/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${jwtToken}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.status === 401) {
+            throw new Error('Unauthorized. Token may have expired.');
+        }
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data.success || !data.data) {
+            throw new Error('Invalid response from server');
+        }
+
+        const user = data.data;
+        const details = user.details || {};
+        const isPassout = user.user_type === 'passout';
+
+        function formatDate(dateStr) {
+            return dateStr ? new Date(dateStr).toLocaleDateString() : 'N/A';
+        }
+
+        function formatDateTime(dateStr) {
+            return dateStr ? new Date(dateStr).toLocaleString() : 'N/A';
+        }
+
+        const fullDetailsHTML = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Full Details - ${user.name}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            padding: 40px 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        header {
+            background: var(--primary-color, #7b3f00);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        .section {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .section h2 {
+            font-size: 1.3rem;
+            color: var(--primary-color, #7b3f00);
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-color, #7b3f00);
+            padding-left: 10px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+        .field {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        .label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 4px;
+        }
+        .value {
+            color: #222;
+        }
+        .value:empty::after {
+            content: 'N/A';
+            color: #aaa;
+            font-style: italic;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #f1f1f1;
+        }
+        button.print-btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: var(--primary-color, #7b3f00);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button.print-btn:hover {
+            background: #5e2c00;
+        }
+        @media print {
+            body, .container {
+                background: white !important;
+                box-shadow: none;
+            }
+            button.print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Full User Details</h1>
+            <div>${user.name}</div>
+        </header>
+
+        <!-- Basic Info -->
+        <div class="section">
+            <h2>Basic Information</h2>
+            <div class="info-grid">
+                <div class="field"><div class="label">User ID</div><div class="value">${user.id}</div></div>
+                <div class="field"><div class="label">Name</div><div class="value">${user.name}</div></div>
+                <div class="field"><div class="label">Email</div><div class="value">${user.email}</div></div>
+                <div class="field"><div class="label">Phone</div><div class="value">${user.contact_no || ''}</div></div>
+                <div class="field"><div class="label">Role</div><div class="value">${user.user_type || 'user'}</div></div>
+                <div class="field"><div class="label">Joined On</div><div class="value">${formatDateTime(user.created_at)}</div></div>
+                <div class="field"><div class="label">Last Login</div><div class="value">${user.last_login ? formatDateTime(user.last_login) : 'Never'}</div></div>
+            </div>
+        </div>
+
+        <!-- Personal Info -->
+        <div class="section">
+            <h2>Personal Details</h2>
+            <div class="info-grid">
+                <div class="field"><div class="label">Date of Birth</div><div class="value">${formatDate(details.date_of_birth)}</div></div>
+                <div class="field"><div class="label">Gender</div><div class="value">${details.gender || ''}</div></div>
+            </div>
+        </div>
+
+        <!-- Academic Info -->
+        <div class="section">
+            <h2>Academic Information</h2>
+            <div class="info-grid">
+                <div class="field"><div class="label">College</div><div class="value">${details.college_name || ''}</div></div>
+                ${isPassout ? `
+                    <div class="field"><div class="label">Degree Completed</div><div class="value">${details.degree_completed || ''}</div></div>
+                    <div class="field"><div class="label">Year of Passing</div><div class="value">${details.year_of_passing || ''}</div></div>
+                    <div class="field"><div class="label">Current Status</div><div class="value">${details.current_status || ''}</div></div>
+                ` : `
+                    <div class="field"><div class="label">Course</div><div class="value">${details.course_degree || ''}</div></div>
+                    <div class="field"><div class="label">Year of Study</div><div class="value">${details.year_of_study || ''}</div></div>
+                `}
+            </div>
+        </div>
+
+        <!-- Location -->
+        <div class="section">
+            <h2>Location</h2>
+            <div class="info-grid">
+                <div class="field"><div class="label">City</div><div class="value">${details.city || ''}</div></div>
+                <div class="field"><div class="label">State</div><div class="value">${details.state || ''}</div></div>
+                <div class="field"><div class="label">Pincode</div><div class="value">${details.pincode || ''}</div></div>
+            </div>
+        </div>
+
+        <!-- Participations -->
+        ${user.participations && user.participations.length > 0 ? `
+        <div class="section">
+            <h2>Event Participations (${user.participations.length})</h2>
+            <div class="info-grid">
+                ${user.participations.map(p => `
+                <div class="field">
+                    <div class="label">${p.event_title}</div>
+                    <div class="value">
+                        Status: ${p.status}<br>
+                        ${p.result ? `Score: ${p.result.score}, Rank: ${p.result.rank}, Remarks: ${p.result.remarks}` : ''}
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+        ` : ''}
+
+        <!-- Organized Events -->
+        ${user.organized_events && user.organized_events.length > 0 ? `
+        <div class="section">
+            <h2>Organized Events (${user.organized_events.length})</h2>
+            <div class="info-grid">
+                ${user.organized_events.map(e => `
+                <div class="field">
+                    <div class="label">${e.title}</div>
+                    <div class="value">Type: ${e.type}</div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+        ` : ''}
+
+        <footer>
+            <button onclick="window.print()" class="print-btn">🖨️ Print This Page</button>
+        </footer>
+    </div>
+</body>
+</html>
+        `;
+
+        // Update popup with real data
+        popup.document.write(fullDetailsHTML);
+        popup.document.close();
+    })
+    .catch(error => {
+        console.error('Error fetching user details:', error);
+        const errorMsg = `
+            <html><body style="padding: 40px; font-family: Arial; color: #333;">
+                <h3 style="color: red;">❌ Failed to Load User Details</h3>
+                <p>${error.message}</p>
+                <button onclick="window.close()" style="padding: 10px 20px; background: #7b3f00; color: white; border: none; border-radius: 5px;">Close</button>
+            </body></html>
+        `;
+        popup.document.write(errorMsg);
+        popup.document.close();
+    });
+}
+
+// Make available globally
+window.showFullDetails = showFullDetails;
     </script>
 </body>
 </html>
-
 
