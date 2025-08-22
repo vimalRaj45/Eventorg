@@ -1099,21 +1099,18 @@ user.organized_events.forEach(event => {
         window.changePage = changePage;
 
 async function showFullDetails(userId) {
-    const jwtToken =localStorage.getItem('jwtToken');
+    const jwtToken = localStorage.getItem('jwtToken');
     if (!jwtToken) {
         Swal.fire('Error', 'Authentication required. Please log in again.', 'error');
         window.location.href = "Login.html";
         return;
     }
 
-    // Show loading
     Swal.fire({
         title: 'Loading...',
         html: 'Fetching user details',
         allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
+        didOpen: () => Swal.showLoading()
     });
 
     try {
@@ -1125,138 +1122,44 @@ async function showFullDetails(userId) {
             }
         });
 
-        if (response.status === 401) {
-            throw new Error('Unauthorized: Session expired');
-        }
-
-        if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
-        }
+        if (response.status === 401) throw new Error('Unauthorized: Session expired');
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
         const result = await response.json();
-        if (!result.success || !result.data) {
-            throw new Error('Invalid response from server');
-        }
+        if (!result.user) throw new Error('Invalid response from server');
 
-        const user = result.data;
+        const user = result.user;
         const details = user.details || {};
-        const isPassout = user.user_type === 'passout';
 
-        // Format date helper
-        const formatDate = (dateStr) => {
-            return dateStr ? new Date(dateStr).toLocaleDateString() : 'N/A';
-        };
+        const formatDate = (dateStr) =>
+            dateStr ? new Date(dateStr).toLocaleDateString() : 'N/A';
 
-        const formatDateTime = (dateStr) => {
-            return dateStr ? new Date(dateStr).toLocaleString() : 'N/A';
-        };
+        const formatDateTime = (dateStr) =>
+            dateStr ? new Date(dateStr).toLocaleString() : 'N/A';
 
-        // Build Participations HTML
-        const participationsHtml = user.participations?.length > 0
-            ? `
-            <div style="margin-top: 15px; font-size: 0.9em;">
-                <strong>🎟️ Participations (${user.participations.length})</strong>
-                <table border="1" cellpadding="5" cellspacing="0" style="width:100%; margin-top: 8px; border-collapse: collapse;">
-                    <tr style="background-color: #f1f1f1;">
-                        <th>Event</th>
-                        <th>Status</th>
-                        <th>Result</th>
-                    </tr>
-                    ${user.participations.map(p => `
-                    <tr>
-                        <td>${p.event_title}</td>
-                        <td>
-                            <span style="color: white; background: ${
-                                p.status === 'completed' ? '#28a745' :
-                                p.status === 'ongoing' ? '#ffc107' :
-                                '#17a2b8'
-                            }; padding: 2px 6px; border-radius: 4px;">
-                                ${p.status}
-                            </span>
-                        </td>
-                        <td>
-                            ${p.result ? `
-                                Score: ${p.result.score}<br>
-                                Rank: ${p.result.rank}<br>
-                                Remarks: ${p.result.remarks}
-                            ` : 'N/A'}
-                        </td>
-                    </tr>
-                    `).join('')}
-                </table>
-            </div>`
-            : '<div style="margin-top: 15px; color: #999;">No participations</div>';
-
-        // Build Organized Events HTML
-        let organizedHtml = '<div style="margin-top: 15px; color: #999;">No organized events</div>';
-
-        if (user.organized_events?.length > 0) {
-            let eventRows = '';
-
-            for (const event of user.organized_events) {
-                try {
-                    const res = await fetch(`https://event-db.vercel.app/api/events/${event.event_id}/verified`);
-                    const data = await res.json();
-                    const verified = data.verified_count || 0;
-                    const pending = data.pending_count || 0;
-                    eventRows += `
-                    <tr>
-                        <td>${event.title}</td>
-                        <td>${event.type}</td>
-                        <td>✔ ${verified} / ⏳ ${pending}</td>
-                    </tr>`;
-                } catch (err) {
-                    eventRows += `
-                    <tr>
-                        <td>${event.title}</td>
-                        <td>${event.type}</td>
-                        <td style="color: red;">Error</td>
-                    </tr>`;
-                }
-            }
-
-            organizedHtml = `
-            <div style="margin-top: 15px; font-size: 0.9em;">
-                <strong>🏆 Organized Events (${user.organized_events.length})</strong>
-                <table border="1" cellpadding="5" cellspacing="0" style="width:100%; margin-top: 8px; border-collapse: collapse;">
-                    <tr style="background-color: #f1f1f1;">
-                        <th>Event</th>
-                        <th>Type</th>
-                        <th>Participants</th>
-                    </tr>
-                    ${eventRows}
-                </table>
-            </div>`;
-        }
-
-        // Full HTML for Swal
         const fullHtml = `
-            <div style="text-align: left; font-family: 'Segoe UI', sans-serif; line-height: 1.5;">
-                <!-- Header -->
-                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #7b3f00;">
-                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random" 
-                         alt="User" style="width: 70px; height: 70px; border-radius: 50%;">
+            <div style="text-align:left;font-family:'Segoe UI',sans-serif;line-height:1.5;">
+                <div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #7b3f00;">
+                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random"
+                         alt="User" style="width:70px;height:70px;border-radius:50%;">
                     <div>
-                        <h3 style="margin: 0; color: #333;">${user.name}</h3>
-                        <span style="background: #7b3f00; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
-                            ${user.user_type || 'user'}
+                        <h3 style="margin:0;color:#333;">${user.name}</h3>
+                        <span style="background:#7b3f00;color:white;padding:4px 10px;border-radius:12px;font-size:0.85em;">
+                            ${user.user_type}
                         </span>
                     </div>
                 </div>
 
-                <!-- Basic Info -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 15px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:15px;">
                     <div><strong>ID:</strong> ${user.id}</div>
                     <div><strong>Email:</strong> ${user.email}</div>
                     <div><strong>Phone:</strong> ${user.contact_no || 'N/A'}</div>
                     <div><strong>Joined:</strong> ${formatDateTime(user.created_at)}</div>
-                    <div><strong>Last Login:</strong> ${user.last_login ? formatDateTime(user.last_login) : 'Never'}</div>
                 </div>
 
-                <!-- Personal & Academic -->
-                <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px;">
-                    <strong>👤 Personal & Academic Information</strong>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 8px; font-size: 0.9em;">
+                <div style="margin-top:15px;border-top:1px dashed #ccc;padding-top:10px;">
+                    <strong>Personal & Academic Information</strong>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px;font-size:0.9em;">
                         <div><strong>Date of Birth:</strong> ${formatDate(details.date_of_birth)}</div>
                         <div><strong>Gender:</strong> ${details.gender || 'N/A'}</div>
                         <div><strong>College:</strong> ${details.college_name || 'N/A'}</div>
@@ -1268,38 +1171,19 @@ async function showFullDetails(userId) {
                         <div><strong>Pincode:</strong> ${details.pincode || 'N/A'}</div>
                     </div>
                 </div>
-
-                ${participationsHtml}
-                ${organizedHtml}
             </div>
         `;
 
-        // Close loading Swal and open details
         Swal.close();
-
         Swal.fire({
             title: 'User Details',
             html: fullHtml,
-            width: '900px',
-            padding: '20px',
+            width: '800px',
             showCloseButton: true,
-            showConfirmButton: true,
             confirmButtonText: '🖨️ Print',
-            confirmButtonColor: '#7b3f00',
-            scrollbarPadding: false,
-            customClass: {
-                popup: 'swal2-custom-popup'
-            },
-            didOpen: () => {
-                // Prevent scroll on body
-                document.body.style.overflow = 'hidden';
-            },
-            willClose: () => {
-                document.body.style.overflow = 'auto';
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Open print window
+            confirmButtonColor: '#7b3f00'
+        }).then((res) => {
+            if (res.isConfirmed) {
                 const printWindow = window.open('', '', 'height=800,width=1000');
                 printWindow.document.write(`
                     <html>
@@ -1307,9 +1191,6 @@ async function showFullDetails(userId) {
                         <title>Print User Details</title>
                         <style>
                             body { font-family: 'Segoe UI', sans-serif; padding: 30px; }
-                            table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-                            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-                            th { background-color: #f4f4f4; }
                             .section { margin: 20px 0; }
                         </style>
                     </head>
@@ -1317,23 +1198,22 @@ async function showFullDetails(userId) {
                     </html>
                 `);
                 printWindow.document.close();
-                printWindow.focus();
                 printWindow.print();
             }
         });
 
-    } catch (error) {
-        console.error('Error:', error);
+    } catch (err) {
         Swal.close();
-        Swal.fire('Error', error.message || 'Failed to load user details.', 'error');
+        Swal.fire('Error', err.message || 'Failed to load user details.', 'error');
     }
 }
 
-// Make globally available
 window.showUserDetails = showFullDetails;
+
     </script>
 </body>
 </html>
+
 
 
 
