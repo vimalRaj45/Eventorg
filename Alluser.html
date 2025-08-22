@@ -1123,16 +1123,45 @@ async function showFullDetails(userId) {
         if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
         const result = await response.json();
-        if (!result.user) throw new Error('Invalid response from server');
+        if (!result.user) throw new Error('User not found');
 
         const user = result.user;
         const details = user.details || {};
 
-        const formatDate = (dateStr) =>
-            dateStr ? new Date(dateStr).toLocaleDateString() : 'N/A';
+        const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString() : 'N/A';
+        const formatDateTime = (dateStr) => dateStr ? new Date(dateStr).toLocaleString() : 'N/A';
 
-        const formatDateTime = (dateStr) =>
-            dateStr ? new Date(dateStr).toLocaleString() : 'N/A';
+        // Dynamically show fields based on user type
+        let personalHtml = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px;font-size:0.9em;">
+                <div><strong>Date of Birth:</strong> ${formatDate(details.date_of_birth)}</div>
+                <div><strong>Gender:</strong> ${details.gender || 'N/A'}</div>
+                <div><strong>City:</strong> ${details.city || 'N/A'}</div>
+                <div><strong>State:</strong> ${details.state || 'N/A'}</div>
+                <div><strong>Pincode:</strong> ${details.pincode || 'N/A'}</div>
+        `;
+
+        if (user.user_type === 'school') {
+            personalHtml += `
+                <div><strong>School:</strong> ${details.school_name || 'N/A'}</div>
+                <div><strong>Class:</strong> ${details.class_grade || 'N/A'}</div>
+            `;
+        } else if (user.user_type === 'college') {
+            personalHtml += `
+                <div><strong>College:</strong> ${details.college_name || 'N/A'}</div>
+                <div><strong>Course:</strong> ${details.course_degree || 'N/A'}</div>
+                <div><strong>Year:</strong> ${details.year_of_study || 'N/A'}</div>
+            `;
+        } else if (user.user_type === 'passout') {
+            personalHtml += `
+                <div><strong>College:</strong> ${details.college_name || 'N/A'}</div>
+                <div><strong>Degree:</strong> ${details.degree_completed || 'N/A'}</div>
+                <div><strong>Year of Passing:</strong> ${details.year_of_passing || 'N/A'}</div>
+                <div><strong>Status:</strong> ${details.current_status || 'N/A'}</div>
+            `;
+        }
+
+        personalHtml += `</div>`;
 
         const fullHtml = `
             <div style="text-align:left;font-family:'Segoe UI',sans-serif;line-height:1.5;">
@@ -1156,16 +1185,7 @@ async function showFullDetails(userId) {
 
                 <div style="margin-top:15px;border-top:1px dashed #ccc;padding-top:10px;">
                     <strong>Personal & Academic Information</strong>
-                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px;font-size:0.9em;">
-                        <div><strong>Date of Birth:</strong> ${formatDate(details.date_of_birth)}</div>
-                        <div><strong>Gender:</strong> ${details.gender || 'N/A'}</div>
-                        <div><strong>College:</strong> ${details.college_name || 'N/A'}</div>
-                        <div><strong>Course:</strong> ${details.course_degree || details.degree_completed || 'N/A'}</div>
-                        <div><strong>Year:</strong> ${details.year_of_study || details.year_of_passing || 'N/A'}</div>
-                        <div><strong>City:</strong> ${details.city || 'N/A'}</div>
-                        <div><strong>State:</strong> ${details.state || 'N/A'}</div>
-                        <div><strong>Pincode:</strong> ${details.pincode || 'N/A'}</div>
-                    </div>
+                    ${personalHtml}
                 </div>
             </div>
         `;
@@ -1185,10 +1205,7 @@ async function showFullDetails(userId) {
                     <html>
                     <head>
                         <title>Print User Details</title>
-                        <style>
-                            body { font-family: 'Segoe UI', sans-serif; padding: 30px; }
-                            .section { margin: 20px 0; }
-                        </style>
+                        <style>body { font-family: 'Segoe UI', sans-serif; padding: 30px; }</style>
                     </head>
                     <body>${fullHtml}</body>
                     </html>
@@ -1206,9 +1223,11 @@ async function showFullDetails(userId) {
 
 window.showUserDetails = showFullDetails;
 
+
     </script>
 </body>
 </html>
+
 
 
 
