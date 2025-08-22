@@ -897,8 +897,8 @@ body {
   </div>
 
 <!-- Welcome Section (Shown First) -->
-<!-- === Branded Welcome Section (Bright & Premium) === -->
-<div id="welcome-section" class="features-section text-center position-relative d-flex align-items-center justify-content-center" style="min-height: 100vh; padding: 2rem;">
+<!-- === Branded Welcome Section (Bright, Responsive, Fullscreen) === -->
+<div id="welcome-section" class="features-section text-center position-relative d-flex align-items-center justify-content-center" style="height: 100vh; padding: 1rem; overflow: hidden;">
   
   <!-- Background Image -->
   <div class="position-absolute w-100 h-100" style="
@@ -915,11 +915,11 @@ body {
   "></div>
 
   <!-- Content -->
-  <div class="px-3" style="max-width: 900px;">
+  <div class="px-3 w-100" style="max-width: 900px;">
     <!-- Logo -->
     <div class="mb-3">
       <h2 class="d-inline-block px-4 py-2 rounded-pill shadow-sm" style="
-        font-size: 1.1rem;
+        font-size: 1rem;
         background: rgba(255, 255, 255, 0.9);
         border: 1px solid rgba(212, 175, 55, 0.3);
         color: #d4af37;
@@ -931,9 +931,9 @@ body {
     </div>
 
     <!-- Main Headline -->
-    <h2 class="mb-4" style="
+    <h2 class="mb-3" style="
       font-weight: 700;
-      font-size: 2.6rem;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
       line-height: 1.2;
       letter-spacing: -0.5px;
       color: #222;
@@ -943,18 +943,18 @@ body {
     </h2>
 
     <!-- Subtitle -->
-    <p class="lead mb-5" style="
-      font-size: 1.2rem;
+    <p class="lead mb-4" style="
+      font-size: clamp(1rem, 3vw, 1.2rem);
       color: #444;
       max-width: 700px;
       margin: 0 auto;
-      line-height: 1.7;
+      line-height: 1.6;
     ">
       Unlock your potential through real-world challenges, internships, and events — all verified and powered by Edwyna.
     </p>
 
     <!-- Key Highlights -->
-    <div class="d-flex flex-wrap justify-content-center gap-3 mb-5" style="font-size: 0.95rem; font-weight: 500;">
+    <div class="d-flex flex-wrap justify-content-center gap-2 mb-4" style="font-size: clamp(0.8rem, 2.5vw, 0.95rem); font-weight: 500;">
       <span class="d-flex align-items-center" style="color:#d48806;"><i class="fas fa-check-circle me-2"></i> Easy Event Access</span>
       <span class="d-flex align-items-center" style="color:#1cc88a;"><i class="fas fa-check-circle me-2"></i> Skill Growth</span>
       <span class="d-flex align-items-center" style="color:#4e73df;"><i class="fas fa-check-circle me-2"></i> Internships & Contests</span>
@@ -968,7 +968,7 @@ body {
         background: linear-gradient(135deg, #ffd700, #f4b30d);
         color: #222;
         font-weight: 700;
-        font-size: 1.2rem;
+        font-size: clamp(1rem, 3vw, 1.2rem);
         border: none;
         border-radius: 50px;
         box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
@@ -981,11 +981,12 @@ body {
     </button>
 
     <!-- Footer -->
-    <p class="mt-4" style="font-size: 0.9rem; color: #555;">
+    <p class="mt-3" style="font-size: clamp(0.75rem, 2vw, 0.9rem); color: #555;">
       Have an idea? <strong style="color: #d4af37;">We can make it an official Edwyna event.</strong>
     </p>
   </div>
 </div>
+
 
   <div id="auth-wrapper" class="auth-container mt-5 ps-2 pe-2" style="display: none;">
     <div class="auth-card shadow-lg" data-aos="zoom-in" data-aos-duration="800">
