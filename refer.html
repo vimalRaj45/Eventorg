@@ -706,17 +706,20 @@ async function userLogin() {
 
     if (err.message === 'Account not approved. Please contact admin.') {
       // Get user from localStorage (correct key!)
-      const user = JSON.parse(localStorage.getItem("eventHubUser"));
+      const user = JSON.parse(localStorage.getItem("user"));
+if (user && user.id) {
+  const adminNumber = "918015500319"; // WhatsApp format
+  const message = `Hello Admin, my User ID is ${user.id}. Please approve my account. For Referral System.`;
+  const whatsappUrl = `https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`;
 
-      if (user && user.id) {
-        // Ask for confirmation before opening WhatsApp
-        if (confirm("Your account is not approved. Do you want to contact admin on WhatsApp?")) {
-          const adminNumber = "918015500319"; // WhatsApp format (no +, no spaces)
-          const message = `Hello Admin, my User ID is ${user.id}. Please approve my account.`;
-          const whatsappUrl = `https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`;
-          window.open(whatsappUrl, "_blank"); // open in new tab
-        }
-      } else {
+  // Show WhatsApp link instead of confirm
+  document.getElementById("whatsappLinkContainer").innerHTML = `
+    <p class="text-danger fw-bold">Your account is not approved.</p>
+    <a href="${whatsappUrl}" target="_blank" class="btn btn-success">
+      Contact Admin on WhatsApp
+    </a>
+  `;
+} else {
         alert("Please login again...");
       }
     }
