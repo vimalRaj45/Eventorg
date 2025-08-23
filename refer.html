@@ -727,7 +727,7 @@ async function deleteTarget(targetId) {
    
     // Set up UI elements
     document.getElementById('studentDashboard').classList.remove('hidden');
-    document.getElementById('studentName').textContent = `${user.first_name} ${user.last_name}`;
+    document.getElementById('studentName').textContent = `${user.first_name}`;
     document.getElementById('studentAvatar').textContent = user.first_name.charAt(0) + user.last_name.charAt(0);
     document.getElementById('referralCode').textContent = user.referral_code;
     document.getElementById('whatsappShare').href = `https://wa.me/?text=Join%20EventHub%20with%20my%20referral%20code:%20${user.referral_code}`;
@@ -1249,6 +1249,10 @@ function toggleNavMenu() {
   if (user && user.id) {
     document.getElementById("loginUserId").value = user.id;
     userLogin();
+  }
+  else{
+    alert('No user found, redirecting to registration.');
+    window.location.href = "referregister.html"; // Redirect to login if no user found
   }
   
 
