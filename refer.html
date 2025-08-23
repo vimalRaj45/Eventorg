@@ -666,13 +666,14 @@ async function deleteTarget(targetId) {
     // In a real implementation, you would show a signup form or redirect to a signup page
   }
 
-  // Main login function
-  async function userLogin() {
+// Main login function
+async function userLogin() {
   const userid = document.getElementById('loginUserId').value.trim();
 
   if (!userid) {
     alert('Please login....');
     window.location.href = '/index.html';
+    return; // stop further execution
   }
 
   // Show loading state
@@ -694,14 +695,33 @@ async function deleteTarget(targetId) {
 
     const user = await response.json();
 
-    // ✅ Store user and route to dashboard
+    // ✅ Store user in localStorage
     localStorage.setItem('eventHubUser', JSON.stringify(user));
+
+    // ✅ Redirect to dashboard
     routeUserToDashboard(user);
 
   } catch (err) {
     alert(err.message);
+
+    if (err.message === 'Account not approved. Please contact admin.') {
+      // Get user from localStorage (correct key!)
+      const user = JSON.parse(localStorage.getItem("eventHubUser"));
+
+      if (user && user.id) {
+        // Ask for confirmation before opening WhatsApp
+        if (confirm("Your account is not approved. Do you want to contact admin on WhatsApp?")) {
+          const adminNumber = "918015500319"; // WhatsApp format (no +, no spaces)
+          const message = `Hello Admin, my User ID is ${user.id}. Please approve my account.`;
+          const whatsappUrl = `https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`;
+          window.open(whatsappUrl, "_blank"); // open in new tab
+        }
+      } else {
+        alert("Please login again...");
+      }
+    }
   } finally {
-    // Reset button
+    // Reset button state
     document.getElementById('loginBtnText').classList.remove('hidden');
     document.getElementById('loginSpinner').classList.add('hidden');
     document.getElementById('loginBtn').disabled = false;
