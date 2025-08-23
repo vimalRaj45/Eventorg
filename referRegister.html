@@ -462,7 +462,14 @@
         <button type="submit" class="btn btn-primary w-100 py-3 mt-2">
           <i class="bi bi-check-circle me-2"></i>Complete Sign Up
         </button>
+        
+
       </form>
+      <div class="text-center mt-3">
+  <a href="refer.html" class="text-decoration-none">
+    Already have an account? <strong>Login here</strong>
+  </a>
+</div>
 
       <div id="result" class="mt-4"></div>
     </div>
@@ -565,12 +572,15 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Update failed');
 
-      result.innerHTML = `
-        <div class="alert alert-success text-center fade-in">
-          <i class="bi bi-check-circle-fill me-2"></i>
-          <strong>${data.message || 'Registration completed!'}</strong>
-        </div>
-      `;
+     result.innerHTML = `
+  <div class="alert alert-success text-center fade-in">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    <strong>${data.message || 'Registration completed!'}</strong>
+    <br>
+    <small class="text-muted">Verification may take up to 30 minutes or more.</small>
+  </div>
+`;
+
 
       // Final step: Mark as completed
       step2Indicator.classList.replace('active', 'completed');
