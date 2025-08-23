@@ -1255,7 +1255,7 @@ function toggleNavMenu() {
   }
   // Get user data from localStorage
   const user = JSON.parse(localStorage.getItem("user"));
-
+  console.log('User from localStorage:', user);
   if (user && user.id) {
     document.getElementById("loginUserId").value = user.id;
   }
