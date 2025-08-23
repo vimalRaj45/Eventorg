@@ -703,7 +703,7 @@ async function userLogin() {
     alert(err.message);
 
   if (err.message === 'Account not approved. Please contact admin.') {
-  const user = JSON.parse(localStorage.getItem("eventHubUser"));
+  const user = JSON.parse(localStorage.getItem("user"));
 
   if (user && user.id) {
     const adminNumber = "918015500319"; // WhatsApp format (no +, no spaces)
