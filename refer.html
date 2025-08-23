@@ -671,8 +671,8 @@ async function deleteTarget(targetId) {
   const userid = document.getElementById('loginUserId').value.trim();
 
   if (!userid) {
-    alert('Please enter your User ID');
-    return;
+    alert('Please login....');
+    window.location.href = '/index.html';
   }
 
   // Show loading state
@@ -1228,7 +1228,6 @@ function toggleNavMenu() {
   document.addEventListener("DOMContentLoaded", () => {
     const user = localStorage.getItem("eventHubUser");
     if (user) {
-      document.getElementById("logoutItem").style.display = "block";
       document.getElementById("loginItem").style.display = "none";
     } else {
       document.getElementById("logoutItem").style.display = "none";
