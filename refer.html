@@ -697,14 +697,14 @@ async function userLogin() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userid })
     });
-
+    alert(response.ok);
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Login failed');
     }
 
     const user = await response.json();
-
+    alert(user);
     // Store user in localStorage
     localStorage.setItem('eventHubUser', JSON.stringify(user));
 
