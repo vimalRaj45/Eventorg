@@ -1251,7 +1251,6 @@ function toggleNavMenu() {
   const userData = localStorage.getItem('eventHubUser');
   if (!userData) {
     console.error('No user data found in localStorage');
-    return;
   }
   // Get user data from localStorage
   const user = JSON.parse(localStorage.getItem("user"));
