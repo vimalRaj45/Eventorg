@@ -359,15 +359,6 @@
       display: none;
     ">Login</a>
 
-    <a id="logoutItem" href="#" onclick="logoutUser()" style="
-      text-decoration: none;
-      background: #f46721;
-      color: white;
-      padding: 0.5rem 1.2rem;
-      border-radius: 8px;
-      font-weight: 600;
-      display: none;
-    ">Logout</a>
   </div>
   </div>
 </nav>
@@ -394,7 +385,7 @@
             <!-- Student Login -->
             <div class="tab-pane fade show active" id="studentLogin" role="tabpanel">
               <!-- In the login section -->
-<div class="mb-3">
+<div class="mb-3" style="display: none;">
   <label for="loginUserId" class="form-label">User ID</label>
   <input type="text" id="loginUserId" class="form-control" placeholder="Enter your User ID" required>
 </div>
@@ -1257,9 +1248,10 @@ function toggleNavMenu() {
   console.log('User from localStorage:', user);
   if (user && user.id) {
     document.getElementById("loginUserId").value = user.id;
+    userLogin();
   }
   
-  userLogin();
+
   const eventHubUser = JSON.parse(userData);
   console.log('Loaded user:', eventHubUser);
   if (!eventHubUser.id) {
