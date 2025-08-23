@@ -1253,7 +1253,14 @@ function toggleNavMenu() {
     console.error('No user data found in localStorage');
     return;
   }
+  // Get user data from localStorage
+  const user = JSON.parse(localStorage.getItem("user"));
 
+  if (user && user.id) {
+    document.getElementById("loginUserId").value = user.id;
+  }
+  
+  userLogin();
   const eventHubUser = JSON.parse(userData);
   console.log('Loaded user:', eventHubUser);
   if (!eventHubUser.id) {
