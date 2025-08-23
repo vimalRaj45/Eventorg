@@ -1252,12 +1252,12 @@ function toggleNavMenu() {
   }
 
   function logoutUser() {
-    localStorage.removeItem("eventHubUser");
+    localStorage.removeItem("user");
     window.location.reload();
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    const user = localStorage.getItem("eventHubUser");
+    const user = localStorage.getItem("user");
     if (user) {
       document.getElementById("loginItem").style.display = "none";
     } else {
@@ -1269,7 +1269,7 @@ function toggleNavMenu() {
 
   window.addEventListener('resize', handleResize);
   document.addEventListener('DOMContentLoaded', () => {
-  const userData = localStorage.getItem('eventHubUser');
+  const userData = localStorage.getItem('user');
   if (!userData) {
     console.error('No user data found in localStorage');
   }
