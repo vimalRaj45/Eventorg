@@ -19,6 +19,7 @@
   <!-- AOS CSS -->
   <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 
+
   <style>
 
 /* === Global Enhancements === */
@@ -1558,7 +1559,7 @@ async function loginUser() {
     setToken(result.token);
     localStorage.setItem("user", JSON.stringify(result.user));
 
-    // ✅ If user chose remember me → store flag
+    // ✅ Remember me flag
     if (rememberMe) {
       localStorage.setItem("autoLogin", "true");
     } else {
@@ -1568,7 +1569,13 @@ async function loginUser() {
     showToast('success', 'Login Successful', `Welcome back, ${result.user.name || 'User'}!`);
 
     setTimeout(() => {
-      if (result.user.role === 'admin') {
+      // After login success, check for redirect param
+      const params = new URLSearchParams(window.location.search);
+      const redirectUrl = params.get('redirect');
+
+      if (redirectUrl) {
+        window.location.href = redirectUrl; // go back to page user originally came from
+      } else if (result.user.role === 'admin') {
         window.location.href = "Alluser.html";
       } else {
         window.location.href = "edwynahome.html";
