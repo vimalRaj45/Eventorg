@@ -438,18 +438,23 @@
     console.log("User ID from localStorage:", userId); // log in console
     
   } else {
-    console.log("No user found in localStorage");
-    Swal.fire({
-      icon: 'warning',
-      title: 'Please login',
-      text: 'Please login in Edwyna to continue',
-      confirmButtonText: 'OK'
-    }).then(() => {
-      // Redirect to index.html with a return URL so after login we can come back here
-      const currentPage = encodeURIComponent(window.location.href);
-      window.location.href = `index.html?redirect=${currentPage}`;
-    });
-  }
+  console.clear(); // ✅ Clears all previous console logs
+  console.log("No user found in localStorage");
+
+  Swal.fire({
+    icon: 'warning',
+    title: 'Please login',
+    text: 'Please login in Edwyna to continue',
+    confirmButtonText: 'OK'
+  }).then(() => {
+    // Redirect to index.html with a return URL so after login we can come back here
+    const currentPage = encodeURIComponent(window.location.href);
+    console.log("Redirecting to login with return URL:", currentPage);
+    window.location.href = `index.html?redirect=${currentPage}`;
+    console.log(index.html?redirect=${currentPage});
+  });
+}
+
 
   // Disable right-click context menu
 document.addEventListener('contextmenu', e => e.preventDefault());
