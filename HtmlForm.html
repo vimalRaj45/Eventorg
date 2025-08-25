@@ -897,7 +897,7 @@ function showQuizInstructions(questions) {
       </button>
     </div>
   `;
-
+  violationTrackingActive=false; // Activate violation tracking only after starting the quiz
   // ✅ Attach handler
   document.getElementById("startQuizBtn").addEventListener("click", () => handleStartQuiz(questions));
 }
