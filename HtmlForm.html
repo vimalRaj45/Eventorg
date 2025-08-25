@@ -447,10 +447,10 @@
     text: 'Please login in Edwyna to continue',
     confirmButtonText: 'OK'
   }).then(() => {
-    // Redirect to index.html with a return URL so after login we can come back here
-    const currentPage = encodeURIComponent(window.location.href);
-    console.log("Redirecting to login with return URL:", currentPage);
-    window.location.href = `https://edwyna.org/index.html?redirect=https://edwyna.org/htmlform?quiz=Q-MASTERS-2`;
+  const currentPage = window.location.href;      
+  const encodedPage = encodeURIComponent(currentPage); 
+  console.log("Redirecting to login with return URL:", currentPage); // Logs decoded
+  window.location.href = `https://edwyna.org/index.html?redirect=${encodedPage}`;;
   });
 }
 
