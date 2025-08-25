@@ -15,6 +15,7 @@
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <!-- SweetAlert2 CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
   <style>
     :root {
       --primary-color: rgba(94, 10, 0, 1);
@@ -426,6 +427,30 @@
   
 <script>
 
+  // Get the user object string from localStorage
+   const userStr = localStorage.getItem("user");
+  
+  if (userStr) {
+    // Parse it into an object
+    const user = JSON.parse(userStr);
+    const userId = user?.id || '';
+
+    console.log("User ID from localStorage:", userId); // log in console
+    
+  } else {
+    console.log("No user found in localStorage");
+    Swal.fire({
+      icon: 'warning',
+      title: 'Please login',
+      text: 'Please login in Edwyna to continue',
+      confirmButtonText: 'OK'
+    }).then(() => {
+      // Redirect to index.html with a return URL so after login we can come back here
+      const currentPage = encodeURIComponent(window.location.href);
+      window.location.href = `index.html?redirect=${currentPage}`;
+    });
+  }
+
   // Disable right-click context menu
 document.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -671,8 +696,8 @@ async function loadQuiz() {
         <h3>${quizName} Quiz</h3>
         <p>This quiz contains ${questionsCount} questions with a total time limit of ${Math.round(totalTimeout / 60)} minutes.</p>
         <div class="mb-3" id="emailField">
-          <label class="form-label">Enter your email to begin</label>
-          <input type="email" required id="userEmail" class="form-control" placeholder="your@email.com">
+          <label class="form-label">Auto Verifying your account registred or not</label>
+          <input type="text" required id="userEmail" class="form-control" placeholder="user id ">
           <input type="text" id="referralCode" class="form-control mt-2" placeholder="Referral Code (optional)" style="display:none">
         </div>
         <button type="button" class="btn btn-primary px-4 py-2" id="startQuizBtn">
@@ -721,7 +746,9 @@ async function handleStartQuiz(questions) {
     startBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Checking eligibility...`;
 
     console.log("📡 Checking eligibility for:", emailInput.value.trim());
-    const checkRes = await fetch(`https://script.google.com/macros/s/AKfycbzF0lhzDN7ITFmwetzR_6n_UbFWjDJGLJ0dh5GyIGczqOf19v0ftdpREavyAv0NrBcC/exec?quiz=${quizName}&email=${encodeURIComponent(emailInput.value.trim())}`);
+    const checkRes = await fetch(
+  `https://script.google.com/macros/s/AKfycbzeIQpnQm_QAWRf29QggiPLCPLsSgo779P7HeEBM_QiUPZTYPEqxHADxE5kzeXCoLd-/exec?quiz=${encodeURIComponent(quizName)}&event=${encodeURIComponent(quizName)}&userid=${encodeURIComponent(emailInput.value.trim())}`
+);
     const checkData = await checkRes.json();
     console.log("✅ Eligibility response:", checkData);
 
