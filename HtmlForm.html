@@ -434,6 +434,12 @@
     // Parse it into an object
     const user = JSON.parse(userStr);
     const userId = user?.id || '';
+     // Set the value of the input field with id="userEmail"
+    const emailInput = document.getElementById("userEmail");
+
+    if (emailInput) {
+      emailInput.value = userId;
+    }
 
     console.log("User ID from localStorage:", userId); // log in console
     
@@ -558,6 +564,15 @@ let violationTrackingActive = false; // Added flag to control when tracking star
 
 // Check for existing violations on page load
 document.addEventListener('DOMContentLoaded', function() {
+    const user = JSON.parse(userStr);
+    const userId = user?.id || '';
+     // Set the value of the input field with id="userEmail"
+    const emailInput = document.getElementById("userEmail");
+    
+    if (emailInput) {
+      emailInput.value = userId;
+    }
+
     const violationData = localStorage.getItem('quizViolations');
     if (violationData) {
         const { count, timestamp } = JSON.parse(violationData);
@@ -678,50 +693,71 @@ window.onblur = () => {
 
 // ✅ Load quiz + show intro screen
 async function loadQuiz() {
+  const userStr = localStorage.getItem("user");
+  let userId = '';
+
+  if (userStr) {
+    const user = JSON.parse(userStr);
+    userId = user?.id || '';
+  }
+
+  if (!userId) {
+    // No user → redirect to login
+    Swal.fire({
+      icon: 'warning',
+      title: 'Please login',
+      text: 'Please login in Edwyna to continue',
+      confirmButtonText: 'OK'
+    }).then(() => {
+      window.location.href = `https://edwyna.org/index.html?redirect=${encodeURIComponent(window.location.href)}`;
+    });
+    return;
+  }
+
+  // ✅ Show loading
+  form.innerHTML = `
+    <div class="loader-container">
+      <span class="loader"></span>
+      <p>Checking your eligibility...</p>
+    </div>
+  `;
+
   try {
-    console.log(`📡 Fetching quiz data from: ${API_URL}?quiz=${quizName}`);
     const res = await fetch(`${API_URL}?quiz=${quizName}`);
     const data = await res.json();
-
     if (!data || !data.questions || !Array.isArray(data.questions)) {
-      const errorMsg = data?.message || data?.error || "Quiz is not available at the moment.";
-      throw new Error(errorMsg);
+      throw new Error(data?.message || "Quiz not available.");
+    }
+    const questions = data.questions;
+
+    // ✅ Now check eligibility
+    const checkRes = await fetch(
+      `https://script.google.com/macros/s/AKfycbzeIQpnQm_QAWRf29QggiPLCPLsSgo779P7HeEBM_QiUPZTYPEqxHADxE5kzeXCoLd-/exec?quiz=${encodeURIComponent(quizName)}&event=${encodeURIComponent(quizName)}&userid=${encodeURIComponent(userId)}`
+    );
+    const checkData = await checkRes.json();
+
+    if (!checkData.success) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Not Eligible',
+        text: checkData.message || "You are not allowed to take this quiz.",
+        confirmButtonColor: 'var(--primary-color)'
+      }).then(() => {
+        window.location.href = 'index.html';
+      });
+      return;
     }
 
-    const questions = data.questions;
-    questionsCount = questions.length;
-    totalTimeout = questions.reduce((total, q) => total + (q.timeout || 0), 0) * 60;
-
-    // ✅ Render intro form
-    form.innerHTML = `
-      <div class="quiz-intro">
-        <div class="quiz-intro-icon">
-          <i class="bi bi-question-circle"></i>
-        </div>
-        <h3>${quizName} Quiz</h3>
-        <p>This quiz contains ${questionsCount} questions with a total time limit of ${Math.round(totalTimeout / 60)} minutes.</p>
-        <div class="mb-3" id="emailField">
-          <label class="form-label">Auto Verifying your account registred or not</label>
-          <input type="text" required id="userEmail" class="form-control" placeholder="user id ">
-          <input type="text" id="referralCode" class="form-control mt-2" placeholder="Referral Code (optional)" style="display:none">
-        </div>
-        <button type="button" class="btn btn-primary px-4 py-2" id="startQuizBtn">
-          <i class="bi bi-play-fill me-2"></i> Start Quiz
-        </button>
-      </div>
-    `;
-
-    // ✅ Attach handler
-    document.getElementById("startQuizBtn").addEventListener("click", () => handleStartQuiz(questions));
+    // ✅ All good — start quiz
+    userEmail = userId;
+    enableFullscreen();
+    showQuizInstructions(questions);
 
   } catch (err) {
-    console.error("❌ Quiz loading failed:", err.message);
-    quizTitle.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i> Quiz Loading Error`;
-    form.innerHTML = '';
     Swal.fire({
       icon: 'error',
-      title: 'Failed to load quiz',
-      text: err.message,
+      title: 'Error',
+      text: 'Failed to verify eligibility. Try again.',
       confirmButtonColor: 'var(--primary-color)'
     });
   }
@@ -730,7 +766,6 @@ async function loadQuiz() {
 // ✅ Handle Start Quiz button click
 async function handleStartQuiz(questions) {
   const emailInput = document.getElementById("userEmail");
-  const startBtn = document.getElementById("startQuizBtn");
 
   // Validate email
   if (!emailInput.value.trim() || !emailInput.checkValidity()) {
