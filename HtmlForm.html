@@ -447,6 +447,7 @@
     text: 'Please login in Edwyna to continue',
     confirmButtonText: 'OK'
   }).then(() => {
+  window.removeEventListener("beforeunload", beforeUnloadHandler);
   const currentPage = window.location.href;      
   const encodedPage = encodeURIComponent(currentPage); 
   console.log("Redirecting to login with return URL:", currentPage); // Logs decoded
