@@ -428,31 +428,37 @@
 <script>
 
   // Get the user object string from localStorage
-   const userStr = localStorage.getItem("user");
-  
-  if (userStr) {
-    // Parse it into an object
-    const user = JSON.parse(userStr);
-    const userId = user?.id || '';
+const userStr = localStorage.getItem("user");
 
-    console.log("User ID from localStorage:", userId); // log in console
-    
-  } else {
+if (!userStr) {
   console.clear(); // ✅ Clears all previous console logs
   console.log("No user found in localStorage");
 
+  // Show message first, then redirect after user confirms
   Swal.fire({
     icon: 'warning',
     title: 'Please login',
-    text: 'Please login in Edwyna to continue',
-    confirmButtonText: 'OK'
-  }).then(() => {
-  const currentPage = window.location.href;      
-  const encodedPage = encodeURIComponent(currentPage); 
-  console.log("Redirecting to login with return URL:", currentPage); // Logs decoded
-  window.location.href = `https://edwyna.org/index.html?redirect=${encodedPage}`;;
+    text: 'Please login to Edwyna to continue with the quiz',
+    confirmButtonText: 'OK',
+    allowOutsideClick: false,
+    allowEscapeKey: false
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const currentPage = window.location.href;      
+      const encodedPage = encodeURIComponent(currentPage); 
+      console.log("Redirecting to login with return URL:", currentPage);
+      window.location.href = `https://edwyna.org/index.html?redirect=${encodedPage}`;
+    }
   });
+  
+  // Stop further execution since user is not logged in
+  throw new Error("User not logged in");
 }
+
+// Parse it into an object only if user exists
+const user = JSON.parse(userStr);
+const userId = user?.id || '';
+console.log("User ID from localStorage:", userId);
 
 
   // Disable right-click context menu
